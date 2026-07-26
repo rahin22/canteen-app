@@ -52,6 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Photo: 'Photo',
+  ChildRegistration: 'ChildRegistration',
+  Setting: 'Setting',
   Card: 'Card',
   MenuItem: 'MenuItem',
   Transaction: 'Transaction'
@@ -80,12 +83,53 @@ export const UserScalarFieldEnum = {
   username: 'username',
   passwordHash: 'passwordHash',
   className: 'className',
+  email: 'email',
+  phone: 'phone',
   balance: 'balance',
   active: 'active',
+  photoId: 'photoId',
   createdAt: 'createdAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PhotoScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  mimeType: 'mimeType',
+  byteSize: 'byteSize',
+  createdAt: 'createdAt'
+} as const
+
+export type PhotoScalarFieldEnum = (typeof PhotoScalarFieldEnum)[keyof typeof PhotoScalarFieldEnum]
+
+
+export const ChildRegistrationScalarFieldEnum = {
+  id: 'id',
+  parentId: 'parentId',
+  name: 'name',
+  schoolId: 'schoolId',
+  className: 'className',
+  photoId: 'photoId',
+  status: 'status',
+  note: 'note',
+  reviewerId: 'reviewerId',
+  reviewedAt: 'reviewedAt',
+  studentId: 'studentId',
+  createdAt: 'createdAt'
+} as const
+
+export type ChildRegistrationScalarFieldEnum = (typeof ChildRegistrationScalarFieldEnum)[keyof typeof ChildRegistrationScalarFieldEnum]
+
+
+export const SettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettingScalarFieldEnum = (typeof SettingScalarFieldEnum)[keyof typeof SettingScalarFieldEnum]
 
 
 export const CardScalarFieldEnum = {

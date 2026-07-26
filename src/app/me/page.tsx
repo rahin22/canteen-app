@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
+import { onlineTopupsAvailable } from "@/lib/settings";
 import { logout } from "@/app/login/actions";
 import { ShowCardButton } from "./show-card";
 
@@ -26,6 +27,7 @@ export default async function StudentHome() {
   const qr = card
     ? await QRCode.toDataURL(card.token, { margin: 1, width: 280 })
     : null;
+  const onlineTopups = await onlineTopupsAvailable();
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -54,7 +56,7 @@ export default async function StudentHome() {
             href="/me/topup"
             className="flex-1 rounded-xl bg-white/95 py-2.5 text-center font-semibold text-indigo-700 hover:bg-white"
           >
-            Top up
+            {onlineTopups ? "Top up" : "How to top up"}
           </Link>
           {qr && <ShowCardButton qr={qr} name={user.name} username={user.username} />}
         </div>
@@ -62,7 +64,8 @@ export default async function StudentHome() {
 
       {user.balance < 500 && (
         <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Your balance is running low — top up so you don&apos;t miss out at lunch.
+          Your balance is running low — {onlineTopups ? "top up" : "bring cash to the canteen"}{" "}
+          so you don&apos;t miss out at lunch.
         </p>
       )}
 

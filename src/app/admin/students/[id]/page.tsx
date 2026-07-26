@@ -12,6 +12,7 @@ import {
   CardStatusToggle,
   NfcAttach,
   ParentsManager,
+  PhotoManager,
 } from "./manage-forms";
 
 export const dynamic = "force-dynamic";
@@ -65,7 +66,23 @@ export default async function StudentDetailPage({
       )}
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
+            {student.photoId ? (
+              // Private, no-store response — must bypass the image optimiser.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={`/api/photo/student/${student.id}`}
+                alt={`Photo of ${student.name}`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-2xl font-bold text-slate-400">
+                {student.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
           <h1 className="text-2xl font-bold text-slate-900">
             {student.name}
             {!student.active && (
@@ -77,6 +94,7 @@ export default async function StudentDetailPage({
           <p className="text-sm text-slate-500">
             {student.className || "No class"} · <span className="font-mono">{student.username}</span>
           </p>
+          </div>
         </div>
         <div className="rounded-xl bg-slate-900 px-5 py-3 text-right text-white">
           <p className="text-xs uppercase tracking-wide text-slate-400">Balance</p>
@@ -155,7 +173,12 @@ export default async function StudentDetailPage({
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="mb-3 font-semibold text-slate-900">Identification photo</h2>
+          <PhotoManager studentId={student.id} hasPhoto={Boolean(student.photoId)} />
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="mb-3 font-semibold text-slate-900">Parents</h2>
           <ParentsManager
             studentId={student.id}

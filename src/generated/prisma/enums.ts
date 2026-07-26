@@ -44,3 +44,12 @@ export const TxType = {
 } as const
 
 export type TxType = (typeof TxType)[keyof typeof TxType]
+
+
+export const RegistrationStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type RegistrationStatus = (typeof RegistrationStatus)[keyof typeof RegistrationStatus]

@@ -9,16 +9,14 @@ import { generateCardToken, generatePassword } from "@/lib/cards";
 import { creditStudent, LedgerError } from "@/lib/ledger";
 import { parseAmount, formatMoney } from "@/lib/money";
 import { normalizeNfcSerial } from "@/lib/nfc";
+import { normalizeUsername } from "@/lib/username";
+import { PhotoError, processPhotoUpload } from "@/lib/photos";
 
 export type ActionState = {
   error?: string;
   success?: string;
   credentials?: { username: string; password: string };
 };
-
-function normalizeUsername(raw: string) {
-  return raw.trim().toLowerCase().replace(/\s+/g, "");
-}
 
 export async function createStudent(
   _prev: ActionState,
@@ -277,6 +275,68 @@ export async function unlinkParent(studentId: string, parentId: string) {
     where: { id: studentId },
     data: { parents: { disconnect: { id: parentId } } },
   });
+  revalidatePath(`/admin/students/${studentId}`);
+}
+
+/** Sets or replaces a student's identification photo. */
+export async function uploadStudentPhoto(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireRole("ADMIN");
+  const studentId = String(formData.get("studentId"));
+  const photo = formData.get("photo");
+  if (!(photo instanceof File)) return { error: "Choose a photo to upload." };
+
+  const student = await prisma.user.findUnique({
+    where: { id: studentId, role: "STUDENT" },
+    select: { photoId: true },
+  });
+  if (!student) return { error: "Student not found." };
+
+  let processed;
+  try {
+    processed = await processPhotoUpload(photo);
+  } catch (err) {
+    if (err instanceof PhotoError) return { error: err.message };
+    throw err;
+  }
+
+  const previousPhotoId = student.photoId;
+  await prisma.$transaction(async (tx) => {
+    const created = await tx.photo.create({
+      data: {
+        data: processed.data,
+        mimeType: processed.mimeType,
+        byteSize: processed.byteSize,
+      },
+    });
+    await tx.user.update({
+      where: { id: studentId },
+      data: { photoId: created.id },
+    });
+    if (previousPhotoId) {
+      await tx.photo.delete({ where: { id: previousPhotoId } });
+    }
+  });
+
+  revalidatePath(`/admin/students/${studentId}`);
+  return { success: "Photo saved." };
+}
+
+/** Deletes a student's photo outright — the bytes go, not just the link. */
+export async function removeStudentPhoto(studentId: string) {
+  await requireRole("ADMIN");
+  const student = await prisma.user.findUnique({
+    where: { id: studentId, role: "STUDENT" },
+    select: { photoId: true },
+  });
+  if (!student?.photoId) return;
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: studentId }, data: { photoId: null } }),
+    prisma.photo.delete({ where: { id: student.photoId } }),
+  ]);
   revalidatePath(`/admin/students/${studentId}`);
 }
 

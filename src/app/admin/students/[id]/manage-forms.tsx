@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { PhotoInput } from "@/components/photo-input";
 import {
   updateStudent,
   cashTopup,
@@ -13,6 +14,8 @@ import {
   createParent,
   linkParent,
   unlinkParent,
+  uploadStudentPhoto,
+  removeStudentPhoto,
   type ActionState,
 } from "../actions";
 
@@ -240,6 +243,10 @@ export function NfcAttach({ studentId }: { studentId: string }) {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    // Deliberately in an effect, not lazy initial state: the server can't know
+    // whether the browser has Web NFC, so deciding during render would
+    // hydration-mismatch on Android Chrome.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSupported(typeof window !== "undefined" && Boolean(window.NDEFReader));
     return () => abortRef.current?.abort();
   }, []);
@@ -408,6 +415,57 @@ export function ParentsManager({
         </div>
         <Feedback state={linkState} />
       </form>
+    </div>
+  );
+}
+
+export function PhotoManager({
+  studentId,
+  hasPhoto,
+}: {
+  studentId: string;
+  hasPhoto: boolean;
+}) {
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(
+    uploadStudentPhoto,
+    {}
+  );
+  const [removing, startRemoving] = useTransition();
+
+  return (
+    <div>
+      <form action={formAction} className="space-y-3">
+        <input type="hidden" name="studentId" value={studentId} />
+        <PhotoInput
+          name="photo"
+          required
+          initialPreview={hasPhoto ? `/api/photo/student/${studentId}` : null}
+        />
+        <Feedback state={state} />
+        <div className="flex gap-2">
+          <button disabled={pending} className={btnPrimary}>
+            {pending ? "Saving…" : hasPhoto ? "Replace photo" : "Save photo"}
+          </button>
+          {hasPhoto && (
+            <button
+              type="button"
+              disabled={removing}
+              onClick={() =>
+                startRemoving(async () => {
+                  await removeStudentPhoto(studentId);
+                })
+              }
+              className={btnGhost}
+            >
+              {removing ? "Removing…" : "Remove photo"}
+            </button>
+          )}
+        </div>
+      </form>
+      <p className="mt-3 text-xs text-slate-400">
+        Shown to canteen staff at the till so they can check the card belongs to
+        the student. Stored encrypted; removing it deletes the image.
+      </p>
     </div>
   );
 }

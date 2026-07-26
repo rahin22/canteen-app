@@ -38,6 +38,7 @@ the *Password* link in the top-right corner.
 |---|---|
 | `DATABASE_URL` | Postgres connection string |
 | `SESSION_SECRET` | Long random string signing login cookies |
+| `PHOTO_ENCRYPTION_KEY` | 64 hex chars (`openssl rand -hex 32`). Encrypts student photos at rest — back it up with the database |
 | `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_…`). Empty = online top-ups hidden |
 | `STRIPE_WEBHOOK_SECRET` | From the Stripe webhook endpoint (`whsec_…`) |
 | `APP_URL` | Public URL, used for Stripe redirects |
@@ -57,6 +58,54 @@ the *Password* link in the top-right corner.
 4. Generate a public domain (HTTPS is required for phone camera access).
 5. Run the seed once: `npx prisma db seed` with `DATABASE_URL` pointed at the
    public Postgres URL.
+
+## Settings (Admin → Settings)
+
+Two switches, both **off** by default:
+
+- **Online top-ups** — when off, every top-up screen tells students and parents
+  to pay cash instead, and the checkout action refuses even if someone crafts
+  the request by hand. Needs `STRIPE_SECRET_KEY` set before it can be enabled.
+  Cash top-ups recorded by an admin work regardless.
+- **Parent self-registration** — opens `/signup` so parents can create their
+  own account and register their children.
+
+## Parent self-registration
+
+1. A parent signs up at `/signup` with their email (which is their username),
+   name and password. The account starts empty — no children, no balance.
+2. They add each child: full name, school student ID, class, and a photo.
+3. Requests land in **Admin → Registrations** with a badge showing the count.
+   Nothing exists in the canteen system until an admin approves — self-signup
+   can never create a student account, a card or a balance on its own.
+4. On approval, if a student with that ID already exists (the usual case after
+   a roll import) the parent is linked to that record; otherwise a new student
+   and QR card are created and the login details are shown once.
+5. Declining asks for a reason, which the parent sees on their dashboard.
+
+### Identification photos
+
+Photos exist so canteen staff can confirm the card belongs to the student — the
+photo appears next to the balance as soon as a card is scanned at the till.
+
+Handling of this data:
+
+- **Encrypted at rest** with AES-256-GCM under `PHOTO_ENCRYPTION_KEY`, stored
+  in Postgres. A stolen database dump or backup contains no viewable images.
+- **Never public.** The only way to fetch one is `/api/photo/...`, which
+  authorises every request: admins and till operators can see any student, a
+  parent only children linked to their account, a student only themselves.
+  Responses are `no-store`, so nothing is cached by a browser or CDN.
+- **Metadata stripped.** Every upload is re-encoded and resized to 512×512,
+  which discards EXIF — including the GPS coordinates phone cameras embed.
+- **Validated by content**, not by the browser-supplied type: files that
+  aren't a real JPEG/PNG/WebP are rejected, and uploads are capped at 8MB.
+- **Deletable.** Declining a request deletes the photo immediately. An admin
+  can remove a student's photo from their page; the bytes are deleted, not
+  just unlinked.
+
+If you rotate `PHOTO_ENCRYPTION_KEY`, existing photos become unreadable and
+must be re-uploaded — everything else in the app keeps working.
 
 ## Stripe setup (online top-ups)
 
@@ -84,8 +133,9 @@ the *Password* link in the top-right corner.
 - **Admin** — full access. Change your own password via the *Password* link.
 - **Operator** — till only. Create/disable operators under Admin → Staff.
 - **Student** — created under Admin → Students (individually or bulk import).
-- **Parent** — created/linked from a student's page (Parents section). One
-  parent can be linked to several children and tops up each child online.
+- **Parent** — created/linked from a student's page (Parents section), or
+  self-registered at `/signup` when that setting is on. One parent can be
+  linked to several children and tops up each child online.
 
 ## NFC cards
 

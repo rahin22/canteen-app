@@ -9,6 +9,9 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/Photo'
+export type * from './models/ChildRegistration'
+export type * from './models/Setting'
 export type * from './models/Card'
 export type * from './models/MenuItem'
 export type * from './models/Transaction'

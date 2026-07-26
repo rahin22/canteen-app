@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
+import { onlineTopupsAvailable } from "@/lib/settings";
+import { CashOnlyNotice } from "@/components/cash-only-notice";
 import { TopupForm } from "@/app/me/topup/topup-form";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +29,7 @@ export default async function ChildPage({
   });
   if (!child) notFound();
 
-  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
+  const onlineTopups = await onlineTopupsAvailable();
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -44,14 +46,7 @@ export default async function ChildPage({
       </div>
 
       <h2 className="mb-3 mt-6 font-semibold text-slate-900">Top up</h2>
-      {stripeConfigured ? (
-        <TopupForm studentId={child.id} />
-      ) : (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-          Online top-ups aren&apos;t available yet — for now, send cash to the
-          canteen or school office and it&apos;ll be credited straight away.
-        </div>
-      )}
+      {onlineTopups ? <TopupForm studentId={child.id} /> : <CashOnlyNotice />}
 
       <h2 className="mb-3 mt-8 font-semibold text-slate-900">Recent activity</h2>
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">

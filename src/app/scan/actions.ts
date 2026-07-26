@@ -11,6 +11,8 @@ export type ScanStudent = {
   className: string | null;
   username: string;
   balance: number;
+  /** Whether an ID photo exists — the image itself is fetched authenticated. */
+  hasPhoto: boolean;
 };
 
 export type LookupResult =
@@ -60,6 +62,7 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
       className: user.className,
       username: user.username,
       balance: user.balance,
+      hasPhoto: Boolean(user.photoId),
     },
   };
 }

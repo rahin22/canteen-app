@@ -2,12 +2,16 @@ import { requireRole } from "@/lib/auth";
 import { logout } from "@/app/login/actions";
 import Link from "next/link";
 
+import { prisma } from "@/lib/db";
+
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/students", label: "Students" },
+  { href: "/admin/registrations", label: "Registrations", badge: true },
   { href: "/admin/menu", label: "Menu" },
   { href: "/admin/transactions", label: "Transactions" },
   { href: "/admin/staff", label: "Staff" },
+  { href: "/admin/settings", label: "Settings" },
   { href: "/scan", label: "Till" },
 ];
 
@@ -17,6 +21,9 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   await requireRole("ADMIN");
+  const pendingRegistrations = await prisma.childRegistration.count({
+    where: { status: "PENDING" },
+  });
 
   return (
     <div className="flex min-h-screen flex-1 flex-col">
@@ -45,6 +52,11 @@ export default async function AdminLayout({
               className="whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
               {item.label}
+              {item.badge && pendingRegistrations > 0 && (
+                <span className="ml-1.5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-xs font-semibold text-white">
+                  {pendingRegistrations}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

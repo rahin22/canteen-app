@@ -47,6 +47,31 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model Photo
+ * *
+ *  * Identification photos of children — sensitive personal data.
+ *  *
+ *  * `data` holds AES-256-GCM ciphertext (see src/lib/photos.ts), so a leaked
+ *  * database dump does not expose the images. Photos are only ever served
+ *  * through /api/photo/... which authorises every request; they are never
+ *  * written to disk or exposed on a public URL. Images are re-encoded on
+ *  * upload, which strips EXIF — including GPS coordinates.
+ */
+export type Photo = Prisma.PhotoModel
+/**
+ * Model ChildRegistration
+ * *
+ *  * A child a parent has registered through the public signup flow. Nothing is
+ *  * created in the canteen system until an admin approves it — self-signup on
+ *  * its own can never mint a student account or a card.
+ */
+export type ChildRegistration = Prisma.ChildRegistrationModel
+/**
+ * Model Setting
+ * * Simple key/value app settings editable by an admin at /admin/settings.
+ */
+export type Setting = Prisma.SettingModel
+/**
  * Model Card
  * 
  */

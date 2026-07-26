@@ -32,6 +32,12 @@ enum TxType {
   ADJUSTMENT
 }
 
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(cuid())
   role         Role     @default(STUDENT)
@@ -39,6 +45,9 @@ model User {
   username     String   @unique
   passwordHash String
   className    String?
+  // Contact details, only collected for self-registered PARENT accounts.
+  email        String?
+  phone        String?
   // Cached balance in cents. Source of truth is the Transaction ledger;
   // every write to balance happens atomically alongside a Transaction row.
   balance      Int      @default(0)
@@ -49,7 +58,70 @@ model User {
   // PARENT accounts link to their STUDENT children (and vice versa).
   children     User[]   @relation("ParentChild")
   parents      User[]   @relation("ParentChild")
+  // Identification photo (students only). See Photo — stored encrypted.
+  photo        Photo?   @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  photoId      String?  @unique
+  // Registrations this parent submitted, and the one that created this student.
+  submittedRegistrations ChildRegistration[] @relation("ParentRegistrations")
+  reviewedRegistrations  ChildRegistration[] @relation("ReviewerRegistrations")
+  registration           ChildRegistration?  @relation("RegisteredStudent")
   createdAt    DateTime @default(now())
+}
+
+/**
+ * Identification photos of children — sensitive personal data.
+ *
+ * `data` holds AES-256-GCM ciphertext (see src/lib/photos.ts), so a leaked
+ * database dump does not expose the images. Photos are only ever served
+ * through /api/photo/... which authorises every request; they are never
+ * written to disk or exposed on a public URL. Images are re-encoded on
+ * upload, which strips EXIF — including GPS coordinates.
+ */
+model Photo {
+  id           String  @id @default(cuid())
+  data         Bytes
+  mimeType     String
+  byteSize     Int
+  user         User?
+  registration ChildRegistration?
+  createdAt    DateTime @default(now())
+}
+
+/**
+ * A child a parent has registered through the public signup flow. Nothing is
+ * created in the canteen system until an admin approves it — self-signup on
+ * its own can never mint a student account or a card.
+ */
+model ChildRegistration {
+  id         String             @id @default(cuid())
+  parent     User               @relation("ParentRegistrations", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId   String
+  name       String
+  // School-issued student ID; becomes the student's username on approval.
+  schoolId   String
+  className  String?
+  photo      Photo?             @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  photoId    String?            @unique
+  status     RegistrationStatus @default(PENDING)
+  note       String?
+  // Audit trail: who actioned this and when.
+  reviewer   User?              @relation("ReviewerRegistrations", fields: [reviewerId], references: [id], onDelete: SetNull)
+  reviewerId String?
+  reviewedAt DateTime?
+  // The student account this registration resolved to, once approved.
+  student    User?              @relation("RegisteredStudent", fields: [studentId], references: [id], onDelete: SetNull)
+  studentId  String?            @unique
+  createdAt  DateTime           @default(now())
+
+  @@index([status, createdAt])
+  @@index([parentId])
+}
+
+/** Simple key/value app settings editable by an admin at /admin/settings. */
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Card {

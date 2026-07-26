@@ -89,7 +89,9 @@ function Scanner({
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [nfcReady, setNfcReady] = useState(false);
   const onTokenRef = useRef(onToken);
-  onTokenRef.current = onToken;
+  useEffect(() => {
+    onTokenRef.current = onToken;
+  }, [onToken]);
 
   // Web NFC (Android Chrome): tap a registered NFC card/wristband on the
   // phone instead of showing a QR code. Silently unavailable elsewhere.
@@ -283,15 +285,33 @@ function OrderBuilder({
   return (
     <div className="mt-2">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-lg font-bold text-slate-900">{student.name}</p>
-            <p className="text-sm text-slate-500">
+        <div className="flex items-center gap-3">
+          {/* Photo first — staff check the face before charging the card. */}
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
+            {student.hasPhoto ? (
+              // Private, no-store response — must bypass the image optimiser.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={`/api/photo/student/${student.studentId}`}
+                alt={`Photo of ${student.name}`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-2xl font-bold text-slate-400">
+                {student.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-lg font-bold text-slate-900">
+              {student.name}
+            </p>
+            <p className="truncate text-sm text-slate-500">
               {student.className ? `${student.className} · ` : ""}
               {student.username}
             </p>
           </div>
-          <div className="text-right">
+          <div className="shrink-0 text-right">
             <p className="text-xs uppercase tracking-wide text-slate-400">Balance</p>
             <p
               className={`text-lg font-bold ${

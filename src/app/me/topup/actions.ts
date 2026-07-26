@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { getStripe } from "@/lib/stripe";
+import { onlineTopupsAvailable } from "@/lib/settings";
 import { parseAmount } from "@/lib/money";
 
 export type TopupState = { error?: string };
@@ -20,6 +21,13 @@ export async function startCheckout(
   formData: FormData
 ): Promise<TopupState> {
   const session = await requireRole("STUDENT", "PARENT");
+  // Authoritative check — the UI hides the form when online top-ups are off,
+  // but the action must refuse regardless of what the client submits.
+  if (!(await onlineTopupsAvailable())) {
+    return {
+      error: "Online top-ups are turned off. Please top up with cash at the canteen.",
+    };
+  }
   const stripe = getStripe();
   if (!stripe) {
     return { error: "Online payments aren't set up yet. Please top up in person." };
