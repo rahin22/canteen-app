@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  STUDENT
+  PARENT
+}
+
+enum CardType {
+  QR
+  NFC
+}
+
+enum CardStatus {
+  ACTIVE
+  BLOCKED
+  REPLACED
+}
+
+enum TxType {
+  TOPUP_CASH
+  TOPUP_STRIPE
+  PURCHASE
+  ADJUSTMENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  role         Role     @default(STUDENT)
+  name         String
+  username     String   @unique
+  passwordHash String
+  className    String?
+  // Cached balance in cents. Source of truth is the Transaction ledger;
+  // every write to balance happens atomically alongside a Transaction row.
+  balance      Int      @default(0)
+  active       Boolean  @default(true)
+  cards        Card[]
+  transactions Transaction[] @relation("StudentTx")
+  operated     Transaction[] @relation("OperatorTx")
+  // PARENT accounts link to their STUDENT children (and vice versa).
+  children     User[]   @relation("ParentChild")
+  parents      User[]   @relation("ParentChild")
+  createdAt    DateTime @default(now())
+}
+
+model Card {
+  id        String     @id @default(cuid())
+  token     String     @unique
+  type      CardType   @default(QR)
+  status    CardStatus @default(ACTIVE)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime   @default(now())
+
+  @@index([userId])
+}
+
+model MenuItem {
+  id        String  @id @default(cuid())
+  name      String
+  price     Int
+  category  String?
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  type            TxType
+  // Signed cents: top-ups positive, purchases negative.
+  amount          Int
+  student         User     @relation("StudentTx", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId       String
+  operator        User?    @relation("OperatorTx", fields: [operatorId], references: [id], onDelete: SetNull)
+  operatorId      String?
+  items           Json?
+  note            String?
+  stripeSessionId String?  @unique
+  createdAt       DateTime @default(now())
+
+  @@index([studentId, createdAt])
+  @@index([createdAt])
+}
