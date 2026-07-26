@@ -52,7 +52,11 @@ export async function resetOperatorPassword(id: string): Promise<StaffActionStat
   const password = generatePassword();
   await prisma.user.update({
     where: { id },
-    data: { passwordHash: await bcrypt.hash(password, 10) },
+    // Bumping the version signs the operator out everywhere immediately.
+    data: {
+      passwordHash: await bcrypt.hash(password, 10),
+      sessionVersion: { increment: 1 },
+    },
   });
   return {
     success: "Password reset.",

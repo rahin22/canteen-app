@@ -27,10 +27,12 @@ export type AggregateUser = {
 }
 
 export type UserAvgAggregateOutputType = {
+  sessionVersion: number | null
   balance: number | null
 }
 
 export type UserSumAggregateOutputType = {
+  sessionVersion: number | null
   balance: number | null
 }
 
@@ -43,6 +45,8 @@ export type UserMinAggregateOutputType = {
   className: string | null
   email: string | null
   phone: string | null
+  emailVerifiedAt: Date | null
+  sessionVersion: number | null
   balance: number | null
   active: boolean | null
   photoId: string | null
@@ -58,6 +62,8 @@ export type UserMaxAggregateOutputType = {
   className: string | null
   email: string | null
   phone: string | null
+  emailVerifiedAt: Date | null
+  sessionVersion: number | null
   balance: number | null
   active: boolean | null
   photoId: string | null
@@ -73,6 +79,8 @@ export type UserCountAggregateOutputType = {
   className: number
   email: number
   phone: number
+  emailVerifiedAt: number
+  sessionVersion: number
   balance: number
   active: number
   photoId: number
@@ -82,10 +90,12 @@ export type UserCountAggregateOutputType = {
 
 
 export type UserAvgAggregateInputType = {
+  sessionVersion?: true
   balance?: true
 }
 
 export type UserSumAggregateInputType = {
+  sessionVersion?: true
   balance?: true
 }
 
@@ -98,6 +108,8 @@ export type UserMinAggregateInputType = {
   className?: true
   email?: true
   phone?: true
+  emailVerifiedAt?: true
+  sessionVersion?: true
   balance?: true
   active?: true
   photoId?: true
@@ -113,6 +125,8 @@ export type UserMaxAggregateInputType = {
   className?: true
   email?: true
   phone?: true
+  emailVerifiedAt?: true
+  sessionVersion?: true
   balance?: true
   active?: true
   photoId?: true
@@ -128,6 +142,8 @@ export type UserCountAggregateInputType = {
   className?: true
   email?: true
   phone?: true
+  emailVerifiedAt?: true
+  sessionVersion?: true
   balance?: true
   active?: true
   photoId?: true
@@ -230,6 +246,8 @@ export type UserGroupByOutputType = {
   className: string | null
   email: string | null
   phone: string | null
+  emailVerifiedAt: Date | null
+  sessionVersion: number
   balance: number
   active: boolean
   photoId: string | null
@@ -268,10 +286,13 @@ export type UserWhereInput = {
   className?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
   active?: Prisma.BoolFilter<"User"> | boolean
   photoId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  codes?: Prisma.VerificationCodeListRelationFilter
   cards?: Prisma.CardListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   operated?: Prisma.TransactionListRelationFilter
@@ -292,10 +313,13 @@ export type UserOrderByWithRelationInput = {
   className?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  codes?: Prisma.VerificationCodeOrderByRelationAggregateInput
   cards?: Prisma.CardOrderByRelationAggregateInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   operated?: Prisma.TransactionOrderByRelationAggregateInput
@@ -320,9 +344,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   className?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
   active?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  codes?: Prisma.VerificationCodeListRelationFilter
   cards?: Prisma.CardListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   operated?: Prisma.TransactionListRelationFilter
@@ -343,6 +370,8 @@ export type UserOrderByWithAggregationInput = {
   className?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -366,6 +395,8 @@ export type UserScalarWhereWithAggregatesInput = {
   className?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  sessionVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
   balance?: Prisma.IntWithAggregatesFilter<"User"> | number
   active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   photoId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -381,9 +412,12 @@ export type UserCreateInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -404,10 +438,13 @@ export type UserUncheckedCreateInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -427,9 +464,12 @@ export type UserUpdateInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -450,10 +490,13 @@ export type UserUncheckedUpdateInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -473,6 +516,8 @@ export type UserCreateManyInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
@@ -488,6 +533,8 @@ export type UserUpdateManyMutationInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -502,6 +549,8 @@ export type UserUncheckedUpdateManyInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -527,6 +576,8 @@ export type UserCountOrderByAggregateInput = {
   className?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -534,6 +585,7 @@ export type UserCountOrderByAggregateInput = {
 }
 
 export type UserAvgOrderByAggregateInput = {
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
 }
 
@@ -546,6 +598,8 @@ export type UserMaxOrderByAggregateInput = {
   className?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -561,6 +615,8 @@ export type UserMinOrderByAggregateInput = {
   className?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -568,6 +624,7 @@ export type UserMinOrderByAggregateInput = {
 }
 
 export type UserSumOrderByAggregateInput = {
+  sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
 }
 
@@ -615,6 +672,10 @@ export type EnumRoleFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type IntFieldUpdateOperationsInput = {
@@ -763,6 +824,20 @@ export type UserUpdateOneWithoutRegistrationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRegistrationInput, Prisma.UserUpdateWithoutRegistrationInput>, Prisma.UserUncheckedUpdateWithoutRegistrationInput>
 }
 
+export type UserCreateNestedOneWithoutCodesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCodesInput, Prisma.UserUncheckedCreateWithoutCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCodesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCodesInput, Prisma.UserUncheckedCreateWithoutCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCodesInput
+  upsert?: Prisma.UserUpsertWithoutCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCodesInput, Prisma.UserUpdateWithoutCodesInput>, Prisma.UserUncheckedUpdateWithoutCodesInput>
+}
+
 export type UserCreateNestedOneWithoutCardsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCardsInput, Prisma.UserUncheckedCreateWithoutCardsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCardsInput
@@ -816,9 +891,12 @@ export type UserCreateWithoutParentsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -838,10 +916,13 @@ export type UserUncheckedCreateWithoutParentsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -865,9 +946,12 @@ export type UserCreateWithoutChildrenInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -887,10 +971,13 @@ export type UserUncheckedCreateWithoutChildrenInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -933,6 +1020,8 @@ export type UserScalarWhereInput = {
   className?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
   active?: Prisma.BoolFilter<"User"> | boolean
   photoId?: Prisma.StringNullableFilter<"User"> | string | null
@@ -964,9 +1053,12 @@ export type UserCreateWithoutPhotoInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -986,9 +1078,12 @@ export type UserUncheckedCreateWithoutPhotoInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -1024,9 +1119,12 @@ export type UserUpdateWithoutPhotoInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1046,9 +1144,12 @@ export type UserUncheckedUpdateWithoutPhotoInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -1068,9 +1169,12 @@ export type UserCreateWithoutSubmittedRegistrationsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -1090,10 +1194,13 @@ export type UserUncheckedCreateWithoutSubmittedRegistrationsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -1117,9 +1224,12 @@ export type UserCreateWithoutReviewedRegistrationsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -1139,10 +1249,13 @@ export type UserUncheckedCreateWithoutReviewedRegistrationsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -1166,9 +1279,12 @@ export type UserCreateWithoutRegistrationInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
@@ -1188,10 +1304,13 @@ export type UserUncheckedCreateWithoutRegistrationInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
@@ -1226,9 +1345,12 @@ export type UserUpdateWithoutSubmittedRegistrationsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1248,10 +1370,13 @@ export type UserUncheckedUpdateWithoutSubmittedRegistrationsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -1281,9 +1406,12 @@ export type UserUpdateWithoutReviewedRegistrationsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1303,10 +1431,13 @@ export type UserUncheckedUpdateWithoutReviewedRegistrationsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -1336,9 +1467,12 @@ export type UserUpdateWithoutRegistrationInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1358,6 +1492,124 @@ export type UserUncheckedUpdateWithoutRegistrationInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
+}
+
+export type UserCreateWithoutCodesInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  active?: boolean
+  createdAt?: Date | string
+  cards?: Prisma.CardCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  children?: Prisma.UserCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
+  photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
+  submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationCreateNestedOneWithoutStudentInput
+}
+
+export type UserUncheckedCreateWithoutCodesInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  active?: boolean
+  photoId?: string | null
+  createdAt?: Date | string
+  cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationUncheckedCreateNestedOneWithoutStudentInput
+}
+
+export type UserCreateOrConnectWithoutCodesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCodesInput, Prisma.UserUncheckedCreateWithoutCodesInput>
+}
+
+export type UserUpsertWithoutCodesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCodesInput, Prisma.UserUncheckedUpdateWithoutCodesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCodesInput, Prisma.UserUncheckedCreateWithoutCodesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCodesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCodesInput, Prisma.UserUncheckedUpdateWithoutCodesInput>
+}
+
+export type UserUpdateWithoutCodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cards?: Prisma.CardUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  children?: Prisma.UserUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
+  photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1369,6 +1621,7 @@ export type UserUncheckedUpdateWithoutRegistrationInput = {
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type UserCreateWithoutCardsInput = {
@@ -1380,9 +1633,12 @@ export type UserCreateWithoutCardsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
@@ -1402,10 +1658,13 @@ export type UserUncheckedCreateWithoutCardsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
@@ -1440,9 +1699,12 @@ export type UserUpdateWithoutCardsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
@@ -1462,10 +1724,13 @@ export type UserUncheckedUpdateWithoutCardsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
@@ -1484,9 +1749,12 @@ export type UserCreateWithoutTransactionsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
@@ -1506,10 +1774,13 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
@@ -1533,9 +1804,12 @@ export type UserCreateWithoutOperatedInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
@@ -1555,10 +1829,13 @@ export type UserUncheckedCreateWithoutOperatedInput = {
   className?: string | null
   email?: string | null
   phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
   balance?: number
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
@@ -1593,9 +1870,12 @@ export type UserUpdateWithoutTransactionsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
@@ -1615,10 +1895,13 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
@@ -1648,9 +1931,12 @@ export type UserUpdateWithoutOperatedInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
@@ -1670,10 +1956,13 @@ export type UserUncheckedUpdateWithoutOperatedInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
@@ -1692,9 +1981,12 @@ export type UserUpdateWithoutParentsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1714,10 +2006,13 @@ export type UserUncheckedUpdateWithoutParentsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -1736,6 +2031,8 @@ export type UserUncheckedUpdateManyWithoutParentsInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1751,9 +2048,12 @@ export type UserUpdateWithoutChildrenInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
@@ -1773,10 +2073,13 @@ export type UserUncheckedUpdateWithoutChildrenInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
@@ -1795,6 +2098,8 @@ export type UserUncheckedUpdateManyWithoutChildrenInput = {
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1807,6 +2112,7 @@ export type UserUncheckedUpdateManyWithoutChildrenInput = {
  */
 
 export type UserCountOutputType = {
+  codes: number
   cards: number
   transactions: number
   operated: number
@@ -1817,6 +2123,7 @@ export type UserCountOutputType = {
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  codes?: boolean | UserCountOutputTypeCountCodesArgs
   cards?: boolean | UserCountOutputTypeCountCardsArgs
   transactions?: boolean | UserCountOutputTypeCountTransactionsArgs
   operated?: boolean | UserCountOutputTypeCountOperatedArgs
@@ -1834,6 +2141,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VerificationCodeWhereInput
 }
 
 /**
@@ -1895,10 +2209,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   className?: boolean
   email?: boolean
   phone?: boolean
+  emailVerifiedAt?: boolean
+  sessionVersion?: boolean
   balance?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
+  codes?: boolean | Prisma.User$codesArgs<ExtArgs>
   cards?: boolean | Prisma.User$cardsArgs<ExtArgs>
   transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
   operated?: boolean | Prisma.User$operatedArgs<ExtArgs>
@@ -1920,6 +2237,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   className?: boolean
   email?: boolean
   phone?: boolean
+  emailVerifiedAt?: boolean
+  sessionVersion?: boolean
   balance?: boolean
   active?: boolean
   photoId?: boolean
@@ -1936,6 +2255,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   className?: boolean
   email?: boolean
   phone?: boolean
+  emailVerifiedAt?: boolean
+  sessionVersion?: boolean
   balance?: boolean
   active?: boolean
   photoId?: boolean
@@ -1952,14 +2273,17 @@ export type UserSelectScalar = {
   className?: boolean
   email?: boolean
   phone?: boolean
+  emailVerifiedAt?: boolean
+  sessionVersion?: boolean
   balance?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "name" | "username" | "passwordHash" | "className" | "email" | "phone" | "balance" | "active" | "photoId" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "name" | "username" | "passwordHash" | "className" | "email" | "phone" | "emailVerifiedAt" | "sessionVersion" | "balance" | "active" | "photoId" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  codes?: boolean | Prisma.User$codesArgs<ExtArgs>
   cards?: boolean | Prisma.User$cardsArgs<ExtArgs>
   transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
   operated?: boolean | Prisma.User$operatedArgs<ExtArgs>
@@ -1981,6 +2305,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
+    codes: Prisma.$VerificationCodePayload<ExtArgs>[]
     cards: Prisma.$CardPayload<ExtArgs>[]
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     operated: Prisma.$TransactionPayload<ExtArgs>[]
@@ -2000,6 +2325,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     className: string | null
     email: string | null
     phone: string | null
+    emailVerifiedAt: Date | null
+    sessionVersion: number
     balance: number
     active: boolean
     photoId: string | null
@@ -2398,6 +2725,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  codes<T extends Prisma.User$codesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$codesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cards<T extends Prisma.User$cardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactions<T extends Prisma.User$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   operated<T extends Prisma.User$operatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$operatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2444,6 +2772,8 @@ export interface UserFieldRefs {
   readonly className: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
+  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly sessionVersion: Prisma.FieldRef<"User", 'Int'>
   readonly balance: Prisma.FieldRef<"User", 'Int'>
   readonly active: Prisma.FieldRef<"User", 'Boolean'>
   readonly photoId: Prisma.FieldRef<"User", 'String'>
@@ -2846,6 +3176,30 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Users to delete.
    */
   limit?: number
+}
+
+/**
+ * User.codes
+ */
+export type User$codesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VerificationCode
+   */
+  select?: Prisma.VerificationCodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VerificationCode
+   */
+  omit?: Prisma.VerificationCodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VerificationCodeInclude<ExtArgs> | null
+  where?: Prisma.VerificationCodeWhereInput
+  orderBy?: Prisma.VerificationCodeOrderByWithRelationInput | Prisma.VerificationCodeOrderByWithRelationInput[]
+  cursor?: Prisma.VerificationCodeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VerificationCodeScalarFieldEnum | Prisma.VerificationCodeScalarFieldEnum[]
 }
 
 /**

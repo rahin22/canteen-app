@@ -14,7 +14,12 @@ export type PendingRegistration = {
   className: string | null;
   hasPhoto: boolean;
   createdAt: string;
-  parent: { name: string; username: string; phone: string | null };
+  parent: {
+    name: string;
+    username: string;
+    phone: string | null;
+    emailVerified: boolean;
+  };
   match: { name: string; className: string | null; alreadyLinked: boolean } | null;
 };
 
@@ -86,6 +91,18 @@ export function ReviewCard({ registration }: { registration: PendingRegistration
           <p className="mt-2 text-sm text-slate-600">
             Submitted by <b>{registration.parent.name}</b> ·{" "}
             <span className="text-slate-500">{registration.parent.username}</span>
+            {registration.parent.emailVerified ? (
+              <span
+                title="This parent confirmed their email address"
+                className="ml-1.5 rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-800"
+              >
+                email verified
+              </span>
+            ) : (
+              <span className="ml-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">
+                email unverified
+              </span>
+            )}
             {registration.parent.phone ? ` · ${registration.parent.phone}` : ""}
           </p>
           <p className="mt-0.5 text-xs text-slate-400">{registration.createdAt}</p>

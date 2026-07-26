@@ -20,11 +20,19 @@ export async function login(
     return { error: "Wrong username or password." };
   }
 
-  await createSession({ uid: user.id, role: user.role, name: user.name });
+  await createSession({
+    uid: user.id,
+    role: user.role,
+    name: user.name,
+    version: user.sessionVersion,
+  });
 
   if (user.role === "ADMIN") redirect("/admin");
   if (user.role === "OPERATOR") redirect("/scan");
-  if (user.role === "PARENT") redirect("/family");
+  // Parents who haven't confirmed their address land on the code screen.
+  if (user.role === "PARENT") {
+    redirect(user.emailVerifiedAt || !user.email ? "/family" : "/verify-email");
+  }
   redirect("/me");
 }
 

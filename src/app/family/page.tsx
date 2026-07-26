@@ -63,6 +63,20 @@ export default async function FamilyPage({
         </div>
       </header>
 
+      {!parent.emailVerifiedAt && (
+        <Link
+          href="/verify-email"
+          className="mb-4 block rounded-2xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300"
+        >
+          <p className="font-semibold text-amber-900">Confirm your email ✉️</p>
+          <p className="mt-1 text-sm text-amber-800">
+            We sent a code to {parent.email}. You&apos;ll need to confirm it
+            before you can register a child —{" "}
+            <span className="font-medium underline">enter the code</span>.
+          </p>
+        </Link>
+      )}
+
       {submitted && (
         <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
           <p className="font-semibold">Request submitted ✓</p>
@@ -163,7 +177,7 @@ export default async function FamilyPage({
         </p>
       )}
 
-      {canRegister && (
+      {canRegister && parent.emailVerifiedAt && (
         <Link
           href="/family/register"
           className="mt-4 block rounded-2xl border-2 border-dashed border-slate-300 p-4 text-center font-semibold text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50"

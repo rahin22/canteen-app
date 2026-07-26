@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/Photo'
 export type * from './models/ChildRegistration'
+export type * from './models/VerificationCode'
 export type * from './models/Setting'
 export type * from './models/Card'
 export type * from './models/MenuItem'

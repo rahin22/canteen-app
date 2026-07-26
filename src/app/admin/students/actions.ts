@@ -124,7 +124,11 @@ export async function resetPassword(id: string): Promise<ActionState> {
   const password = generatePassword();
   await prisma.user.update({
     where: { id, role: "STUDENT" },
-    data: { passwordHash: await bcrypt.hash(password, 10) },
+    // Bumping the version signs the student out everywhere immediately.
+    data: {
+      passwordHash: await bcrypt.hash(password, 10),
+      sessionVersion: { increment: 1 },
+    },
   });
   const user = await prisma.user.findUniqueOrThrow({ where: { id } });
   return {

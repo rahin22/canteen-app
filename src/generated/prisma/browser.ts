@@ -43,6 +43,15 @@ export type Photo = Prisma.PhotoModel
  */
 export type ChildRegistration = Prisma.ChildRegistrationModel
 /**
+ * Model VerificationCode
+ * *
+ *  * One-time codes emailed to a parent to confirm their address or reset their
+ *  * password. Only a bcrypt hash of the code is stored, codes expire quickly,
+ *  * and `attempts` caps guessing — six digits is only a million combinations,
+ *  * so the attempt limit is what actually makes them safe.
+ */
+export type VerificationCode = Prisma.VerificationCodeModel
+/**
  * Model Setting
  * * Simple key/value app settings editable by an admin at /admin/settings.
  */

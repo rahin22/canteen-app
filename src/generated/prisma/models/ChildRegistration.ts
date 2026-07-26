@@ -637,10 +637,6 @@ export type EnumRegistrationStatusFieldUpdateOperationsInput = {
   set?: $Enums.RegistrationStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type ChildRegistrationCreateWithoutParentInput = {
   id?: string
   name: string

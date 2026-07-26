@@ -38,6 +38,11 @@ enum RegistrationStatus {
   REJECTED
 }
 
+enum VerificationPurpose {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+}
+
 model User {
   id           String   @id @default(cuid())
   role         Role     @default(STUDENT)
@@ -46,8 +51,15 @@ model User {
   passwordHash String
   className    String?
   // Contact details, only collected for self-registered PARENT accounts.
-  email        String?
-  phone        String?
+  // Students and operators sign in with a school-issued username and have no
+  // email, so the email-based flows never apply to them.
+  email           String?
+  phone           String?
+  emailVerifiedAt DateTime?
+  // Bumped whenever the password changes. The value is baked into the session
+  // cookie, so every existing session stops working after a reset.
+  sessionVersion  Int       @default(0)
+  codes           VerificationCode[]
   // Cached balance in cents. Source of truth is the Transaction ledger;
   // every write to balance happens atomically alongside a Transaction row.
   balance      Int      @default(0)
@@ -115,6 +127,27 @@ model ChildRegistration {
 
   @@index([status, createdAt])
   @@index([parentId])
+}
+
+/**
+ * One-time codes emailed to a parent to confirm their address or reset their
+ * password. Only a bcrypt hash of the code is stored, codes expire quickly,
+ * and `attempts` caps guessing — six digits is only a million combinations,
+ * so the attempt limit is what actually makes them safe.
+ */
+model VerificationCode {
+  id         String              @id @default(cuid())
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  purpose    VerificationPurpose
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int                 @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime            @default(now())
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
 }
 
 /** Simple key/value app settings editable by an admin at /admin/settings. */

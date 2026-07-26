@@ -19,7 +19,9 @@ export default async function RegistrationsPage() {
       where: { status: "PENDING" },
       orderBy: { createdAt: "asc" },
       include: {
-        parent: { select: { name: true, username: true, phone: true } },
+        parent: {
+          select: { name: true, username: true, phone: true, emailVerifiedAt: true },
+        },
       },
     }),
     prisma.childRegistration.findMany({
@@ -62,7 +64,12 @@ export default async function RegistrationsPage() {
       className: reg.className,
       hasPhoto: Boolean(reg.photoId),
       createdAt: dateFormat.format(reg.createdAt),
-      parent: reg.parent,
+      parent: {
+        name: reg.parent.name,
+        username: reg.parent.username,
+        phone: reg.parent.phone,
+        emailVerified: Boolean(reg.parent.emailVerifiedAt),
+      },
       match: match
         ? {
             name: match.name,

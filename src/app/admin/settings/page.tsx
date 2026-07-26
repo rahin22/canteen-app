@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/auth";
 import { getFlags, SETTINGS } from "@/lib/settings";
+import { emailConfigured } from "@/lib/email";
 import { Toggle } from "./settings-toggles";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,7 @@ export default async function SettingsPage() {
   await requireRole("ADMIN");
   const flags = await getFlags();
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
+  const mailWorks = emailConfigured();
 
   return (
     <div className="max-w-2xl">
@@ -29,9 +31,22 @@ export default async function SettingsPage() {
           settingKey={SETTINGS.parentSignup}
           initial={flags.parentSignup}
           title="Parent self-registration"
-          description="Lets parents create their own account and register their children. Every child they submit waits for your approval before anything is created."
+          description="Lets parents create their own account and register their children. They must confirm their email first, and every child they submit waits for your approval before anything is created."
         />
       </div>
+
+      {!mailWorks && (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+          <p className="font-semibold">Email sending isn&apos;t configured</p>
+          <p className="mt-1">
+            Confirmation codes and password resets can&apos;t reach parents until{" "}
+            <code className="rounded bg-amber-100 px-1">RESEND_API_KEY</code> and{" "}
+            <code className="rounded bg-amber-100 px-1">EMAIL_FROM</code> are set
+            on the server. Parents can still be created manually from a
+            student&apos;s page in the meantime.
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
         <p className="font-medium text-slate-800">Cash top-ups</p>

@@ -33,6 +33,16 @@ export async function registerChild(
     return { error: "Too many submissions. Please try again later." };
   }
 
+  // A confirmed email is required before anything reaches the approval queue:
+  // it keeps fake signups out and guarantees the school can contact the parent.
+  const parent = await prisma.user.findUniqueOrThrow({
+    where: { id: session.uid },
+    select: { emailVerifiedAt: true },
+  });
+  if (!parent.emailVerifiedAt) {
+    return { error: "Confirm your email address first — check your inbox for the code." };
+  }
+
   const name = String(formData.get("name") || "").trim();
   const schoolId = normalizeUsername(String(formData.get("schoolId") || ""));
   const className = String(formData.get("className") || "").trim();

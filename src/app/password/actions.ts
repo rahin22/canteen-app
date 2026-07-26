@@ -2,7 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { bumpSessionVersion, createSession, getSession } from "@/lib/auth";
 
 export type PasswordState = { error?: string; success?: string };
 
@@ -25,9 +25,17 @@ export async function changePassword(
     return { error: "Current password is incorrect." };
   }
 
+  if (next === current) return { error: "Choose a password different from your current one." };
+
   await prisma.user.update({
     where: { id: user.id },
     data: { passwordHash: await bcrypt.hash(next, 10) },
   });
-  return { success: "Password changed." };
+
+  // Sign every other device out, then re-issue this one so the person
+  // changing their password isn't the one who gets kicked.
+  const version = await bumpSessionVersion(user.id);
+  await createSession({ uid: user.id, role: user.role, name: user.name, version });
+
+  return { success: "Password changed. Other devices have been signed out." };
 }

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { parentSignupOpen } from "@/lib/settings";
 import { RegisterForm } from "./register-form";
 
@@ -8,10 +10,17 @@ export const dynamic = "force-dynamic";
 export default async function RegisterChildPage({
   searchParams,
 }: {
-  searchParams: Promise<{ welcome?: string }>;
+  searchParams: Promise<{ welcome?: string; verified?: string }>;
 }) {
-  await requireRole("PARENT");
-  const { welcome } = await searchParams;
+  const session = await requireRole("PARENT");
+  const { welcome, verified } = await searchParams;
+
+  const parent = await prisma.user.findUniqueOrThrow({
+    where: { id: session.uid },
+    select: { emailVerifiedAt: true },
+  });
+  if (!parent.emailVerifiedAt) redirect("/verify-email");
+
   const open = await parentSignupOpen();
 
   return (
@@ -28,9 +37,11 @@ export default async function RegisterChildPage({
         activated.
       </p>
 
-      {welcome && (
+      {(welcome || verified) && (
         <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-          <p className="font-semibold">Account created 🎉</p>
+          <p className="font-semibold">
+            {verified ? "Email confirmed ✓" : "Account created 🎉"}
+          </p>
           <p className="mt-1">
             Now add your first child below. You can add more later.
           </p>

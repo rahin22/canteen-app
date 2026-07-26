@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Photo: 'Photo',
   ChildRegistration: 'ChildRegistration',
+  VerificationCode: 'VerificationCode',
   Setting: 'Setting',
   Card: 'Card',
   MenuItem: 'MenuItem',
@@ -85,6 +86,8 @@ export const UserScalarFieldEnum = {
   className: 'className',
   email: 'email',
   phone: 'phone',
+  emailVerifiedAt: 'emailVerifiedAt',
+  sessionVersion: 'sessionVersion',
   balance: 'balance',
   active: 'active',
   photoId: 'photoId',
@@ -121,6 +124,20 @@ export const ChildRegistrationScalarFieldEnum = {
 } as const
 
 export type ChildRegistrationScalarFieldEnum = (typeof ChildRegistrationScalarFieldEnum)[keyof typeof ChildRegistrationScalarFieldEnum]
+
+
+export const VerificationCodeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  purpose: 'purpose',
+  codeHash: 'codeHash',
+  expiresAt: 'expiresAt',
+  attempts: 'attempts',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationCodeScalarFieldEnum = (typeof VerificationCodeScalarFieldEnum)[keyof typeof VerificationCodeScalarFieldEnum]
 
 
 export const SettingScalarFieldEnum = {

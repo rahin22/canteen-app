@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { login, type LoginState } from "./actions";
 
-export function LoginForm({ signupOpen }: { signupOpen: boolean }) {
+export function LoginForm({
+  signupOpen,
+  justReset,
+}: {
+  signupOpen: boolean;
+  justReset?: boolean;
+}) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
     login,
     {}
@@ -25,6 +31,13 @@ export function LoginForm({ signupOpen }: { signupOpen: boolean }) {
           </p>
         </div>
 
+        {justReset && (
+          <p className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            <b className="font-semibold">Password updated ✓</b> Sign in with your
+            new password.
+          </p>
+        )}
+
         <form
           action={formAction}
           className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
@@ -42,9 +55,17 @@ export function LoginForm({ signupOpen }: { signupOpen: boolean }) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Password
-            </label>
+            <div className="mb-1 flex items-baseline justify-between">
+              <label className="block text-sm font-medium text-slate-700">
+                Password
+              </label>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-indigo-600 hover:underline"
+              >
+                Forgot?
+              </Link>
+            </div>
             <input
               name="password"
               type="password"
