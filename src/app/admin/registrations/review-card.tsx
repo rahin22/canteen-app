@@ -18,7 +18,8 @@ export type PendingRegistration = {
     name: string;
     username: string;
     phone: string | null;
-    emailVerified: boolean;
+    /** null when email confirmation is switched off — there's nothing to report. */
+    emailVerified: boolean | null;
   };
   match: { name: string; className: string | null; alreadyLinked: boolean } | null;
 };
@@ -91,14 +92,15 @@ export function ReviewCard({ registration }: { registration: PendingRegistration
           <p className="mt-2 text-sm text-slate-600">
             Submitted by <b>{registration.parent.name}</b> ·{" "}
             <span className="text-slate-500">{registration.parent.username}</span>
-            {registration.parent.emailVerified ? (
+            {registration.parent.emailVerified === true && (
               <span
                 title="This parent confirmed their email address"
                 className="ml-1.5 rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-800"
               >
                 email verified
               </span>
-            ) : (
+            )}
+            {registration.parent.emailVerified === false && (
               <span className="ml-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">
                 email unverified
               </span>

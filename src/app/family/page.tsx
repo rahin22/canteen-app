@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { logout } from "@/app/login/actions";
 import { WithdrawButton } from "./withdraw-button";
 
@@ -16,7 +16,7 @@ export default async function FamilyPage({
   const session = await requireRole("PARENT");
   const { submitted } = await searchParams;
 
-  const [parent, registrations, canRegister] = await Promise.all([
+  const [parent, registrations, canRegister, mailOn] = await Promise.all([
     prisma.user.findUniqueOrThrow({
       where: { id: session.uid },
       include: {
@@ -40,6 +40,7 @@ export default async function FamilyPage({
       orderBy: { createdAt: "desc" },
     }),
     parentSignupOpen(),
+    emailAvailable(),
   ]);
 
   return (
@@ -63,7 +64,7 @@ export default async function FamilyPage({
         </div>
       </header>
 
-      {!parent.emailVerifiedAt && (
+      {mailOn && !parent.emailVerifiedAt && (
         <Link
           href="/verify-email"
           className="mb-4 block rounded-2xl border border-amber-200 bg-amber-50 p-4 transition hover:border-amber-300"
@@ -177,7 +178,7 @@ export default async function FamilyPage({
         </p>
       )}
 
-      {canRegister && parent.emailVerifiedAt && (
+      {canRegister && (!mailOn || parent.emailVerifiedAt) && (
         <Link
           href="/family/register"
           className="mt-4 block rounded-2xl border-2 border-dashed border-slate-300 p-4 text-center font-semibold text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50"

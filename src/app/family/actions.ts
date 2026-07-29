@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { rateLimit } from "@/lib/ratelimit";
 import { normalizeUsername } from "@/lib/username";
 import { PhotoError, processPhotoUpload } from "@/lib/photos";
@@ -34,13 +34,17 @@ export async function registerChild(
   }
 
   // A confirmed email is required before anything reaches the approval queue:
-  // it keeps fake signups out and guarantees the school can contact the parent.
-  const parent = await prisma.user.findUniqueOrThrow({
-    where: { id: session.uid },
-    select: { emailVerifiedAt: true },
-  });
-  if (!parent.emailVerifiedAt) {
-    return { error: "Confirm your email address first — check your inbox for the code." };
+  // it keeps fake signups out and guarantees the school can contact the
+  // parent. Only enforceable while we're sending email — when we aren't, the
+  // admin approval step is the gate, and it always was the one that mattered.
+  if (await emailAvailable()) {
+    const parent = await prisma.user.findUniqueOrThrow({
+      where: { id: session.uid },
+      select: { emailVerifiedAt: true },
+    });
+    if (!parent.emailVerifiedAt) {
+      return { error: "Confirm your email address first — check your inbox for the code." };
+    }
   }
 
   const name = String(formData.get("name") || "").trim();

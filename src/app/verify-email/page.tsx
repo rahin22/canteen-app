@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { emailAvailable } from "@/lib/settings";
 import { logout } from "@/app/login/actions";
 import { VerifyForm } from "./verify-form";
 
@@ -9,6 +10,8 @@ export const dynamic = "force-dynamic";
 
 export default async function VerifyEmailPage() {
   const session = await requireRole("PARENT");
+  // Nothing to confirm if we can't send a code in the first place.
+  if (!(await emailAvailable())) redirect("/family");
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: session.uid },
     select: { email: true, emailVerifiedAt: true },

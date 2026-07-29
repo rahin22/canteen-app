@@ -250,6 +250,35 @@ export async function createParent(
   };
 }
 
+/**
+ * Resets a parent's password and shows the new one once.
+ *
+ * Parents can reset their own by email, but only when the school has email
+ * switched on — otherwise this is the only way back in for a locked-out
+ * parent, and the office identifying them in person is the check that
+ * replaces the emailed code.
+ */
+export async function resetParentPassword(parentId: string): Promise<ActionState> {
+  await requireRole("ADMIN");
+  const password = generatePassword();
+  const parent = await prisma.user.update({
+    // role is part of the filter so this can never be pointed at a student,
+    // an operator or another admin.
+    where: { id: parentId, role: "PARENT" },
+    data: {
+      passwordHash: await bcrypt.hash(password, 10),
+      // Signs the parent out everywhere, in case the lockout is because
+      // someone else has their old password.
+      sessionVersion: { increment: 1 },
+    },
+    select: { username: true },
+  });
+  return {
+    success: "Password reset.",
+    credentials: { username: parent.username, password },
+  };
+}
+
 /** Links an existing PARENT account (by username) to the student. */
 export async function linkParent(
   _prev: ActionState,

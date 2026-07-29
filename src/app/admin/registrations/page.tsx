@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { ReviewCard, type PendingRegistration } from "./review-card";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ const dateFormat = new Intl.DateTimeFormat(
 export default async function RegistrationsPage() {
   await requireRole("ADMIN");
 
-  const [pending, recent, signupOpen] = await Promise.all([
+  const [pending, recent, signupOpen, mailOn] = await Promise.all([
     prisma.childRegistration.findMany({
       where: { status: "PENDING" },
       orderBy: { createdAt: "asc" },
@@ -34,6 +34,7 @@ export default async function RegistrationsPage() {
       },
     }),
     parentSignupOpen(),
+    emailAvailable(),
   ]);
 
   // Look up which school IDs already exist so the admin can see, before
@@ -68,7 +69,9 @@ export default async function RegistrationsPage() {
         name: reg.parent.name,
         username: reg.parent.username,
         phone: reg.parent.phone,
-        emailVerified: Boolean(reg.parent.emailVerifiedAt),
+        // Nothing to badge when confirmation is switched off — no parent has
+        // been asked to confirm, so "unverified" would just be noise.
+        emailVerified: mailOn ? Boolean(reg.parent.emailVerifiedAt) : null,
       },
       match: match
         ? {

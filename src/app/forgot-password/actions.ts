@@ -8,11 +8,14 @@ import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { consumeCode, issueCode } from "@/lib/verification";
 import { passwordResetEmail, sendEmail } from "@/lib/email";
 import { normalizeUsername } from "@/lib/username";
+import { emailAvailable } from "@/lib/settings";
 
 export type ForgotState = { error?: string; sent?: boolean };
 export type ResetState = { error?: string };
 
 const MIN_PASSWORD = 8;
+const OFFICE_ONLY =
+  "Password resets by email are switched off. Please contact the school office.";
 
 /**
  * Starts a password reset.
@@ -26,6 +29,14 @@ export async function requestReset(
   _prev: ForgotState,
   formData: FormData
 ): Promise<ForgotState> {
+  // Closed outright when the school isn't sending email. The page already
+  // hides the form; this stops a hand-crafted request from quietly minting
+  // codes that would sit in the table unsendable. No account is looked up, so
+  // there's nothing to leak and no need for the usual identical-answer dance.
+  if (!(await emailAvailable())) {
+    return { error: OFFICE_ONLY };
+  }
+
   const email = normalizeUsername(String(formData.get("email") || ""));
   if (!email) return { error: "Enter your email address." };
 
@@ -58,6 +69,12 @@ export async function resetPassword(
   _prev: ResetState,
   formData: FormData
 ): Promise<ResetState> {
+  // Also refuse to spend a code that was issued before email was switched
+  // off, so turning the feature off closes the door immediately.
+  if (!(await emailAvailable())) {
+    return { error: OFFICE_ONLY };
+  }
+
   const email = normalizeUsername(String(formData.get("email") || ""));
   const code = String(formData.get("code") || "");
   const password = String(formData.get("password") || "");

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { RegisterForm } from "./register-form";
 
 export const dynamic = "force-dynamic";
@@ -15,11 +15,13 @@ export default async function RegisterChildPage({
   const session = await requireRole("PARENT");
   const { welcome, verified } = await searchParams;
 
-  const parent = await prisma.user.findUniqueOrThrow({
-    where: { id: session.uid },
-    select: { emailVerifiedAt: true },
-  });
-  if (!parent.emailVerifiedAt) redirect("/verify-email");
+  if (await emailAvailable()) {
+    const parent = await prisma.user.findUniqueOrThrow({
+      where: { id: session.uid },
+      select: { emailVerifiedAt: true },
+    });
+    if (!parent.emailVerifiedAt) redirect("/verify-email");
+  }
 
   const open = await parentSignupOpen();
 

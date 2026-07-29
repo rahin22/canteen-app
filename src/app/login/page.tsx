@@ -1,4 +1,4 @@
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,10 @@ export default async function LoginPage({
 }) {
   const { reset } = await searchParams;
   return (
-    <LoginForm signupOpen={await parentSignupOpen()} justReset={Boolean(reset)} />
+    <LoginForm
+      signupOpen={await parentSignupOpen()}
+      canResetByEmail={await emailAvailable()}
+      justReset={Boolean(reset)}
+    />
   );
 }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/auth";
-import { parentSignupOpen } from "@/lib/settings";
+import { emailAvailable, parentSignupOpen } from "@/lib/settings";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { issueCode } from "@/lib/verification";
 import { sendEmail, verificationEmail } from "@/lib/email";
@@ -68,8 +68,16 @@ export async function signup(
     },
   });
 
-  // Email them a confirmation code straight away. A failure to send must not
-  // strand a parent with an account they can't get into, so it's logged
+  await createSession({ uid: parent.id, role: "PARENT", name: parent.name });
+
+  // With email switched off there is no code to send and nothing to confirm,
+  // so send them straight on to add their first child. Nothing is weakened by
+  // skipping it: a parent account grants no access on its own, and every
+  // child they submit still waits for an admin to approve it.
+  if (!(await emailAvailable())) redirect("/family/register?welcome=1");
+
+  // Otherwise email a confirmation code straight away. A failure to send must
+  // not strand a parent with an account they can't get into, so it's logged
   // rather than surfaced — they can request another code on the next page.
   const issued = await issueCode(parent.id, "EMAIL_VERIFY");
   if (issued.ok) {
@@ -79,6 +87,5 @@ export async function signup(
     });
   }
 
-  await createSession({ uid: parent.id, role: "PARENT", name: parent.name });
   redirect("/verify-email");
 }

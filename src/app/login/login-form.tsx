@@ -6,9 +6,11 @@ import { login, type LoginState } from "./actions";
 
 export function LoginForm({
   signupOpen,
+  canResetByEmail,
   justReset,
 }: {
   signupOpen: boolean;
+  canResetByEmail: boolean;
   justReset?: boolean;
 }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
@@ -59,12 +61,14 @@ export function LoginForm({
               <label className="block text-sm font-medium text-slate-700">
                 Password
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-indigo-600 hover:underline"
-              >
-                Forgot?
-              </Link>
+              {canResetByEmail && (
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-indigo-600 hover:underline"
+                >
+                  Forgot?
+                </Link>
+              )}
             </div>
             <input
               name="password"
@@ -88,6 +92,12 @@ export function LoginForm({
           >
             {pending ? "Signing in…" : "Sign in"}
           </button>
+
+          {!canResetByEmail && (
+            <p className="border-t border-slate-100 pt-4 text-center text-xs text-slate-400">
+              Forgotten your password? Ask the school office to reset it.
+            </p>
+          )}
 
           {signupOpen && (
             <p className="border-t border-slate-100 pt-4 text-center text-sm text-slate-500">

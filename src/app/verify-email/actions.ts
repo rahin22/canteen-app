@@ -5,12 +5,16 @@ import { prisma } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { consumeCode, issueCode } from "@/lib/verification";
 import { sendEmail, verificationEmail } from "@/lib/email";
+import { emailAvailable } from "@/lib/settings";
 
 export type VerifyState = { error?: string; success?: string };
+
+const EMAIL_OFF = "Email confirmation is switched off — you don't need a code.";
 
 /** Emails the signed-in parent a fresh confirmation code. */
 export async function sendVerificationCode(): Promise<VerifyState> {
   const session = await requireRole("PARENT");
+  if (!(await emailAvailable())) return { error: EMAIL_OFF };
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: session.uid },
     select: { email: true, name: true, emailVerifiedAt: true },
@@ -37,6 +41,7 @@ export async function confirmEmail(
   formData: FormData
 ): Promise<VerifyState> {
   const session = await requireRole("PARENT");
+  if (!(await emailAvailable())) return { error: EMAIL_OFF };
   const result = await consumeCode(
     session.uid,
     "EMAIL_VERIFY",

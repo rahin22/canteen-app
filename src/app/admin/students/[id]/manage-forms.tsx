@@ -14,6 +14,7 @@ import {
   createParent,
   linkParent,
   unlinkParent,
+  resetParentPassword,
   uploadStudentPhoto,
   removeStudentPhoto,
   type ActionState,
@@ -339,6 +340,7 @@ export function ParentsManager({
     {}
   );
   const [pending, startTransition] = useTransition();
+  const [result, setResult] = useState<ActionState>({});
 
   return (
     <div>
@@ -353,20 +355,41 @@ export function ParentsManager({
                 <p className="text-sm font-medium text-slate-900">{p.name}</p>
                 <p className="font-mono text-xs text-slate-400">{p.username}</p>
               </div>
-              <button
-                disabled={pending}
-                onClick={() => {
-                  if (!confirm(`Unlink ${p.name} from this student?`)) return;
-                  startTransition(async () => {
-                    await unlinkParent(studentId, p.id);
-                  });
-                }}
-                className="text-xs font-medium text-red-600 hover:underline"
-              >
-                Unlink
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    if (
+                      !confirm(
+                        `Reset ${p.name}'s password? They'll be signed out on every device and you'll need to read them the new password.`
+                      )
+                    )
+                      return;
+                    startTransition(async () =>
+                      setResult(await resetParentPassword(p.id))
+                    );
+                  }}
+                  className="text-xs font-medium text-slate-600 hover:underline"
+                >
+                  Reset password
+                </button>
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    if (!confirm(`Unlink ${p.name} from this student?`)) return;
+                    startTransition(async () => {
+                      setResult({});
+                      await unlinkParent(studentId, p.id);
+                    });
+                  }}
+                  className="text-xs font-medium text-red-600 hover:underline"
+                >
+                  Unlink
+                </button>
+              </div>
             </div>
           ))}
+          <Feedback state={result} />
         </div>
       ) : (
         <p className="mb-3 text-sm text-slate-500">

@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { emailAvailable } from "@/lib/settings";
 import { ResetForm } from "./reset-form";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +10,9 @@ export default async function ResetPasswordPage({
   searchParams: Promise<{ email?: string }>;
 }) {
   const { email } = await searchParams;
+  // No codes go out when email is off, so there is nothing to enter here —
+  // send them to the page that explains how to get a new password instead.
+  if (!(await emailAvailable())) redirect("/forgot-password");
 
   return (
     <main className="flex flex-1 items-center justify-center p-6">

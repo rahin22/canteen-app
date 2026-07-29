@@ -39,7 +39,7 @@ the *Password* link in the top-right corner.
 | `DATABASE_URL` | Postgres connection string |
 | `SESSION_SECRET` | Long random string signing login cookies |
 | `PHOTO_ENCRYPTION_KEY` | 64 hex chars (`openssl rand -hex 32`). Encrypts student photos at rest — back it up with the database |
-| `RESEND_API_KEY` | Resend API key. Empty = codes are logged to the server console instead of emailed |
+| `RESEND_API_KEY` | Resend API key. Empty = the app sends no email at all (see *Running without email*) |
 | `EMAIL_FROM` | Sender, e.g. `School Canteen <canteen@school.edu.au>`. The domain must be verified in Resend |
 | `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_…`). Empty = online top-ups hidden |
 | `STRIPE_WEBHOOK_SECRET` | From the Stripe webhook endpoint (`whsec_…`) |
@@ -63,7 +63,7 @@ the *Password* link in the top-right corner.
 
 ## Settings (Admin → Settings)
 
-Two switches, both **off** by default:
+Three switches, all **off** by default:
 
 - **Online top-ups** — when off, every top-up screen tells students and parents
   to pay cash instead, and the checkout action refuses even if someone crafts
@@ -71,6 +71,8 @@ Two switches, both **off** by default:
   Cash top-ups recorded by an admin work regardless.
 - **Parent self-registration** — opens `/signup` so parents can create their
   own account and register their children.
+- **Email confirmation & password reset** — see below. Needs `RESEND_API_KEY`
+  and `EMAIL_FROM` set before it can be enabled.
 
 ## Accounts, passwords and email
 
@@ -89,11 +91,40 @@ Admin → Staff.
   number; changing or resetting a password bumps it, which signs out every
   other device immediately. Disabling an account does the same.
 
+### Running without email
+
+The app is designed to work with email switched off, which is the default.
+Turning the **Email confirmation & password reset** setting off (or simply
+never setting `RESEND_API_KEY`) means:
+
+- Parents sign up and go straight to registering a child — no code, no
+  confirmation step, and no reminder banners.
+- `/forgot-password` shows "contact the school office" instead of a form, and
+  `/reset-password` redirects to it. Both server actions refuse as well, so a
+  hand-crafted request can't reset a password either — including with a code
+  issued before the setting was turned off.
+- **Nobody can reset their own password.** An admin resets a parent's from any
+  of their children's pages (Students → open the student → Parents → *Reset
+  password*); students and staff are reset the same way as always.
+
+Nothing is weakened by turning it off. A parent account on its own grants no
+access to anything, and every child a parent submits still waits for an admin
+to approve it — that approval, not the email, is what stops a stranger
+attaching themselves to a student. What you lose is the guarantee that the
+address on file actually reaches the parent, and some protection against a
+bored person filling the approval queue with junk (still rate-limited to 5
+signups per IP per hour).
+
+Turning it back on later immediately reinstates confirmation for parents who
+signed up without it — the app never records a fake "verified" timestamp to
+paper over the setting being off.
+
 ## Parent self-registration
 
 1. A parent signs up at `/signup` with their email (which is their username),
    name and password. The account starts empty — no children, no balance.
-2. They confirm their email with the code we send them.
+2. They confirm their email with the code we send them (skipped when email is
+   switched off).
 3. They add each child: full name, school student ID, class, and a photo.
 4. Requests land in **Admin → Registrations** with a badge showing the count.
    Nothing exists in the canteen system until an admin approves — self-signup

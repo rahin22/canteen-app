@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { createSession, destroySession } from "@/lib/auth";
+import { emailAvailable } from "@/lib/settings";
 
 export type LoginState = { error?: string };
 
@@ -29,9 +30,12 @@ export async function login(
 
   if (user.role === "ADMIN") redirect("/admin");
   if (user.role === "OPERATOR") redirect("/scan");
-  // Parents who haven't confirmed their address land on the code screen.
+  // Parents who haven't confirmed their address land on the code screen —
+  // but only while we're actually able to send them a code.
   if (user.role === "PARENT") {
-    redirect(user.emailVerifiedAt || !user.email ? "/family" : "/verify-email");
+    const needsConfirming =
+      Boolean(user.email) && !user.emailVerifiedAt && (await emailAvailable());
+    redirect(needsConfirming ? "/verify-email" : "/family");
   }
   redirect("/me");
 }
