@@ -30,6 +30,7 @@ export default async function FamilyPage({
             balance: true,
             active: true,
             photoId: true,
+            dailyLimit: true,
           },
         },
       },
@@ -110,7 +111,16 @@ export default async function FamilyPage({
                       </span>
                     )}
                   </p>
-                  <p className="text-sm text-slate-500">{child.className || ""}</p>
+                  <p className="text-sm text-slate-500">
+                    {[
+                      child.className,
+                      child.dailyLimit !== null
+                        ? `${formatMoney(child.dailyLimit)}/day limit`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
                 </div>
               </div>
               <div className="shrink-0 text-right">
@@ -146,7 +156,7 @@ export default async function FamilyPage({
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold text-slate-900">{reg.name}</p>
                 <p className="text-sm text-slate-500">
-                  {[reg.className, reg.schoolId].filter(Boolean).join(" · ")}
+                  {[reg.className, reg.studentIdCode].filter(Boolean).join(" · ")}
                 </p>
               </div>
               {reg.status === "PENDING" ? (

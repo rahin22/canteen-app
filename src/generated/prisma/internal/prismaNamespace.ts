@@ -401,10 +401,12 @@ export const ModelName = {
   Photo: 'Photo',
   ChildRegistration: 'ChildRegistration',
   VerificationCode: 'VerificationCode',
+  School: 'School',
   Setting: 'Setting',
   Card: 'Card',
   MenuItem: 'MenuItem',
-  Transaction: 'Transaction'
+  Transaction: 'Transaction',
+  Preorder: 'Preorder'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "setting" | "card" | "menuItem" | "transaction"
+    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "school" | "setting" | "card" | "menuItem" | "transaction" | "preorder"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -720,6 +722,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    School: {
+      payload: Prisma.$SchoolPayload<ExtArgs>
+      fields: Prisma.SchoolFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SchoolFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SchoolFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        findFirst: {
+          args: Prisma.SchoolFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SchoolFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        findMany: {
+          args: Prisma.SchoolFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+        }
+        create: {
+          args: Prisma.SchoolCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        createMany: {
+          args: Prisma.SchoolCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SchoolCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+        }
+        delete: {
+          args: Prisma.SchoolDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        update: {
+          args: Prisma.SchoolUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        deleteMany: {
+          args: Prisma.SchoolDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SchoolUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SchoolUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+        }
+        upsert: {
+          args: Prisma.SchoolUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolPayload>
+        }
+        aggregate: {
+          args: Prisma.SchoolAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSchool>
+        }
+        groupBy: {
+          args: Prisma.SchoolGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SchoolGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SchoolCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SchoolCountAggregateOutputType> | number
+        }
+      }
+    }
     Setting: {
       payload: Prisma.$SettingPayload<ExtArgs>
       fields: Prisma.SettingFieldRefs
@@ -1016,6 +1092,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Preorder: {
+      payload: Prisma.$PreorderPayload<ExtArgs>
+      fields: Prisma.PreorderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PreorderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PreorderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        findFirst: {
+          args: Prisma.PreorderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PreorderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        findMany: {
+          args: Prisma.PreorderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>[]
+        }
+        create: {
+          args: Prisma.PreorderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        createMany: {
+          args: Prisma.PreorderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PreorderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>[]
+        }
+        delete: {
+          args: Prisma.PreorderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        update: {
+          args: Prisma.PreorderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        deleteMany: {
+          args: Prisma.PreorderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PreorderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PreorderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>[]
+        }
+        upsert: {
+          args: Prisma.PreorderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PreorderPayload>
+        }
+        aggregate: {
+          args: Prisma.PreorderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePreorder>
+        }
+        groupBy: {
+          args: Prisma.PreorderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PreorderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PreorderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PreorderCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1062,11 +1212,13 @@ export const UserScalarFieldEnum = {
   username: 'username',
   passwordHash: 'passwordHash',
   className: 'className',
+  schoolId: 'schoolId',
   email: 'email',
   phone: 'phone',
   emailVerifiedAt: 'emailVerifiedAt',
   sessionVersion: 'sessionVersion',
   balance: 'balance',
+  dailyLimit: 'dailyLimit',
   active: 'active',
   photoId: 'photoId',
   createdAt: 'createdAt'
@@ -1090,6 +1242,7 @@ export const ChildRegistrationScalarFieldEnum = {
   id: 'id',
   parentId: 'parentId',
   name: 'name',
+  studentIdCode: 'studentIdCode',
   schoolId: 'schoolId',
   className: 'className',
   photoId: 'photoId',
@@ -1116,6 +1269,17 @@ export const VerificationCodeScalarFieldEnum = {
 } as const
 
 export type VerificationCodeScalarFieldEnum = (typeof VerificationCodeScalarFieldEnum)[keyof typeof VerificationCodeScalarFieldEnum]
+
+
+export const SchoolScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
 export const SettingScalarFieldEnum = {
@@ -1145,7 +1309,8 @@ export const MenuItemScalarFieldEnum = {
   price: 'price',
   category: 'category',
   active: 'active',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  schoolId: 'schoolId'
 } as const
 
 export type MenuItemScalarFieldEnum = (typeof MenuItemScalarFieldEnum)[keyof typeof MenuItemScalarFieldEnum]
@@ -1166,6 +1331,24 @@ export const TransactionScalarFieldEnum = {
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
 
 
+export const PreorderScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  placedById: 'placedById',
+  source: 'source',
+  items: 'items',
+  total: 'total',
+  status: 'status',
+  serviceDate: 'serviceDate',
+  transactionId: 'transactionId',
+  collectedAt: 'collectedAt',
+  cancelledAt: 'cancelledAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PreorderScalarFieldEnum = (typeof PreorderScalarFieldEnum)[keyof typeof PreorderScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1180,6 +1363,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1375,6 +1565,34 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'PreorderSource'
+ */
+export type EnumPreorderSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreorderSource'>
+    
+
+
+/**
+ * Reference to a field of type 'PreorderSource[]'
+ */
+export type ListEnumPreorderSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreorderSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PreorderStatus'
+ */
+export type EnumPreorderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreorderStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PreorderStatus[]'
+ */
+export type ListEnumPreorderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreorderStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1542,10 +1760,12 @@ export type GlobalOmitConfig = {
   photo?: Prisma.PhotoOmit
   childRegistration?: Prisma.ChildRegistrationOmit
   verificationCode?: Prisma.VerificationCodeOmit
+  school?: Prisma.SchoolOmit
   setting?: Prisma.SettingOmit
   card?: Prisma.CardOmit
   menuItem?: Prisma.MenuItemOmit
   transaction?: Prisma.TransactionOmit
+  preorder?: Prisma.PreorderOmit
 }
 
 /* Types for Logging */

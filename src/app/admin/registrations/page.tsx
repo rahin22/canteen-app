@@ -22,6 +22,7 @@ export default async function RegistrationsPage() {
         parent: {
           select: { name: true, username: true, phone: true, emailVerifiedAt: true },
         },
+        school: { select: { name: true } },
       },
     }),
     prisma.childRegistration.findMany({
@@ -42,7 +43,7 @@ export default async function RegistrationsPage() {
   const matches = pending.length
     ? await prisma.user.findMany({
         where: {
-          username: { in: pending.map((r) => r.schoolId) },
+          username: { in: pending.map((r) => r.studentIdCode) },
         },
         select: {
           username: true,
@@ -56,12 +57,13 @@ export default async function RegistrationsPage() {
 
   const cards: PendingRegistration[] = pending.map((reg) => {
     const match = matches.find(
-      (m) => m.username === reg.schoolId && m.role === "STUDENT"
+      (m) => m.username === reg.studentIdCode && m.role === "STUDENT"
     );
     return {
       id: reg.id,
       name: reg.name,
-      schoolId: reg.schoolId,
+      studentIdCode: reg.studentIdCode,
+      schoolName: reg.school?.name ?? null,
       className: reg.className,
       hasPhoto: Boolean(reg.photoId),
       createdAt: dateFormat.format(reg.createdAt),
@@ -128,7 +130,7 @@ export default async function RegistrationsPage() {
                   <p className="truncate font-medium text-slate-900">
                     {reg.name}{" "}
                     <span className="font-mono text-xs text-slate-400">
-                      {reg.schoolId}
+                      {reg.studentIdCode}
                     </span>
                   </p>
                   <p className="text-xs text-slate-500">

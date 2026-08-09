@@ -42,3 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# printer protocol reverse-engineering scratch (RLabel APK + jadx decompiler)
+*.apk
+/jadx-*/

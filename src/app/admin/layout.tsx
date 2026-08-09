@@ -3,17 +3,21 @@ import { logout } from "@/app/login/actions";
 import Link from "next/link";
 
 import { prisma } from "@/lib/db";
+import { startOfSchoolDay } from "@/lib/day";
+import { allSchools, currentSchoolId, studentSchoolFilter } from "@/lib/schools";
+import { SchoolSwitcher } from "./school-switcher";
 
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/students", label: "Students" },
-  { href: "/admin/registrations", label: "Registrations", badge: true },
+  { href: "/admin/registrations", label: "Registrations", badge: "registrations" },
+  { href: "/admin/preorders", label: "Orders", badge: "preorders" },
   { href: "/admin/menu", label: "Menu" },
   { href: "/admin/transactions", label: "Transactions" },
   { href: "/admin/staff", label: "Staff" },
   { href: "/admin/settings", label: "Settings" },
   { href: "/scan", label: "Till" },
-];
+] as const;
 
 export default async function AdminLayout({
   children,
@@ -21,9 +25,30 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   await requireRole("ADMIN");
-  const pendingRegistrations = await prisma.childRegistration.count({
-    where: { status: "PENDING" },
-  });
+  const [schools, selectedSchool, schoolScope] = await Promise.all([
+    allSchools(),
+    currentSchoolId(),
+    studentSchoolFilter(),
+  ]);
+  const [pendingRegistrations, pendingPreorders] = await Promise.all([
+    prisma.childRegistration.count({
+      where: {
+        status: "PENDING",
+        ...(selectedSchool ? { schoolId: selectedSchool } : {}),
+      },
+    }),
+    prisma.preorder.count({
+      where: {
+        status: "PENDING",
+        serviceDate: startOfSchoolDay(),
+        ...schoolScope,
+      },
+    }),
+  ]);
+  const counts = {
+    registrations: pendingRegistrations,
+    preorders: pendingPreorders,
+  };
 
   return (
     <div className="flex min-h-screen flex-1 flex-col">
@@ -34,6 +59,7 @@ export default async function AdminLayout({
             {process.env.NEXT_PUBLIC_SCHOOL_NAME || "School Canteen"}
           </Link>
           <div className="flex items-center gap-3 text-sm">
+            <SchoolSwitcher schools={schools} current={selectedSchool} />
             <Link href="/password" className="text-slate-500 hover:text-slate-800">
               Password
             </Link>
@@ -52,9 +78,9 @@ export default async function AdminLayout({
               className="whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
               {item.label}
-              {item.badge && pendingRegistrations > 0 && (
+              {"badge" in item && counts[item.badge] > 0 && (
                 <span className="ml-1.5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-xs font-semibold text-white">
-                  {pendingRegistrations}
+                  {counts[item.badge]}
                 </span>
               )}
             </Link>

@@ -31,6 +31,7 @@ export type ChildRegistrationMinAggregateOutputType = {
   id: string | null
   parentId: string | null
   name: string | null
+  studentIdCode: string | null
   schoolId: string | null
   className: string | null
   photoId: string | null
@@ -46,6 +47,7 @@ export type ChildRegistrationMaxAggregateOutputType = {
   id: string | null
   parentId: string | null
   name: string | null
+  studentIdCode: string | null
   schoolId: string | null
   className: string | null
   photoId: string | null
@@ -61,6 +63,7 @@ export type ChildRegistrationCountAggregateOutputType = {
   id: number
   parentId: number
   name: number
+  studentIdCode: number
   schoolId: number
   className: number
   photoId: number
@@ -78,6 +81,7 @@ export type ChildRegistrationMinAggregateInputType = {
   id?: true
   parentId?: true
   name?: true
+  studentIdCode?: true
   schoolId?: true
   className?: true
   photoId?: true
@@ -93,6 +97,7 @@ export type ChildRegistrationMaxAggregateInputType = {
   id?: true
   parentId?: true
   name?: true
+  studentIdCode?: true
   schoolId?: true
   className?: true
   photoId?: true
@@ -108,6 +113,7 @@ export type ChildRegistrationCountAggregateInputType = {
   id?: true
   parentId?: true
   name?: true
+  studentIdCode?: true
   schoolId?: true
   className?: true
   photoId?: true
@@ -196,7 +202,8 @@ export type ChildRegistrationGroupByOutputType = {
   id: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId: string | null
   className: string | null
   photoId: string | null
   status: $Enums.RegistrationStatus
@@ -232,7 +239,8 @@ export type ChildRegistrationWhereInput = {
   id?: Prisma.StringFilter<"ChildRegistration"> | string
   parentId?: Prisma.StringFilter<"ChildRegistration"> | string
   name?: Prisma.StringFilter<"ChildRegistration"> | string
-  schoolId?: Prisma.StringFilter<"ChildRegistration"> | string
+  studentIdCode?: Prisma.StringFilter<"ChildRegistration"> | string
+  schoolId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   className?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   photoId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   status?: Prisma.EnumRegistrationStatusFilter<"ChildRegistration"> | $Enums.RegistrationStatus
@@ -242,6 +250,7 @@ export type ChildRegistrationWhereInput = {
   studentId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   createdAt?: Prisma.DateTimeFilter<"ChildRegistration"> | Date | string
   parent?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   photo?: Prisma.XOR<Prisma.PhotoNullableScalarRelationFilter, Prisma.PhotoWhereInput> | null
   reviewer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   student?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -251,7 +260,8 @@ export type ChildRegistrationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  schoolId?: Prisma.SortOrder
+  studentIdCode?: Prisma.SortOrder
+  schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
   className?: Prisma.SortOrderInput | Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -261,6 +271,7 @@ export type ChildRegistrationOrderByWithRelationInput = {
   studentId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   parent?: Prisma.UserOrderByWithRelationInput
+  school?: Prisma.SchoolOrderByWithRelationInput
   photo?: Prisma.PhotoOrderByWithRelationInput
   reviewer?: Prisma.UserOrderByWithRelationInput
   student?: Prisma.UserOrderByWithRelationInput
@@ -275,7 +286,8 @@ export type ChildRegistrationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ChildRegistrationWhereInput | Prisma.ChildRegistrationWhereInput[]
   parentId?: Prisma.StringFilter<"ChildRegistration"> | string
   name?: Prisma.StringFilter<"ChildRegistration"> | string
-  schoolId?: Prisma.StringFilter<"ChildRegistration"> | string
+  studentIdCode?: Prisma.StringFilter<"ChildRegistration"> | string
+  schoolId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   className?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   status?: Prisma.EnumRegistrationStatusFilter<"ChildRegistration"> | $Enums.RegistrationStatus
   note?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
@@ -283,6 +295,7 @@ export type ChildRegistrationWhereUniqueInput = Prisma.AtLeast<{
   reviewedAt?: Prisma.DateTimeNullableFilter<"ChildRegistration"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"ChildRegistration"> | Date | string
   parent?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   photo?: Prisma.XOR<Prisma.PhotoNullableScalarRelationFilter, Prisma.PhotoWhereInput> | null
   reviewer?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   student?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -292,7 +305,8 @@ export type ChildRegistrationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  schoolId?: Prisma.SortOrder
+  studentIdCode?: Prisma.SortOrder
+  schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
   className?: Prisma.SortOrderInput | Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -313,7 +327,8 @@ export type ChildRegistrationScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ChildRegistration"> | string
   parentId?: Prisma.StringWithAggregatesFilter<"ChildRegistration"> | string
   name?: Prisma.StringWithAggregatesFilter<"ChildRegistration"> | string
-  schoolId?: Prisma.StringWithAggregatesFilter<"ChildRegistration"> | string
+  studentIdCode?: Prisma.StringWithAggregatesFilter<"ChildRegistration"> | string
+  schoolId?: Prisma.StringNullableWithAggregatesFilter<"ChildRegistration"> | string | null
   className?: Prisma.StringNullableWithAggregatesFilter<"ChildRegistration"> | string | null
   photoId?: Prisma.StringNullableWithAggregatesFilter<"ChildRegistration"> | string | null
   status?: Prisma.EnumRegistrationStatusWithAggregatesFilter<"ChildRegistration"> | $Enums.RegistrationStatus
@@ -327,13 +342,14 @@ export type ChildRegistrationScalarWhereWithAggregatesInput = {
 export type ChildRegistrationCreateInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   parent: Prisma.UserCreateNestedOneWithoutSubmittedRegistrationsInput
+  school?: Prisma.SchoolCreateNestedOneWithoutRegistrationsInput
   photo?: Prisma.PhotoCreateNestedOneWithoutRegistrationInput
   reviewer?: Prisma.UserCreateNestedOneWithoutReviewedRegistrationsInput
   student?: Prisma.UserCreateNestedOneWithoutRegistrationInput
@@ -343,7 +359,8 @@ export type ChildRegistrationUncheckedCreateInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -357,13 +374,14 @@ export type ChildRegistrationUncheckedCreateInput = {
 export type ChildRegistrationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.UserUpdateOneRequiredWithoutSubmittedRegistrationsNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutRegistrationsNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutRegistrationNestedInput
   reviewer?: Prisma.UserUpdateOneWithoutReviewedRegistrationsNestedInput
   student?: Prisma.UserUpdateOneWithoutRegistrationNestedInput
@@ -373,7 +391,8 @@ export type ChildRegistrationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -388,7 +407,8 @@ export type ChildRegistrationCreateManyInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -402,7 +422,7 @@ export type ChildRegistrationCreateManyInput = {
 export type ChildRegistrationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -414,7 +434,8 @@ export type ChildRegistrationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -444,6 +465,7 @@ export type ChildRegistrationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  studentIdCode?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
   className?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -459,6 +481,7 @@ export type ChildRegistrationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  studentIdCode?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
   className?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -474,6 +497,7 @@ export type ChildRegistrationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  studentIdCode?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
   className?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
@@ -637,15 +661,58 @@ export type EnumRegistrationStatusFieldUpdateOperationsInput = {
   set?: $Enums.RegistrationStatus
 }
 
+export type ChildRegistrationCreateNestedManyWithoutSchoolInput = {
+  create?: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput> | Prisma.ChildRegistrationCreateWithoutSchoolInput[] | Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput | Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput[]
+  createMany?: Prisma.ChildRegistrationCreateManySchoolInputEnvelope
+  connect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+}
+
+export type ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput = {
+  create?: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput> | Prisma.ChildRegistrationCreateWithoutSchoolInput[] | Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput | Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput[]
+  createMany?: Prisma.ChildRegistrationCreateManySchoolInputEnvelope
+  connect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+}
+
+export type ChildRegistrationUpdateManyWithoutSchoolNestedInput = {
+  create?: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput> | Prisma.ChildRegistrationCreateWithoutSchoolInput[] | Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput | Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput[]
+  upsert?: Prisma.ChildRegistrationUpsertWithWhereUniqueWithoutSchoolInput | Prisma.ChildRegistrationUpsertWithWhereUniqueWithoutSchoolInput[]
+  createMany?: Prisma.ChildRegistrationCreateManySchoolInputEnvelope
+  set?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  disconnect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  delete?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  connect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  update?: Prisma.ChildRegistrationUpdateWithWhereUniqueWithoutSchoolInput | Prisma.ChildRegistrationUpdateWithWhereUniqueWithoutSchoolInput[]
+  updateMany?: Prisma.ChildRegistrationUpdateManyWithWhereWithoutSchoolInput | Prisma.ChildRegistrationUpdateManyWithWhereWithoutSchoolInput[]
+  deleteMany?: Prisma.ChildRegistrationScalarWhereInput | Prisma.ChildRegistrationScalarWhereInput[]
+}
+
+export type ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput = {
+  create?: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput> | Prisma.ChildRegistrationCreateWithoutSchoolInput[] | Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput | Prisma.ChildRegistrationCreateOrConnectWithoutSchoolInput[]
+  upsert?: Prisma.ChildRegistrationUpsertWithWhereUniqueWithoutSchoolInput | Prisma.ChildRegistrationUpsertWithWhereUniqueWithoutSchoolInput[]
+  createMany?: Prisma.ChildRegistrationCreateManySchoolInputEnvelope
+  set?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  disconnect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  delete?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  connect?: Prisma.ChildRegistrationWhereUniqueInput | Prisma.ChildRegistrationWhereUniqueInput[]
+  update?: Prisma.ChildRegistrationUpdateWithWhereUniqueWithoutSchoolInput | Prisma.ChildRegistrationUpdateWithWhereUniqueWithoutSchoolInput[]
+  updateMany?: Prisma.ChildRegistrationUpdateManyWithWhereWithoutSchoolInput | Prisma.ChildRegistrationUpdateManyWithWhereWithoutSchoolInput[]
+  deleteMany?: Prisma.ChildRegistrationScalarWhereInput | Prisma.ChildRegistrationScalarWhereInput[]
+}
+
 export type ChildRegistrationCreateWithoutParentInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
   reviewedAt?: Date | string | null
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutRegistrationsInput
   photo?: Prisma.PhotoCreateNestedOneWithoutRegistrationInput
   reviewer?: Prisma.UserCreateNestedOneWithoutReviewedRegistrationsInput
   student?: Prisma.UserCreateNestedOneWithoutRegistrationInput
@@ -654,7 +721,8 @@ export type ChildRegistrationCreateWithoutParentInput = {
 export type ChildRegistrationUncheckedCreateWithoutParentInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -678,13 +746,14 @@ export type ChildRegistrationCreateManyParentInputEnvelope = {
 export type ChildRegistrationCreateWithoutReviewerInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   parent: Prisma.UserCreateNestedOneWithoutSubmittedRegistrationsInput
+  school?: Prisma.SchoolCreateNestedOneWithoutRegistrationsInput
   photo?: Prisma.PhotoCreateNestedOneWithoutRegistrationInput
   student?: Prisma.UserCreateNestedOneWithoutRegistrationInput
 }
@@ -693,7 +762,8 @@ export type ChildRegistrationUncheckedCreateWithoutReviewerInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -716,13 +786,14 @@ export type ChildRegistrationCreateManyReviewerInputEnvelope = {
 export type ChildRegistrationCreateWithoutStudentInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   parent: Prisma.UserCreateNestedOneWithoutSubmittedRegistrationsInput
+  school?: Prisma.SchoolCreateNestedOneWithoutRegistrationsInput
   photo?: Prisma.PhotoCreateNestedOneWithoutRegistrationInput
   reviewer?: Prisma.UserCreateNestedOneWithoutReviewedRegistrationsInput
 }
@@ -731,7 +802,8 @@ export type ChildRegistrationUncheckedCreateWithoutStudentInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -769,7 +841,8 @@ export type ChildRegistrationScalarWhereInput = {
   id?: Prisma.StringFilter<"ChildRegistration"> | string
   parentId?: Prisma.StringFilter<"ChildRegistration"> | string
   name?: Prisma.StringFilter<"ChildRegistration"> | string
-  schoolId?: Prisma.StringFilter<"ChildRegistration"> | string
+  studentIdCode?: Prisma.StringFilter<"ChildRegistration"> | string
+  schoolId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   className?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   photoId?: Prisma.StringNullableFilter<"ChildRegistration"> | string | null
   status?: Prisma.EnumRegistrationStatusFilter<"ChildRegistration"> | $Enums.RegistrationStatus
@@ -810,13 +883,14 @@ export type ChildRegistrationUpdateToOneWithWhereWithoutStudentInput = {
 export type ChildRegistrationUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.UserUpdateOneRequiredWithoutSubmittedRegistrationsNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutRegistrationsNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutRegistrationNestedInput
   reviewer?: Prisma.UserUpdateOneWithoutReviewedRegistrationsNestedInput
 }
@@ -825,7 +899,8 @@ export type ChildRegistrationUncheckedUpdateWithoutStudentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -838,13 +913,14 @@ export type ChildRegistrationUncheckedUpdateWithoutStudentInput = {
 export type ChildRegistrationCreateWithoutPhotoInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   parent: Prisma.UserCreateNestedOneWithoutSubmittedRegistrationsInput
+  school?: Prisma.SchoolCreateNestedOneWithoutRegistrationsInput
   reviewer?: Prisma.UserCreateNestedOneWithoutReviewedRegistrationsInput
   student?: Prisma.UserCreateNestedOneWithoutRegistrationInput
 }
@@ -853,7 +929,8 @@ export type ChildRegistrationUncheckedCreateWithoutPhotoInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   status?: $Enums.RegistrationStatus
   note?: string | null
@@ -882,13 +959,14 @@ export type ChildRegistrationUpdateToOneWithWhereWithoutPhotoInput = {
 export type ChildRegistrationUpdateWithoutPhotoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.UserUpdateOneRequiredWithoutSubmittedRegistrationsNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutRegistrationsNestedInput
   reviewer?: Prisma.UserUpdateOneWithoutReviewedRegistrationsNestedInput
   student?: Prisma.UserUpdateOneWithoutRegistrationNestedInput
 }
@@ -897,7 +975,8 @@ export type ChildRegistrationUncheckedUpdateWithoutPhotoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -907,10 +986,67 @@ export type ChildRegistrationUncheckedUpdateWithoutPhotoInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ChildRegistrationCreateWithoutSchoolInput = {
+  id?: string
+  name: string
+  studentIdCode: string
+  className?: string | null
+  status?: $Enums.RegistrationStatus
+  note?: string | null
+  reviewedAt?: Date | string | null
+  createdAt?: Date | string
+  parent: Prisma.UserCreateNestedOneWithoutSubmittedRegistrationsInput
+  photo?: Prisma.PhotoCreateNestedOneWithoutRegistrationInput
+  reviewer?: Prisma.UserCreateNestedOneWithoutReviewedRegistrationsInput
+  student?: Prisma.UserCreateNestedOneWithoutRegistrationInput
+}
+
+export type ChildRegistrationUncheckedCreateWithoutSchoolInput = {
+  id?: string
+  parentId: string
+  name: string
+  studentIdCode: string
+  className?: string | null
+  photoId?: string | null
+  status?: $Enums.RegistrationStatus
+  note?: string | null
+  reviewerId?: string | null
+  reviewedAt?: Date | string | null
+  studentId?: string | null
+  createdAt?: Date | string
+}
+
+export type ChildRegistrationCreateOrConnectWithoutSchoolInput = {
+  where: Prisma.ChildRegistrationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput>
+}
+
+export type ChildRegistrationCreateManySchoolInputEnvelope = {
+  data: Prisma.ChildRegistrationCreateManySchoolInput | Prisma.ChildRegistrationCreateManySchoolInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChildRegistrationUpsertWithWhereUniqueWithoutSchoolInput = {
+  where: Prisma.ChildRegistrationWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChildRegistrationUpdateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedUpdateWithoutSchoolInput>
+  create: Prisma.XOR<Prisma.ChildRegistrationCreateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedCreateWithoutSchoolInput>
+}
+
+export type ChildRegistrationUpdateWithWhereUniqueWithoutSchoolInput = {
+  where: Prisma.ChildRegistrationWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChildRegistrationUpdateWithoutSchoolInput, Prisma.ChildRegistrationUncheckedUpdateWithoutSchoolInput>
+}
+
+export type ChildRegistrationUpdateManyWithWhereWithoutSchoolInput = {
+  where: Prisma.ChildRegistrationScalarWhereInput
+  data: Prisma.XOR<Prisma.ChildRegistrationUpdateManyMutationInput, Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolInput>
+}
+
 export type ChildRegistrationCreateManyParentInput = {
   id?: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -925,7 +1061,8 @@ export type ChildRegistrationCreateManyReviewerInput = {
   id?: string
   parentId: string
   name: string
-  schoolId: string
+  studentIdCode: string
+  schoolId?: string | null
   className?: string | null
   photoId?: string | null
   status?: $Enums.RegistrationStatus
@@ -938,12 +1075,13 @@ export type ChildRegistrationCreateManyReviewerInput = {
 export type ChildRegistrationUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutRegistrationsNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutRegistrationNestedInput
   reviewer?: Prisma.UserUpdateOneWithoutReviewedRegistrationsNestedInput
   student?: Prisma.UserUpdateOneWithoutRegistrationNestedInput
@@ -952,7 +1090,8 @@ export type ChildRegistrationUpdateWithoutParentInput = {
 export type ChildRegistrationUncheckedUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -966,7 +1105,8 @@ export type ChildRegistrationUncheckedUpdateWithoutParentInput = {
 export type ChildRegistrationUncheckedUpdateManyWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -980,13 +1120,14 @@ export type ChildRegistrationUncheckedUpdateManyWithoutParentInput = {
 export type ChildRegistrationUpdateWithoutReviewerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   parent?: Prisma.UserUpdateOneRequiredWithoutSubmittedRegistrationsNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutRegistrationsNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutRegistrationNestedInput
   student?: Prisma.UserUpdateOneWithoutRegistrationNestedInput
 }
@@ -995,7 +1136,8 @@ export type ChildRegistrationUncheckedUpdateWithoutReviewerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
@@ -1009,11 +1151,72 @@ export type ChildRegistrationUncheckedUpdateManyWithoutReviewerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   parentId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  schoolId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ChildRegistrationCreateManySchoolInput = {
+  id?: string
+  parentId: string
+  name: string
+  studentIdCode: string
+  className?: string | null
+  photoId?: string | null
+  status?: $Enums.RegistrationStatus
+  note?: string | null
+  reviewerId?: string | null
+  reviewedAt?: Date | string | null
+  studentId?: string | null
+  createdAt?: Date | string
+}
+
+export type ChildRegistrationUpdateWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  parent?: Prisma.UserUpdateOneRequiredWithoutSubmittedRegistrationsNestedInput
+  photo?: Prisma.PhotoUpdateOneWithoutRegistrationNestedInput
+  reviewer?: Prisma.UserUpdateOneWithoutReviewedRegistrationsNestedInput
+  student?: Prisma.UserUpdateOneWithoutRegistrationNestedInput
+}
+
+export type ChildRegistrationUncheckedUpdateWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ChildRegistrationUncheckedUpdateManyWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  studentIdCode?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1025,6 +1228,7 @@ export type ChildRegistrationSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   parentId?: boolean
   name?: boolean
+  studentIdCode?: boolean
   schoolId?: boolean
   className?: boolean
   photoId?: boolean
@@ -1035,6 +1239,7 @@ export type ChildRegistrationSelect<ExtArgs extends runtime.Types.Extensions.Int
   studentId?: boolean
   createdAt?: boolean
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
@@ -1044,6 +1249,7 @@ export type ChildRegistrationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   parentId?: boolean
   name?: boolean
+  studentIdCode?: boolean
   schoolId?: boolean
   className?: boolean
   photoId?: boolean
@@ -1054,6 +1260,7 @@ export type ChildRegistrationSelectCreateManyAndReturn<ExtArgs extends runtime.T
   studentId?: boolean
   createdAt?: boolean
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
@@ -1063,6 +1270,7 @@ export type ChildRegistrationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   parentId?: boolean
   name?: boolean
+  studentIdCode?: boolean
   schoolId?: boolean
   className?: boolean
   photoId?: boolean
@@ -1073,6 +1281,7 @@ export type ChildRegistrationSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   studentId?: boolean
   createdAt?: boolean
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
@@ -1082,6 +1291,7 @@ export type ChildRegistrationSelectScalar = {
   id?: boolean
   parentId?: boolean
   name?: boolean
+  studentIdCode?: boolean
   schoolId?: boolean
   className?: boolean
   photoId?: boolean
@@ -1093,21 +1303,24 @@ export type ChildRegistrationSelectScalar = {
   createdAt?: boolean
 }
 
-export type ChildRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "parentId" | "name" | "schoolId" | "className" | "photoId" | "status" | "note" | "reviewerId" | "reviewedAt" | "studentId" | "createdAt", ExtArgs["result"]["childRegistration"]>
+export type ChildRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "parentId" | "name" | "studentIdCode" | "schoolId" | "className" | "photoId" | "status" | "note" | "reviewerId" | "reviewedAt" | "studentId" | "createdAt", ExtArgs["result"]["childRegistration"]>
 export type ChildRegistrationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
 }
 export type ChildRegistrationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
 }
 export type ChildRegistrationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parent?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  school?: boolean | Prisma.ChildRegistration$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.ChildRegistration$photoArgs<ExtArgs>
   reviewer?: boolean | Prisma.ChildRegistration$reviewerArgs<ExtArgs>
   student?: boolean | Prisma.ChildRegistration$studentArgs<ExtArgs>
@@ -1117,6 +1330,7 @@ export type $ChildRegistrationPayload<ExtArgs extends runtime.Types.Extensions.I
   name: "ChildRegistration"
   objects: {
     parent: Prisma.$UserPayload<ExtArgs>
+    school: Prisma.$SchoolPayload<ExtArgs> | null
     photo: Prisma.$PhotoPayload<ExtArgs> | null
     reviewer: Prisma.$UserPayload<ExtArgs> | null
     student: Prisma.$UserPayload<ExtArgs> | null
@@ -1125,7 +1339,8 @@ export type $ChildRegistrationPayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     parentId: string
     name: string
-    schoolId: string
+    studentIdCode: string
+    schoolId: string | null
     className: string | null
     photoId: string | null
     status: $Enums.RegistrationStatus
@@ -1529,6 +1744,7 @@ readonly fields: ChildRegistrationFieldRefs;
 export interface Prisma__ChildRegistrationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   parent<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  school<T extends Prisma.ChildRegistration$schoolArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChildRegistration$schoolArgs<ExtArgs>>): Prisma.Prisma__SchoolClient<runtime.Types.Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   photo<T extends Prisma.ChildRegistration$photoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChildRegistration$photoArgs<ExtArgs>>): Prisma.Prisma__PhotoClient<runtime.Types.Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewer<T extends Prisma.ChildRegistration$reviewerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChildRegistration$reviewerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   student<T extends Prisma.ChildRegistration$studentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ChildRegistration$studentArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -1564,6 +1780,7 @@ export interface ChildRegistrationFieldRefs {
   readonly id: Prisma.FieldRef<"ChildRegistration", 'String'>
   readonly parentId: Prisma.FieldRef<"ChildRegistration", 'String'>
   readonly name: Prisma.FieldRef<"ChildRegistration", 'String'>
+  readonly studentIdCode: Prisma.FieldRef<"ChildRegistration", 'String'>
   readonly schoolId: Prisma.FieldRef<"ChildRegistration", 'String'>
   readonly className: Prisma.FieldRef<"ChildRegistration", 'String'>
   readonly photoId: Prisma.FieldRef<"ChildRegistration", 'String'>
@@ -1971,6 +2188,25 @@ export type ChildRegistrationDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many ChildRegistrations to delete.
    */
   limit?: number
+}
+
+/**
+ * ChildRegistration.school
+ */
+export type ChildRegistration$schoolArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the School
+   */
+  select?: Prisma.SchoolSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the School
+   */
+  omit?: Prisma.SchoolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SchoolInclude<ExtArgs> | null
+  where?: Prisma.SchoolWhereInput
 }
 
 /**

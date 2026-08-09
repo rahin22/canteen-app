@@ -30,6 +30,10 @@ enum TxType {
   TOPUP_STRIPE
   PURCHASE
   ADJUSTMENT
+  // Reverses a purchase that never became food — currently only a cancelled
+  // preorder. Kept separate from ADJUSTMENT because it nets off the daily
+  // spend cap, whereas an admin adjustment deliberately doesn't.
+  REFUND
 }
 
 enum RegistrationStatus {
@@ -43,6 +47,18 @@ enum VerificationPurpose {
   PASSWORD_RESET
 }
 
+enum PreorderStatus {
+  PENDING
+  COLLECTED
+  CANCELLED
+}
+
+/** Where an order was placed — the office kiosk, or a parent's own login. */
+enum PreorderSource {
+  KIOSK
+  PARENT
+}
+
 model User {
   id           String   @id @default(cuid())
   role         Role     @default(STUDENT)
@@ -50,6 +66,12 @@ model User {
   username     String   @unique
   passwordHash String
   className    String?
+  // Which school this person belongs to. Always set for students — it decides
+  // whose menu they see and which admin filter they appear under. Left null
+  // for admins and parents, who aren't tied to one (a parent may well have
+  // children at both).
+  school       School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  schoolId     String?
   // Contact details, only collected for self-registered PARENT accounts.
   // Students and operators sign in with a school-issued username and have no
   // email, so the email-based flows never apply to them.
@@ -63,10 +85,16 @@ model User {
   // Cached balance in cents. Source of truth is the Transaction ledger;
   // every write to balance happens atomically alongside a Transaction row.
   balance      Int      @default(0)
+  // Optional cap on how much this student may spend per day, in cents. Set by
+  // a linked parent. null means no cap; 0 means no spending at all. Enforced
+  // in chargeStudent against purchases made since the start of the local day.
+  dailyLimit   Int?
   active       Boolean  @default(true)
   cards        Card[]
   transactions Transaction[] @relation("StudentTx")
   operated     Transaction[] @relation("OperatorTx")
+  preorders    Preorder[]    @relation("StudentPreorders")
+  placedPreorders Preorder[] @relation("PlacedPreorders")
   // PARENT accounts link to their STUDENT children (and vice versa).
   children     User[]   @relation("ParentChild")
   parents      User[]   @relation("ParentChild")
@@ -110,7 +138,11 @@ model ChildRegistration {
   parentId   String
   name       String
   // School-issued student ID; becomes the student's username on approval.
-  schoolId   String
+  // Named for the ID printed on the card, not the School relation below.
+  studentIdCode String
+  // Which school the parent is enrolling the child at.
+  school     School? @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  schoolId   String?
   className  String?
   photo      Photo?             @relation(fields: [photoId], references: [id], onDelete: SetNull)
   photoId    String?            @unique
@@ -150,6 +182,25 @@ model VerificationCode {
   @@index([expiresAt])
 }
 
+/**
+ * A school the canteen system serves.
+ *
+ * One deployment runs several schools side by side. Students, menus and
+ * registrations each belong to exactly one; admins switch between them (or
+ * view all at once) from the header. Schools are deactivated rather than
+ * deleted so historical students and transactions keep their affiliation.
+ */
+model School {
+  id            String              @id @default(cuid())
+  name          String
+  active        Boolean             @default(true)
+  sortOrder     Int                 @default(0)
+  users         User[]
+  menuItems     MenuItem[]
+  registrations ChildRegistration[]
+  createdAt     DateTime            @default(now())
+}
+
 /** Simple key/value app settings editable by an admin at /admin/settings. */
 model Setting {
   key       String   @id
@@ -176,6 +227,12 @@ model MenuItem {
   category  String?
   active    Boolean @default(true)
   sortOrder Int     @default(0)
+  // Menus are per-school. The two schools run similar lists, but they price
+  // and stock them independently, so an item belongs to exactly one.
+  school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  String
+
+  @@index([schoolId, active])
 }
 
 model Transaction {
@@ -190,8 +247,48 @@ model Transaction {
   items           Json?
   note            String?
   stripeSessionId String?  @unique
+  preorder        Preorder?
   createdAt       DateTime @default(now())
 
   @@index([studentId, createdAt])
   @@index([createdAt])
+}
+
+/**
+ * A meal ordered ahead of time — from the office kiosk at the start of the day
+ * or by a parent from their own login — and collected at the canteen later.
+ *
+ * Preorders carry no money. Nothing is deducted when one is placed; the till
+ * charges it on collection through the normal ledger path, so the balance
+ * check and the parent's daily spend cap are applied at the moment of sale
+ * rather than being second-guessed hours earlier. That also means cancelling
+ * an order never needs a refund.
+ */
+model Preorder {
+  id         String         @id @default(cuid())
+  student    User           @relation("StudentPreorders", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId  String
+  // Who placed it. Null for kiosk orders: tapping a card at the kiosk
+  // identifies the student but never signs anybody in, so there's no actor
+  // beyond the student the card belongs to.
+  placedBy   User?          @relation("PlacedPreorders", fields: [placedById], references: [id], onDelete: SetNull)
+  placedById String?
+  source     PreorderSource
+  // Snapshot of the lines and the prices quoted at order time. The till
+  // charges these rather than live menu prices, so editing the menu can't
+  // change what a child was quoted or strand an order whose item was removed.
+  items      Json
+  total      Int
+  status     PreorderStatus @default(PENDING)
+  // Local midnight of the canteen day the order is for (see src/lib/day.ts).
+  serviceDate DateTime
+  // The purchase that fulfilled this order, once it's been collected.
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  transactionId String?      @unique
+  collectedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime     @default(now())
+
+  @@index([serviceDate, status])
+  @@index([studentId, serviceDate])
 }

@@ -76,6 +76,17 @@ export type ChildRegistration = Prisma.ChildRegistrationModel
  */
 export type VerificationCode = Prisma.VerificationCodeModel
 /**
+ * Model School
+ * *
+ *  * A school the canteen system serves.
+ *  *
+ *  * One deployment runs several schools side by side. Students, menus and
+ *  * registrations each belong to exactly one; admins switch between them (or
+ *  * view all at once) from the header. Schools are deactivated rather than
+ *  * deleted so historical students and transactions keep their affiliation.
+ */
+export type School = Prisma.SchoolModel
+/**
  * Model Setting
  * * Simple key/value app settings editable by an admin at /admin/settings.
  */
@@ -95,3 +106,16 @@ export type MenuItem = Prisma.MenuItemModel
  * 
  */
 export type Transaction = Prisma.TransactionModel
+/**
+ * Model Preorder
+ * *
+ *  * A meal ordered ahead of time — from the office kiosk at the start of the day
+ *  * or by a parent from their own login — and collected at the canteen later.
+ *  *
+ *  * Preorders carry no money. Nothing is deducted when one is placed; the till
+ *  * charges it on collection through the normal ledger path, so the balance
+ *  * check and the parent's daily spend cap are applied at the moment of sale
+ *  * rather than being second-guessed hours earlier. That also means cancelling
+ *  * an order never needs a refund.
+ */
+export type Preorder = Prisma.PreorderModel

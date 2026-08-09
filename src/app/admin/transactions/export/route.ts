@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { studentSchoolFilter } from "@/lib/schools";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
 
-const TYPES = ["PURCHASE", "TOPUP_CASH", "TOPUP_STRIPE", "ADJUSTMENT"] as const;
+const TYPES = ["PURCHASE", "TOPUP_CASH", "TOPUP_STRIPE", "ADJUSTMENT", "REFUND"] as const;
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -19,6 +20,8 @@ export async function GET(req: NextRequest) {
   const to = params.get("to");
 
   const where: Prisma.TransactionWhereInput = {
+    // Matches whatever the admin is looking at on screen.
+    ...(await studentSchoolFilter()),
     ...(type ? { type } : {}),
     ...(from || to
       ? {

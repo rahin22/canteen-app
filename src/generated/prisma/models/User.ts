@@ -29,11 +29,13 @@ export type AggregateUser = {
 export type UserAvgAggregateOutputType = {
   sessionVersion: number | null
   balance: number | null
+  dailyLimit: number | null
 }
 
 export type UserSumAggregateOutputType = {
   sessionVersion: number | null
   balance: number | null
+  dailyLimit: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -43,11 +45,13 @@ export type UserMinAggregateOutputType = {
   username: string | null
   passwordHash: string | null
   className: string | null
+  schoolId: string | null
   email: string | null
   phone: string | null
   emailVerifiedAt: Date | null
   sessionVersion: number | null
   balance: number | null
+  dailyLimit: number | null
   active: boolean | null
   photoId: string | null
   createdAt: Date | null
@@ -60,11 +64,13 @@ export type UserMaxAggregateOutputType = {
   username: string | null
   passwordHash: string | null
   className: string | null
+  schoolId: string | null
   email: string | null
   phone: string | null
   emailVerifiedAt: Date | null
   sessionVersion: number | null
   balance: number | null
+  dailyLimit: number | null
   active: boolean | null
   photoId: string | null
   createdAt: Date | null
@@ -77,11 +83,13 @@ export type UserCountAggregateOutputType = {
   username: number
   passwordHash: number
   className: number
+  schoolId: number
   email: number
   phone: number
   emailVerifiedAt: number
   sessionVersion: number
   balance: number
+  dailyLimit: number
   active: number
   photoId: number
   createdAt: number
@@ -92,11 +100,13 @@ export type UserCountAggregateOutputType = {
 export type UserAvgAggregateInputType = {
   sessionVersion?: true
   balance?: true
+  dailyLimit?: true
 }
 
 export type UserSumAggregateInputType = {
   sessionVersion?: true
   balance?: true
+  dailyLimit?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -106,11 +116,13 @@ export type UserMinAggregateInputType = {
   username?: true
   passwordHash?: true
   className?: true
+  schoolId?: true
   email?: true
   phone?: true
   emailVerifiedAt?: true
   sessionVersion?: true
   balance?: true
+  dailyLimit?: true
   active?: true
   photoId?: true
   createdAt?: true
@@ -123,11 +135,13 @@ export type UserMaxAggregateInputType = {
   username?: true
   passwordHash?: true
   className?: true
+  schoolId?: true
   email?: true
   phone?: true
   emailVerifiedAt?: true
   sessionVersion?: true
   balance?: true
+  dailyLimit?: true
   active?: true
   photoId?: true
   createdAt?: true
@@ -140,11 +154,13 @@ export type UserCountAggregateInputType = {
   username?: true
   passwordHash?: true
   className?: true
+  schoolId?: true
   email?: true
   phone?: true
   emailVerifiedAt?: true
   sessionVersion?: true
   balance?: true
+  dailyLimit?: true
   active?: true
   photoId?: true
   createdAt?: true
@@ -244,11 +260,13 @@ export type UserGroupByOutputType = {
   username: string
   passwordHash: string
   className: string | null
+  schoolId: string | null
   email: string | null
   phone: string | null
   emailVerifiedAt: Date | null
   sessionVersion: number
   balance: number
+  dailyLimit: number | null
   active: boolean
   photoId: string | null
   createdAt: Date
@@ -284,18 +302,23 @@ export type UserWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   className?: Prisma.StringNullableFilter<"User"> | string | null
+  schoolId?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
+  dailyLimit?: Prisma.IntNullableFilter<"User"> | number | null
   active?: Prisma.BoolFilter<"User"> | boolean
   photoId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   codes?: Prisma.VerificationCodeListRelationFilter
   cards?: Prisma.CardListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   operated?: Prisma.TransactionListRelationFilter
+  preorders?: Prisma.PreorderListRelationFilter
+  placedPreorders?: Prisma.PreorderListRelationFilter
   children?: Prisma.UserListRelationFilter
   parents?: Prisma.UserListRelationFilter
   photo?: Prisma.XOR<Prisma.PhotoNullableScalarRelationFilter, Prisma.PhotoWhereInput> | null
@@ -311,18 +334,23 @@ export type UserOrderByWithRelationInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   className?: Prisma.SortOrderInput | Prisma.SortOrder
+  schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  school?: Prisma.SchoolOrderByWithRelationInput
   codes?: Prisma.VerificationCodeOrderByRelationAggregateInput
   cards?: Prisma.CardOrderByRelationAggregateInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
   operated?: Prisma.TransactionOrderByRelationAggregateInput
+  preorders?: Prisma.PreorderOrderByRelationAggregateInput
+  placedPreorders?: Prisma.PreorderOrderByRelationAggregateInput
   children?: Prisma.UserOrderByRelationAggregateInput
   parents?: Prisma.UserOrderByRelationAggregateInput
   photo?: Prisma.PhotoOrderByWithRelationInput
@@ -342,17 +370,22 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   className?: Prisma.StringNullableFilter<"User"> | string | null
+  schoolId?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
+  dailyLimit?: Prisma.IntNullableFilter<"User"> | number | null
   active?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   codes?: Prisma.VerificationCodeListRelationFilter
   cards?: Prisma.CardListRelationFilter
   transactions?: Prisma.TransactionListRelationFilter
   operated?: Prisma.TransactionListRelationFilter
+  preorders?: Prisma.PreorderListRelationFilter
+  placedPreorders?: Prisma.PreorderListRelationFilter
   children?: Prisma.UserListRelationFilter
   parents?: Prisma.UserListRelationFilter
   photo?: Prisma.XOR<Prisma.PhotoNullableScalarRelationFilter, Prisma.PhotoWhereInput> | null
@@ -368,11 +401,13 @@ export type UserOrderByWithAggregationInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   className?: Prisma.SortOrderInput | Prisma.SortOrder
+  schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -393,11 +428,13 @@ export type UserScalarWhereWithAggregatesInput = {
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   className?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  schoolId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   sessionVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
   balance?: Prisma.IntWithAggregatesFilter<"User"> | number
+  dailyLimit?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   photoId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -415,12 +452,16 @@ export type UserCreateInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -436,11 +477,13 @@ export type UserUncheckedCreateInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -448,6 +491,8 @@ export type UserUncheckedCreateInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -467,12 +512,16 @@ export type UserUpdateInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -488,11 +537,13 @@ export type UserUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -500,6 +551,8 @@ export type UserUncheckedUpdateInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -514,11 +567,13 @@ export type UserCreateManyInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -536,6 +591,7 @@ export type UserUpdateManyMutationInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -547,11 +603,13 @@ export type UserUncheckedUpdateManyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -574,11 +632,13 @@ export type UserCountOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   className?: Prisma.SortOrder
+  schoolId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -587,6 +647,7 @@ export type UserCountOrderByAggregateInput = {
 export type UserAvgOrderByAggregateInput = {
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -596,11 +657,13 @@ export type UserMaxOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   className?: Prisma.SortOrder
+  schoolId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -613,11 +676,13 @@ export type UserMinOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   className?: Prisma.SortOrder
+  schoolId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   active?: Prisma.SortOrder
   photoId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -626,6 +691,7 @@ export type UserMinOrderByAggregateInput = {
 export type UserSumOrderByAggregateInput = {
   sessionVersion?: Prisma.SortOrder
   balance?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -680,6 +746,14 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type IntFieldUpdateOperationsInput = {
   set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
@@ -838,6 +912,48 @@ export type UserUpdateOneRequiredWithoutCodesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCodesInput, Prisma.UserUpdateWithoutCodesInput>, Prisma.UserUncheckedUpdateWithoutCodesInput>
 }
 
+export type UserCreateNestedManyWithoutSchoolInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput> | Prisma.UserCreateWithoutSchoolInput[] | Prisma.UserUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSchoolInput | Prisma.UserCreateOrConnectWithoutSchoolInput[]
+  createMany?: Prisma.UserCreateManySchoolInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutSchoolInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput> | Prisma.UserCreateWithoutSchoolInput[] | Prisma.UserUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSchoolInput | Prisma.UserCreateOrConnectWithoutSchoolInput[]
+  createMany?: Prisma.UserCreateManySchoolInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutSchoolNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput> | Prisma.UserCreateWithoutSchoolInput[] | Prisma.UserUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSchoolInput | Prisma.UserCreateOrConnectWithoutSchoolInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutSchoolInput | Prisma.UserUpsertWithWhereUniqueWithoutSchoolInput[]
+  createMany?: Prisma.UserCreateManySchoolInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutSchoolInput | Prisma.UserUpdateWithWhereUniqueWithoutSchoolInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutSchoolInput | Prisma.UserUpdateManyWithWhereWithoutSchoolInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutSchoolNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput> | Prisma.UserCreateWithoutSchoolInput[] | Prisma.UserUncheckedCreateWithoutSchoolInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSchoolInput | Prisma.UserCreateOrConnectWithoutSchoolInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutSchoolInput | Prisma.UserUpsertWithWhereUniqueWithoutSchoolInput[]
+  createMany?: Prisma.UserCreateManySchoolInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutSchoolInput | Prisma.UserUpdateWithWhereUniqueWithoutSchoolInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutSchoolInput | Prisma.UserUpdateManyWithWhereWithoutSchoolInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
 export type UserCreateNestedOneWithoutCardsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCardsInput, Prisma.UserUncheckedCreateWithoutCardsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCardsInput
@@ -882,6 +998,36 @@ export type UserUpdateOneWithoutOperatedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOperatedInput, Prisma.UserUpdateWithoutOperatedInput>, Prisma.UserUncheckedUpdateWithoutOperatedInput>
 }
 
+export type UserCreateNestedOneWithoutPreordersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreordersInput, Prisma.UserUncheckedCreateWithoutPreordersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreordersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutPlacedPreordersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlacedPreordersInput, Prisma.UserUncheckedCreateWithoutPlacedPreordersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlacedPreordersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPreordersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPreordersInput, Prisma.UserUncheckedCreateWithoutPreordersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPreordersInput
+  upsert?: Prisma.UserUpsertWithoutPreordersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPreordersInput, Prisma.UserUpdateWithoutPreordersInput>, Prisma.UserUncheckedUpdateWithoutPreordersInput>
+}
+
+export type UserUpdateOneWithoutPlacedPreordersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlacedPreordersInput, Prisma.UserUncheckedCreateWithoutPlacedPreordersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlacedPreordersInput
+  upsert?: Prisma.UserUpsertWithoutPlacedPreordersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlacedPreordersInput, Prisma.UserUpdateWithoutPlacedPreordersInput>, Prisma.UserUncheckedUpdateWithoutPlacedPreordersInput>
+}
+
 export type UserCreateWithoutParentsInput = {
   id?: string
   role?: $Enums.Role
@@ -894,12 +1040,16 @@ export type UserCreateWithoutParentsInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
   submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
@@ -914,11 +1064,13 @@ export type UserUncheckedCreateWithoutParentsInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -926,6 +1078,8 @@ export type UserUncheckedCreateWithoutParentsInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
@@ -949,12 +1103,16 @@ export type UserCreateWithoutChildrenInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
   submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
@@ -969,11 +1127,13 @@ export type UserUncheckedCreateWithoutChildrenInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -981,6 +1141,8 @@ export type UserUncheckedCreateWithoutChildrenInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
@@ -1018,11 +1180,13 @@ export type UserScalarWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringFilter<"User"> | string
   className?: Prisma.StringNullableFilter<"User"> | string | null
+  schoolId?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringNullableFilter<"User"> | string | null
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessionVersion?: Prisma.IntFilter<"User"> | number
   balance?: Prisma.IntFilter<"User"> | number
+  dailyLimit?: Prisma.IntNullableFilter<"User"> | number | null
   active?: Prisma.BoolFilter<"User"> | boolean
   photoId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -1056,12 +1220,16 @@ export type UserCreateWithoutPhotoInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
@@ -1076,17 +1244,21 @@ export type UserUncheckedCreateWithoutPhotoInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
   codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1122,12 +1294,16 @@ export type UserUpdateWithoutPhotoInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
@@ -1142,17 +1318,21 @@ export type UserUncheckedUpdateWithoutPhotoInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1172,12 +1352,16 @@ export type UserCreateWithoutSubmittedRegistrationsInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1192,11 +1376,13 @@ export type UserUncheckedCreateWithoutSubmittedRegistrationsInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -1204,6 +1390,8 @@ export type UserUncheckedCreateWithoutSubmittedRegistrationsInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
@@ -1227,12 +1415,16 @@ export type UserCreateWithoutReviewedRegistrationsInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1247,11 +1439,13 @@ export type UserUncheckedCreateWithoutReviewedRegistrationsInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -1259,6 +1453,8 @@ export type UserUncheckedCreateWithoutReviewedRegistrationsInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1282,12 +1478,16 @@ export type UserCreateWithoutRegistrationInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1302,11 +1502,13 @@ export type UserUncheckedCreateWithoutRegistrationInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
@@ -1314,6 +1516,8 @@ export type UserUncheckedCreateWithoutRegistrationInput = {
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1348,12 +1552,16 @@ export type UserUpdateWithoutSubmittedRegistrationsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1368,11 +1576,13 @@ export type UserUncheckedUpdateWithoutSubmittedRegistrationsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1380,6 +1590,8 @@ export type UserUncheckedUpdateWithoutSubmittedRegistrationsInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
@@ -1409,12 +1621,16 @@ export type UserUpdateWithoutReviewedRegistrationsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1429,11 +1645,13 @@ export type UserUncheckedUpdateWithoutReviewedRegistrationsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1441,6 +1659,8 @@ export type UserUncheckedUpdateWithoutReviewedRegistrationsInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1470,12 +1690,16 @@ export type UserUpdateWithoutRegistrationInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1490,11 +1714,13 @@ export type UserUncheckedUpdateWithoutRegistrationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1502,6 +1728,8 @@ export type UserUncheckedUpdateWithoutRegistrationInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1520,11 +1748,15 @@ export type UserCreateWithoutCodesInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1540,17 +1772,21 @@ export type UserUncheckedCreateWithoutCodesInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1586,11 +1822,15 @@ export type UserUpdateWithoutCodesInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1606,22 +1846,110 @@ export type UserUncheckedUpdateWithoutCodesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
   registration?: Prisma.ChildRegistrationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type UserCreateWithoutSchoolInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  createdAt?: Date | string
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
+  children?: Prisma.UserCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
+  photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
+  submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationCreateNestedOneWithoutStudentInput
+}
+
+export type UserUncheckedCreateWithoutSchoolInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  photoId?: string | null
+  createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
+  children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationUncheckedCreateNestedOneWithoutStudentInput
+}
+
+export type UserCreateOrConnectWithoutSchoolInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput>
+}
+
+export type UserCreateManySchoolInputEnvelope = {
+  data: Prisma.UserCreateManySchoolInput | Prisma.UserCreateManySchoolInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutSchoolInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSchoolInput, Prisma.UserUncheckedUpdateWithoutSchoolInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSchoolInput, Prisma.UserUncheckedCreateWithoutSchoolInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutSchoolInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSchoolInput, Prisma.UserUncheckedUpdateWithoutSchoolInput>
+}
+
+export type UserUpdateManyWithWhereWithoutSchoolInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutSchoolInput>
 }
 
 export type UserCreateWithoutCardsInput = {
@@ -1636,11 +1964,15 @@ export type UserCreateWithoutCardsInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1656,17 +1988,21 @@ export type UserUncheckedCreateWithoutCardsInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
   codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1702,11 +2038,15 @@ export type UserUpdateWithoutCardsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1722,17 +2062,21 @@ export type UserUncheckedUpdateWithoutCardsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1752,11 +2096,15 @@ export type UserCreateWithoutTransactionsInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1772,17 +2120,21 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
   codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1807,11 +2159,15 @@ export type UserCreateWithoutOperatedInput = {
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
   codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
   cards?: Prisma.CardCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
   photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
@@ -1827,17 +2183,21 @@ export type UserUncheckedCreateWithoutOperatedInput = {
   username: string
   passwordHash: string
   className?: string | null
+  schoolId?: string | null
   email?: string | null
   phone?: string | null
   emailVerifiedAt?: Date | string | null
   sessionVersion?: number
   balance?: number
+  dailyLimit?: number | null
   active?: boolean
   photoId?: string | null
   createdAt?: Date | string
   codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
   cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
   children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
   parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
@@ -1873,11 +2233,15 @@ export type UserUpdateWithoutTransactionsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1893,17 +2257,21 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1934,11 +2302,15 @@ export type UserUpdateWithoutOperatedInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
@@ -1954,17 +2326,285 @@ export type UserUncheckedUpdateWithoutOperatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
+  children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type UserCreateWithoutPreordersInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  placedPreorders?: Prisma.PreorderCreateNestedManyWithoutPlacedByInput
+  children?: Prisma.UserCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
+  photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
+  submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationCreateNestedOneWithoutStudentInput
+}
+
+export type UserUncheckedCreateWithoutPreordersInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  schoolId?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  photoId?: string | null
+  createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  placedPreorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutPlacedByInput
+  children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationUncheckedCreateNestedOneWithoutStudentInput
+}
+
+export type UserCreateOrConnectWithoutPreordersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreordersInput, Prisma.UserUncheckedCreateWithoutPreordersInput>
+}
+
+export type UserCreateWithoutPlacedPreordersInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  createdAt?: Date | string
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
+  codes?: Prisma.VerificationCodeCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutStudentInput
+  children?: Prisma.UserCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserCreateNestedManyWithoutChildrenInput
+  photo?: Prisma.PhotoCreateNestedOneWithoutUserInput
+  submittedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationCreateNestedOneWithoutStudentInput
+}
+
+export type UserUncheckedCreateWithoutPlacedPreordersInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  schoolId?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  photoId?: string | null
+  createdAt?: Date | string
+  codes?: Prisma.VerificationCodeUncheckedCreateNestedManyWithoutUserInput
+  cards?: Prisma.CardUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutStudentInput
+  operated?: Prisma.TransactionUncheckedCreateNestedManyWithoutOperatorInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutStudentInput
+  children?: Prisma.UserUncheckedCreateNestedManyWithoutParentsInput
+  parents?: Prisma.UserUncheckedCreateNestedManyWithoutChildrenInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutParentInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutReviewerInput
+  registration?: Prisma.ChildRegistrationUncheckedCreateNestedOneWithoutStudentInput
+}
+
+export type UserCreateOrConnectWithoutPlacedPreordersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlacedPreordersInput, Prisma.UserUncheckedCreateWithoutPlacedPreordersInput>
+}
+
+export type UserUpsertWithoutPreordersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPreordersInput, Prisma.UserUncheckedUpdateWithoutPreordersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPreordersInput, Prisma.UserUncheckedCreateWithoutPreordersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPreordersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPreordersInput, Prisma.UserUncheckedUpdateWithoutPreordersInput>
+}
+
+export type UserUpdateWithoutPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
+  children?: Prisma.UserUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
+  photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
+  children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUpsertWithoutPlacedPreordersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPlacedPreordersInput, Prisma.UserUncheckedUpdateWithoutPlacedPreordersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlacedPreordersInput, Prisma.UserUncheckedCreateWithoutPlacedPreordersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPlacedPreordersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPlacedPreordersInput, Prisma.UserUncheckedUpdateWithoutPlacedPreordersInput>
+}
+
+export type UserUpdateWithoutPlacedPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  children?: Prisma.UserUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
+  photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPlacedPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
@@ -1984,12 +2624,16 @@ export type UserUpdateWithoutParentsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUpdateManyWithoutParentsNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
@@ -2004,11 +2648,13 @@ export type UserUncheckedUpdateWithoutParentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2016,6 +2662,8 @@ export type UserUncheckedUpdateWithoutParentsInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
@@ -2029,11 +2677,13 @@ export type UserUncheckedUpdateManyWithoutParentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2051,12 +2701,16 @@ export type UserUpdateWithoutChildrenInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
   codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
   cards?: Prisma.CardUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
   parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
   photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
@@ -2071,11 +2725,13 @@ export type UserUncheckedUpdateWithoutChildrenInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2083,6 +2739,8 @@ export type UserUncheckedUpdateWithoutChildrenInput = {
   cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
   operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
   parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
   submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
   reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
@@ -2096,11 +2754,107 @@ export type UserUncheckedUpdateManyWithoutChildrenInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
   balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserCreateManySchoolInput = {
+  id?: string
+  role?: $Enums.Role
+  name: string
+  username: string
+  passwordHash: string
+  className?: string | null
+  email?: string | null
+  phone?: string | null
+  emailVerifiedAt?: Date | string | null
+  sessionVersion?: number
+  balance?: number
+  dailyLimit?: number | null
+  active?: boolean
+  photoId?: string | null
+  createdAt?: Date | string
+}
+
+export type UserUpdateWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUpdateManyWithoutPlacedByNestedInput
+  children?: Prisma.UserUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUpdateManyWithoutChildrenNestedInput
+  photo?: Prisma.PhotoUpdateOneWithoutUserNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  codes?: Prisma.VerificationCodeUncheckedUpdateManyWithoutUserNestedInput
+  cards?: Prisma.CardUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutStudentNestedInput
+  operated?: Prisma.TransactionUncheckedUpdateManyWithoutOperatorNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutStudentNestedInput
+  placedPreorders?: Prisma.PreorderUncheckedUpdateManyWithoutPlacedByNestedInput
+  children?: Prisma.UserUncheckedUpdateManyWithoutParentsNestedInput
+  parents?: Prisma.UserUncheckedUpdateManyWithoutChildrenNestedInput
+  submittedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutParentNestedInput
+  reviewedRegistrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutReviewerNestedInput
+  registration?: Prisma.ChildRegistrationUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutSchoolInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  dailyLimit?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   photoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2116,6 +2870,8 @@ export type UserCountOutputType = {
   cards: number
   transactions: number
   operated: number
+  preorders: number
+  placedPreorders: number
   children: number
   parents: number
   submittedRegistrations: number
@@ -2127,6 +2883,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   cards?: boolean | UserCountOutputTypeCountCardsArgs
   transactions?: boolean | UserCountOutputTypeCountTransactionsArgs
   operated?: boolean | UserCountOutputTypeCountOperatedArgs
+  preorders?: boolean | UserCountOutputTypeCountPreordersArgs
+  placedPreorders?: boolean | UserCountOutputTypeCountPlacedPreordersArgs
   children?: boolean | UserCountOutputTypeCountChildrenArgs
   parents?: boolean | UserCountOutputTypeCountParentsArgs
   submittedRegistrations?: boolean | UserCountOutputTypeCountSubmittedRegistrationsArgs
@@ -2174,6 +2932,20 @@ export type UserCountOutputTypeCountOperatedArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountPreordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PreorderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPlacedPreordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PreorderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountChildrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserWhereInput
 }
@@ -2207,18 +2979,23 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   username?: boolean
   passwordHash?: boolean
   className?: boolean
+  schoolId?: boolean
   email?: boolean
   phone?: boolean
   emailVerifiedAt?: boolean
   sessionVersion?: boolean
   balance?: boolean
+  dailyLimit?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   codes?: boolean | Prisma.User$codesArgs<ExtArgs>
   cards?: boolean | Prisma.User$cardsArgs<ExtArgs>
   transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
   operated?: boolean | Prisma.User$operatedArgs<ExtArgs>
+  preorders?: boolean | Prisma.User$preordersArgs<ExtArgs>
+  placedPreorders?: boolean | Prisma.User$placedPreordersArgs<ExtArgs>
   children?: boolean | Prisma.User$childrenArgs<ExtArgs>
   parents?: boolean | Prisma.User$parentsArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
@@ -2235,14 +3012,17 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   passwordHash?: boolean
   className?: boolean
+  schoolId?: boolean
   email?: boolean
   phone?: boolean
   emailVerifiedAt?: boolean
   sessionVersion?: boolean
   balance?: boolean
+  dailyLimit?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2253,14 +3033,17 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   passwordHash?: boolean
   className?: boolean
+  schoolId?: boolean
   email?: boolean
   phone?: boolean
   emailVerifiedAt?: boolean
   sessionVersion?: boolean
   balance?: boolean
+  dailyLimit?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2271,22 +3054,27 @@ export type UserSelectScalar = {
   username?: boolean
   passwordHash?: boolean
   className?: boolean
+  schoolId?: boolean
   email?: boolean
   phone?: boolean
   emailVerifiedAt?: boolean
   sessionVersion?: boolean
   balance?: boolean
+  dailyLimit?: boolean
   active?: boolean
   photoId?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "name" | "username" | "passwordHash" | "className" | "email" | "phone" | "emailVerifiedAt" | "sessionVersion" | "balance" | "active" | "photoId" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "name" | "username" | "passwordHash" | "className" | "schoolId" | "email" | "phone" | "emailVerifiedAt" | "sessionVersion" | "balance" | "dailyLimit" | "active" | "photoId" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   codes?: boolean | Prisma.User$codesArgs<ExtArgs>
   cards?: boolean | Prisma.User$cardsArgs<ExtArgs>
   transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
   operated?: boolean | Prisma.User$operatedArgs<ExtArgs>
+  preorders?: boolean | Prisma.User$preordersArgs<ExtArgs>
+  placedPreorders?: boolean | Prisma.User$placedPreordersArgs<ExtArgs>
   children?: boolean | Prisma.User$childrenArgs<ExtArgs>
   parents?: boolean | Prisma.User$parentsArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
@@ -2296,19 +3084,24 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  school?: boolean | Prisma.User$schoolArgs<ExtArgs>
   photo?: boolean | Prisma.User$photoArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
+    school: Prisma.$SchoolPayload<ExtArgs> | null
     codes: Prisma.$VerificationCodePayload<ExtArgs>[]
     cards: Prisma.$CardPayload<ExtArgs>[]
     transactions: Prisma.$TransactionPayload<ExtArgs>[]
     operated: Prisma.$TransactionPayload<ExtArgs>[]
+    preorders: Prisma.$PreorderPayload<ExtArgs>[]
+    placedPreorders: Prisma.$PreorderPayload<ExtArgs>[]
     children: Prisma.$UserPayload<ExtArgs>[]
     parents: Prisma.$UserPayload<ExtArgs>[]
     photo: Prisma.$PhotoPayload<ExtArgs> | null
@@ -2323,11 +3116,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     username: string
     passwordHash: string
     className: string | null
+    schoolId: string | null
     email: string | null
     phone: string | null
     emailVerifiedAt: Date | null
     sessionVersion: number
     balance: number
+    dailyLimit: number | null
     active: boolean
     photoId: string | null
     createdAt: Date
@@ -2725,10 +3520,13 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  school<T extends Prisma.User$schoolArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$schoolArgs<ExtArgs>>): Prisma.Prisma__SchoolClient<runtime.Types.Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   codes<T extends Prisma.User$codesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$codesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cards<T extends Prisma.User$cardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transactions<T extends Prisma.User$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   operated<T extends Prisma.User$operatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$operatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preorders<T extends Prisma.User$preordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PreorderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  placedPreorders<T extends Prisma.User$placedPreordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$placedPreordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PreorderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   children<T extends Prisma.User$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   parents<T extends Prisma.User$parentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$parentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   photo<T extends Prisma.User$photoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$photoArgs<ExtArgs>>): Prisma.Prisma__PhotoClient<runtime.Types.Result.GetResult<Prisma.$PhotoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2770,11 +3568,13 @@ export interface UserFieldRefs {
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly className: Prisma.FieldRef<"User", 'String'>
+  readonly schoolId: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly sessionVersion: Prisma.FieldRef<"User", 'Int'>
   readonly balance: Prisma.FieldRef<"User", 'Int'>
+  readonly dailyLimit: Prisma.FieldRef<"User", 'Int'>
   readonly active: Prisma.FieldRef<"User", 'Boolean'>
   readonly photoId: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -3179,6 +3979,25 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.school
+ */
+export type User$schoolArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the School
+   */
+  select?: Prisma.SchoolSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the School
+   */
+  omit?: Prisma.SchoolOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SchoolInclude<ExtArgs> | null
+  where?: Prisma.SchoolWhereInput
+}
+
+/**
  * User.codes
  */
 export type User$codesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3272,6 +4091,54 @@ export type User$operatedArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * User.preorders
+ */
+export type User$preordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Preorder
+   */
+  select?: Prisma.PreorderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Preorder
+   */
+  omit?: Prisma.PreorderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PreorderInclude<ExtArgs> | null
+  where?: Prisma.PreorderWhereInput
+  orderBy?: Prisma.PreorderOrderByWithRelationInput | Prisma.PreorderOrderByWithRelationInput[]
+  cursor?: Prisma.PreorderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PreorderScalarFieldEnum | Prisma.PreorderScalarFieldEnum[]
+}
+
+/**
+ * User.placedPreorders
+ */
+export type User$placedPreordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Preorder
+   */
+  select?: Prisma.PreorderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Preorder
+   */
+  omit?: Prisma.PreorderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PreorderInclude<ExtArgs> | null
+  where?: Prisma.PreorderWhereInput
+  orderBy?: Prisma.PreorderOrderByWithRelationInput | Prisma.PreorderOrderByWithRelationInput[]
+  cursor?: Prisma.PreorderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PreorderScalarFieldEnum | Prisma.PreorderScalarFieldEnum[]
 }
 
 /**

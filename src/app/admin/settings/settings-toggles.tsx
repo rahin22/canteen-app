@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { setFlag } from "./actions";
+import { useActionState, useState, useTransition } from "react";
+import { setFlag, setPreorderCutoff, type CutoffState } from "./actions";
 
 export function Toggle({
   settingKey,
@@ -59,5 +59,57 @@ export function Toggle({
         />
       </button>
     </div>
+  );
+}
+
+/** Time of day after which the kiosk and parent portal stop taking orders. */
+export function CutoffField({ initial }: { initial: string }) {
+  const [state, formAction, pending] = useActionState<CutoffState, FormData>(
+    setPreorderCutoff,
+    {}
+  );
+
+  return (
+    <form
+      action={formAction}
+      className="border-b border-slate-100 px-5 py-4 last:border-0"
+    >
+      <label
+        htmlFor="cutoff"
+        className="font-medium text-slate-900"
+      >
+        Orders close at
+      </label>
+      <p className="mt-0.5 text-sm text-slate-500">
+        After this time the kiosk and the parent portal stop accepting orders
+        for the day, so the kitchen knows what it&apos;s making. Uses the
+        school&apos;s local time.
+      </p>
+      <div className="mt-2 flex items-center gap-2">
+        <input
+          id="cutoff"
+          name="cutoff"
+          type="time"
+          defaultValue={initial}
+          required
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+        />
+        <button
+          disabled={pending}
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+        >
+          {pending ? "Saving…" : "Save"}
+        </button>
+      </div>
+      {(state.error || state.success) && (
+        <p
+          className={`mt-2 rounded-lg px-3 py-2 text-sm ${
+            state.error ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-800"
+          }`}
+        >
+          {state.error || state.success}
+        </p>
+      )}
+    </form>
   );
 }

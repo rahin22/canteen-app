@@ -10,7 +10,10 @@ import {
 export type PendingRegistration = {
   id: string;
   name: string;
-  schoolId: string;
+  /** School-issued student ID printed on their card. */
+  studentIdCode: string;
+  /** Which school the parent enrolled them at. */
+  schoolName: string | null;
   className: string | null;
   hasPhoto: boolean;
   createdAt: string;
@@ -86,9 +89,14 @@ export function ReviewCard({ registration }: { registration: PendingRegistration
         <div className="min-w-0 flex-1">
           <p className="text-lg font-bold text-slate-900">{registration.name}</p>
           <p className="text-sm text-slate-500">
-            ID <span className="font-mono">{registration.schoolId}</span>
+            ID <span className="font-mono">{registration.studentIdCode}</span>
             {registration.className ? ` · ${registration.className}` : ""}
           </p>
+          {registration.schoolName && (
+            <p className="text-sm font-medium text-indigo-600">
+              {registration.schoolName}
+            </p>
+          )}
           <p className="mt-2 text-sm text-slate-600">
             Submitted by <b>{registration.parent.name}</b> ·{" "}
             <span className="text-slate-500">{registration.parent.username}</span>

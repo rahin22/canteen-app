@@ -5,6 +5,9 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { onlineTopupsAvailable } from "@/lib/settings";
+import { getDailySpend } from "@/lib/ledger";
+import { pendingPreorders } from "@/lib/preorders";
+import { describeLines } from "@/lib/preorder-format";
 import { logout } from "@/app/login/actions";
 import { ShowCardButton } from "./show-card";
 
@@ -27,7 +30,11 @@ export default async function StudentHome() {
   const qr = card
     ? await QRCode.toDataURL(card.token, { margin: 1, width: 280 })
     : null;
-  const onlineTopups = await onlineTopupsAvailable();
+  const [onlineTopups, daily, pendingOrders] = await Promise.all([
+    onlineTopupsAvailable(),
+    getDailySpend(user.id),
+    pendingPreorders(user.id),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -61,6 +68,31 @@ export default async function StudentHome() {
           {qr && <ShowCardButton qr={qr} name={user.name} username={user.username} />}
         </div>
       </div>
+
+      {pendingOrders.length > 0 && (
+        <div className="mt-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4">
+          <p className="font-bold text-emerald-900">🥪 Waiting at the canteen</p>
+          {pendingOrders.map((order) => (
+            <p key={order.id} className="mt-1 text-sm text-emerald-800">
+              {describeLines(order.items)} —{" "}
+              <span className="font-semibold">{formatMoney(order.total)}</span>{" "}
+              already paid, just pick it up
+            </p>
+          ))}
+        </div>
+      )}
+
+      {daily.limit !== null && (
+        <p className="mt-3 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          {daily.limit === 0
+            ? "Your family has paused canteen spending on your card."
+            : `Your family set a ${formatMoney(daily.limit)} daily spending limit. You've spent ${formatMoney(daily.spent)} today${
+                daily.remaining === 0
+                  ? " — that's the lot until tomorrow."
+                  : `, so ${formatMoney(daily.remaining!)} is left.`
+              }`}
+        </p>
+      )}
 
       {user.balance < 500 && (
         <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -112,5 +144,6 @@ function describe(type: string, items: unknown, note: string | null): string {
   }
   if (type === "TOPUP_CASH") return "Top-up (in person)";
   if (type === "TOPUP_STRIPE") return "Top-up (online)";
+  if (type === "REFUND") return note ? `Refund — ${note}` : "Refund";
   return note ? `Adjustment — ${note}` : "Adjustment";
 }

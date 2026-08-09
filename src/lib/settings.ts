@@ -10,7 +10,12 @@ export const SETTINGS = {
   onlineTopups: "online_topups_enabled",
   parentSignup: "parent_signup_enabled",
   email: "email_enabled",
+  preorders: "preorders_enabled",
+  preorderCutoff: "preorder_cutoff",
 } as const;
+
+/** Orders for the day close at this local time unless an admin changes it. */
+export const DEFAULT_PREORDER_CUTOFF = "09:30";
 
 // All default to off: the school starts cash-only, registration is opened
 // deliberately by an admin rather than being public from day one, and email
@@ -19,6 +24,8 @@ const DEFAULTS: Record<string, string> = {
   [SETTINGS.onlineTopups]: "off",
   [SETTINGS.parentSignup]: "off",
   [SETTINGS.email]: "off",
+  [SETTINGS.preorders]: "off",
+  [SETTINGS.preorderCutoff]: DEFAULT_PREORDER_CUTOFF,
 };
 
 export async function getSetting(key: string): Promise<string> {
@@ -37,16 +44,44 @@ export async function setSetting(key: string, value: string) {
 export async function getFlags() {
   const rows = await prisma.setting.findMany({
     where: {
-      key: { in: [SETTINGS.onlineTopups, SETTINGS.parentSignup, SETTINGS.email] },
+      key: {
+        in: [
+          SETTINGS.onlineTopups,
+          SETTINGS.parentSignup,
+          SETTINGS.email,
+          SETTINGS.preorders,
+          SETTINGS.preorderCutoff,
+        ],
+      },
     },
   });
-  const value = (key: string) =>
-    (rows.find((r) => r.key === key)?.value ?? DEFAULTS[key]) === "on";
+  const raw = (key: string) => rows.find((r) => r.key === key)?.value ?? DEFAULTS[key];
+  const value = (key: string) => raw(key) === "on";
   return {
     onlineTopups: value(SETTINGS.onlineTopups),
     parentSignup: value(SETTINGS.parentSignup),
     email: value(SETTINGS.email),
+    preorders: value(SETTINGS.preorders),
+    preorderCutoff: normalizeCutoff(raw(SETTINGS.preorderCutoff)),
   };
+}
+
+/** Coerces a stored cutoff to "HH:MM", falling back if it was ever mangled. */
+export function normalizeCutoff(value: string | undefined): string {
+  const match = /^(\d{1,2}):(\d{2})$/.exec((value ?? "").trim());
+  if (!match) return DEFAULT_PREORDER_CUTOFF;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return DEFAULT_PREORDER_CUTOFF;
+  return `${String(hours).padStart(2, "0")}:${match[2]}`;
+}
+
+export async function preordersOpen(): Promise<boolean> {
+  return (await getSetting(SETTINGS.preorders)) === "on";
+}
+
+export async function preorderCutoff(): Promise<string> {
+  return normalizeCutoff(await getSetting(SETTINGS.preorderCutoff));
 }
 
 /**

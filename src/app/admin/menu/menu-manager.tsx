@@ -20,7 +20,14 @@ type Item = {
 const inputCls =
   "rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500";
 
-export function MenuManager({ items }: { items: Item[] }) {
+export function MenuManager({
+  items,
+  schoolId,
+}: {
+  items: Item[];
+  /** The school whose menu this is — submitted with every new item. */
+  schoolId: string;
+}) {
   const [addState, addAction, addPending] = useActionState<MenuActionState, FormData>(
     createMenuItem,
     {}
@@ -32,6 +39,7 @@ export function MenuManager({ items }: { items: Item[] }) {
         action={addAction}
         className="mb-6 flex flex-wrap items-end gap-2 rounded-2xl border border-slate-200 bg-white p-4"
       >
+        <input type="hidden" name="schoolId" value={schoolId} />
         <div className="flex-1 min-w-36">
           <label className="mb-1 block text-xs font-medium text-slate-500">Item</label>
           <input name="name" required placeholder="e.g. Chicken roll" className={inputCls + " w-full"} />

@@ -1,13 +1,15 @@
 import { requireRole } from "@/lib/auth";
 import { getFlags, SETTINGS } from "@/lib/settings";
 import { emailConfigured } from "@/lib/email";
-import { Toggle } from "./settings-toggles";
+import { allSchools } from "@/lib/schools";
+import { CutoffField, Toggle } from "./settings-toggles";
+import { SchoolsManager } from "./schools-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   await requireRole("ADMIN");
-  const flags = await getFlags();
+  const [flags, schools] = await Promise.all([getFlags(), allSchools()]);
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
   // Configured = a provider exists; on = configured *and* switched on.
   const mailWorks = emailConfigured();
@@ -20,6 +22,16 @@ export default async function SettingsPage() {
         Turn features on and off for the whole school.
       </p>
 
+      <h2 className="mb-2 text-lg font-semibold text-slate-900">Schools</h2>
+      <p className="mb-3 text-sm text-slate-500">
+        Each school has its own students, menu and canteen orders. Switch
+        between them with the selector in the header.
+      </p>
+      <div className="mb-8">
+        <SchoolsManager schools={schools} />
+      </div>
+
+      <h2 className="mb-2 text-lg font-semibold text-slate-900">Features</h2>
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <Toggle
           settingKey={SETTINGS.onlineTopups}
@@ -48,6 +60,30 @@ export default async function SettingsPage() {
           description="When off, the app never sends email: parents sign up without confirming an address, and the “Forgot password” page tells them to contact the office. Reset a parent's password yourself from their child's page."
         />
       </div>
+
+      <h2 className="mb-2 mt-8 text-lg font-semibold text-slate-900">Preordering</h2>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <Toggle
+          settingKey={SETTINGS.preorders}
+          initial={flags.preorders}
+          title="Preordering"
+          description="Lets students order at the office kiosk and parents order from their own login. Orders are paid for at the counter when they're collected — nothing is deducted when one is placed."
+        />
+        <CutoffField initial={flags.preorderCutoff} />
+      </div>
+
+      {flags.preorders && (
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+          <p className="font-medium text-slate-800">Setting up the office kiosk</p>
+          <p className="mt-1">
+            Sign the iPad in as an <b>operator</b> account and leave it on{" "}
+            <code className="rounded bg-slate-200 px-1">/kiosk</code>. Students
+            tap or scan their own card to order — the kiosk never signs them in
+            and never shows anything beyond their name, balance and today&apos;s
+            orders.
+          </p>
+        </div>
+      )}
 
       {!mailOn && (
         <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">

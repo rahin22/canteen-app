@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { emailAvailable, parentSignupOpen } from "@/lib/settings";
+import { activeSchools } from "@/lib/schools";
 import { RegisterForm } from "./register-form";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ export default async function RegisterChildPage({
     if (!parent.emailVerifiedAt) redirect("/verify-email");
   }
 
-  const open = await parentSignupOpen();
+  const [open, schools] = await Promise.all([parentSignupOpen(), activeSchools()]);
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -50,8 +51,12 @@ export default async function RegisterChildPage({
         </div>
       )}
 
-      {open ? (
-        <RegisterForm />
+      {open && schools.length > 0 ? (
+        <RegisterForm schools={schools} />
+      ) : open ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+          No schools are set up yet. Please contact the school office.
+        </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
           Registration is closed at the moment. Please contact the school office

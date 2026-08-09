@@ -1,23 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { formatMoney, parseAmount } from "@/lib/money";
-import { NFC_SCAN_PREFIX } from "@/lib/nfc";
+import type { DailySpend } from "@/lib/ledger";
+import { CardScanner } from "@/components/card-scanner";
+import { describeLines } from "@/lib/preorder-format";
 import {
   lookupCard,
   charge,
+  handOverOrder,
   type ScanStudent,
   type ChargeInput,
+  type LastPurchase,
+  type MenuItem,
 } from "./actions";
-
-type MenuItem = { id: string; name: string; price: number; category: string | null };
 
 type Mode =
   | { step: "scan" }
   | { step: "order"; student: ScanStudent }
-  | { step: "done"; student: ScanStudent; total: number; newBalance: number };
+  | {
+      step: "done";
+      student: ScanStudent;
+      total: number;
+      newBalance: number;
+      daily: DailySpend;
+    };
 
-export default function ScanClient({ menu }: { menu: MenuItem[] }) {
+export default function ScanClient() {
   const [mode, setMode] = useState<Mode>({ step: "scan" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,14 +46,18 @@ export default function ScanClient({ menu }: { menu: MenuItem[] }) {
   return (
     <div className="mx-auto w-full max-w-lg flex-1 p-4">
       {mode.step === "scan" && (
-        <Scanner onToken={handleToken} busy={busy} error={error} />
+        <CardScanner
+          title="Scan a student card"
+          onToken={handleToken}
+          busy={busy}
+          error={error}
+        />
       )}
       {mode.step === "order" && (
         <OrderBuilder
           student={mode.student}
-          menu={menu}
-          onDone={(total, newBalance) =>
-            setMode({ step: "done", student: mode.student, total, newBalance })
+          onDone={(total, newBalance, daily) =>
+            setMode({ step: "done", student: mode.student, total, newBalance, daily })
           }
           onCancel={() => {
             setError(null);
@@ -62,6 +75,12 @@ export default function ScanClient({ menu }: { menu: MenuItem[] }) {
             {mode.student.name} — new balance{" "}
             <span className="font-semibold">{formatMoney(mode.newBalance)}</span>
           </p>
+          {mode.daily.remaining !== null && (
+            <p className="mt-1 text-sm text-emerald-700">
+              {formatMoney(mode.daily.remaining)} left of today&apos;s{" "}
+              {formatMoney(mode.daily.limit!)} limit
+            </p>
+          )}
           <button
             autoFocus
             onClick={() => setMode({ step: "scan" })}
@@ -75,141 +94,73 @@ export default function ScanClient({ menu }: { menu: MenuItem[] }) {
   );
 }
 
-function Scanner({
-  onToken,
-  busy,
-  error,
-}: {
-  onToken: (token: string) => void;
-  busy: boolean;
-  error: string | null;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [manual, setManual] = useState("");
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  const [nfcReady, setNfcReady] = useState(false);
-  const onTokenRef = useRef(onToken);
+/** Below this, the previous order is treated as "probably the same visit". */
+const RECENT_ORDER_MS = 30 * 60 * 1000;
+
+function timeAgo(ms: number): string {
+  const mins = Math.floor(ms / 60000);
+  if (mins < 1) return "just now";
+  if (mins === 1) return "1 minute ago";
+  if (mins < 60) return `${mins} minutes ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours === 1) return "1 hour ago";
+  if (hours < 24) return `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "yesterday" : `${days} days ago`;
+}
+
+/**
+ * Shows what this card was last charged for. The common double-charge is a
+ * student rejoining the queue while their food is still being made, so a
+ * recent order is called out loudly rather than tucked into a history list.
+ */
+function LastOrderBanner({ last }: { last: LastPurchase | null }) {
+  // Re-render on a timer so "2 minutes ago" doesn't go stale while an
+  // operator builds the order. Only worth doing while it's still recent.
+  const [now, setNow] = useState(() => Date.now());
+  const recent = last !== null && now - last.at < RECENT_ORDER_MS;
   useEffect(() => {
-    onTokenRef.current = onToken;
-  }, [onToken]);
+    if (!recent) return;
+    const id = setInterval(() => setNow(Date.now()), 15000);
+    return () => clearInterval(id);
+  }, [recent]);
 
-  // Web NFC (Android Chrome): tap a registered NFC card/wristband on the
-  // phone instead of showing a QR code. Silently unavailable elsewhere.
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.NDEFReader) return;
-    const controller = new AbortController();
-    const reader = new window.NDEFReader();
-    let lastSerial = "";
-    let lastTime = 0;
-    reader
-      .scan({ signal: controller.signal })
-      .then(() => {
-        setNfcReady(true);
-        reader.onreading = (event) => {
-          const serial = event.serialNumber;
-          if (!serial) return;
-          const now = Date.now();
-          if (serial === lastSerial && now - lastTime < 3000) return;
-          lastSerial = serial;
-          lastTime = now;
-          onTokenRef.current(`${NFC_SCAN_PREFIX}${serial}`);
-        };
-      })
-      .catch(() => {
-        // Permission denied or NFC off — QR scanning still works.
-      });
-    return () => controller.abort();
-  }, []);
+  if (!last) {
+    return (
+      <p className="mb-3 rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
+        No previous orders on this card.
+      </p>
+    );
+  }
 
-  useEffect(() => {
-    let cancelled = false;
-    // html5-qrcode touches window at import time — load it client-side only.
-    let scanner: { stop: () => Promise<void>; clear: () => void } | null = null;
+  const elapsed = timeAgo(now - last.at);
 
-    (async () => {
-      const { Html5Qrcode } = await import("html5-qrcode");
-      if (cancelled || !containerRef.current) return;
-      const instance = new Html5Qrcode("qr-reader");
-      let lastToken = "";
-      let lastTime = 0;
-      try {
-        await instance.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 240, height: 240 } },
-          (decoded) => {
-            const now = Date.now();
-            // Debounce: the camera fires the same code many times per second.
-            if (decoded === lastToken && now - lastTime < 3000) return;
-            lastToken = decoded;
-            lastTime = now;
-            onTokenRef.current(decoded.trim());
-          },
-          undefined
-        );
-        scanner = instance;
-        if (cancelled) await instance.stop();
-      } catch {
-        if (!cancelled) {
-          setCameraError(
-            "Camera unavailable. Check permissions, or type the student ID below."
-          );
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      if (scanner) scanner.stop().then(() => scanner!.clear()).catch(() => {});
-    };
-  }, []);
+  if (!recent) {
+    return (
+      <p className="mb-3 rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
+        Last order {elapsed} · {formatMoney(last.total)} · {last.summary}
+      </p>
+    );
+  }
 
   return (
-    <div className="mt-4">
-      <h1 className="mb-3 text-center text-lg font-semibold text-slate-800">
-        Scan a student card
-        {nfcReady && (
-          <span className="ml-2 rounded-full bg-sky-100 px-2 py-0.5 align-middle text-xs font-medium text-sky-700">
-            NFC ready — or tap a card
-          </span>
-        )}
-      </h1>
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black">
-        <div id="qr-reader" ref={containerRef} className="min-h-64 w-full" />
+    <div
+      role="alert"
+      className="mb-3 rounded-2xl border-2 border-amber-400 bg-amber-50 p-3"
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="font-bold text-amber-900">⚠️ Already served {elapsed}</p>
+        <p className="shrink-0 font-bold text-amber-900">
+          {formatMoney(last.total)}
+        </p>
       </div>
-      {cameraError && (
-        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          {cameraError}
-        </p>
-      )}
-      {error && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
-          {error}
-        </p>
-      )}
-      {busy && <p className="mt-3 text-center text-sm text-slate-500">Looking up…</p>}
-
-      <form
-        className="mt-5 flex gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (manual.trim()) onToken(manual.trim());
-        }}
-      >
-        <input
-          value={manual}
-          onChange={(e) => setManual(e.target.value)}
-          placeholder="Or type student ID…"
-          autoCapitalize="none"
-          className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-3 text-base outline-none focus:border-indigo-500"
-        />
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded-xl bg-slate-800 px-5 font-semibold text-white disabled:opacity-50"
-        >
-          Find
-        </button>
-      </form>
+      <p className="mt-0.5 text-sm text-amber-800">
+        {last.summary}
+        {last.operator ? ` · by ${last.operator}` : ""}
+      </p>
+      <p className="mt-1 text-xs font-medium text-amber-700">
+        Check this isn&apos;t the same order before charging again.
+      </p>
     </div>
   );
 }
@@ -218,24 +169,30 @@ type CartLine = { menuItemId: string; name: string; price: number; qty: number }
 
 function OrderBuilder({
   student,
-  menu,
   onDone,
   onCancel,
 }: {
   student: ScanStudent;
-  menu: MenuItem[];
-  onDone: (total: number, newBalance: number) => void;
+  onDone: (total: number, newBalance: number, daily: DailySpend) => void;
   onCancel: () => void;
 }) {
+  // The menu arrives with the student so one till can serve either school.
+  const menu = student.menu;
   const [cart, setCart] = useState<CartLine[]>([]);
   const [customInput, setCustomInput] = useState("");
   const [customAmount, setCustomAmount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Kept in state because a rejected charge sends back refreshed figures —
+  // another till may have spent against the same cap in the meantime.
+  const [daily, setDaily] = useState<DailySpend>(student.daily);
+  // Collected orders drop off the list without needing a re-scan.
+  const [orders, setOrders] = useState(student.pendingOrders);
 
   const itemsTotal = cart.reduce((sum, l) => sum + l.price * l.qty, 0);
   const total = itemsTotal + customAmount;
   const shortfall = total - student.balance;
+  const capExceeded = daily.remaining !== null && total > daily.remaining;
 
   const addItem = (item: MenuItem) =>
     setCart((prev) => {
@@ -265,6 +222,21 @@ function OrderBuilder({
     setCustomAmount(cents);
   };
 
+  // No money moves here — the order was paid for when it was placed, so this
+  // just clears it off the list and leaves the operator on the same screen in
+  // case the student also wants to buy something.
+  const handOver = async (preorderId: string) => {
+    setBusy(true);
+    setError(null);
+    const result = await handOverOrder(preorderId);
+    setBusy(false);
+    if (result.ok) {
+      setOrders((prev) => prev.filter((o) => o.id !== preorderId));
+    } else {
+      setError(result.error);
+    }
+  };
+
   const submit = async () => {
     setBusy(true);
     setError(null);
@@ -275,8 +247,9 @@ function OrderBuilder({
     };
     const result = await charge(payload);
     setBusy(false);
+    if (result.daily) setDaily(result.daily);
     if (result.ok) {
-      onDone(result.total, result.newBalance);
+      onDone(result.total, result.newBalance, result.daily);
     } else {
       setError(result.error);
     }
@@ -284,6 +257,8 @@ function OrderBuilder({
 
   return (
     <div className="mt-2">
+      <LastOrderBanner last={student.lastPurchase} />
+
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-center gap-3">
           {/* Photo first — staff check the face before charging the card. */}
@@ -310,6 +285,11 @@ function OrderBuilder({
               {student.className ? `${student.className} · ` : ""}
               {student.username}
             </p>
+            {student.schoolName && (
+              <p className="truncate text-xs font-medium text-indigo-600">
+                {student.schoolName}
+              </p>
+            )}
           </div>
           <div className="shrink-0 text-right">
             <p className="text-xs uppercase tracking-wide text-slate-400">Balance</p>
@@ -322,7 +302,64 @@ function OrderBuilder({
             </p>
           </div>
         </div>
+
+        {daily.limit !== null && (
+          <div
+            className={`mt-3 flex items-center justify-between rounded-xl px-3 py-2 text-sm ${
+              daily.remaining === 0
+                ? "bg-red-50 text-red-800"
+                : "bg-slate-50 text-slate-600"
+            }`}
+          >
+            <span>
+              Daily limit {formatMoney(daily.limit)}
+              <span className="text-slate-400"> · set by parent</span>
+            </span>
+            <span className="font-semibold">
+              {daily.remaining === 0
+                ? "none left today"
+                : `${formatMoney(daily.remaining!)} left`}
+            </span>
+          </div>
+        )}
       </div>
+
+      {orders.length > 0 && (
+        <div className="mt-3 rounded-2xl border-2 border-emerald-400 bg-emerald-50 p-4">
+          <p className="font-bold text-emerald-900">
+            🥪 Ordered ahead — already paid, just hand it over
+          </p>
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-emerald-100 pt-2 first:border-0 first:pt-0"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-emerald-900">
+                  {describeLines(order.items)}
+                </p>
+                <p className="text-xs text-emerald-700">
+                  Paid {formatMoney(order.total)} ·{" "}
+                  {order.source === "KIOSK"
+                    ? "ordered at the office kiosk"
+                    : `ordered by ${order.placedByName ?? "a parent"}`}
+                </p>
+              </div>
+              <button
+                onClick={() => handOver(order.id)}
+                disabled={busy}
+                className="shrink-0 rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {busy ? "Working…" : "Handed over ✓"}
+              </button>
+            </div>
+          ))}
+          <p className="mt-2 text-xs font-medium text-emerald-800">
+            Don&apos;t charge for these again. Anything extra goes below as a
+            separate sale.
+          </p>
+        </div>
+      )}
 
       {menu.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -417,6 +454,18 @@ function OrderBuilder({
           Balance too low — short by {formatMoney(shortfall)}.
         </p>
       )}
+      {capExceeded && total > 0 && (
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          Over the daily limit set by {student.name.split(" ")[0]}&apos;s parent —{" "}
+          {daily.limit === 0
+            ? "they're not allowed to spend anything today."
+            : daily.remaining === 0
+            ? `they've already spent today's ${formatMoney(daily.limit!)}.`
+            : `only ${formatMoney(daily.remaining!)} of ${formatMoney(
+                daily.limit!
+              )} is left today.`}
+        </p>
+      )}
       {error && (
         <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
           {error}
@@ -432,7 +481,7 @@ function OrderBuilder({
         </button>
         <button
           onClick={submit}
-          disabled={busy || total <= 0 || shortfall > 0}
+          disabled={busy || total <= 0 || shortfall > 0 || capExceeded}
           className="flex-1 rounded-xl bg-indigo-600 py-3.5 text-lg font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-40"
         >
           {busy ? "Charging…" : `Charge ${total > 0 ? formatMoney(total) : ""}`}

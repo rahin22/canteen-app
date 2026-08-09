@@ -2,12 +2,13 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
+import { currentSchoolName, studentSchoolFilter } from "@/lib/schools";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 50;
-const TYPES = ["PURCHASE", "TOPUP_CASH", "TOPUP_STRIPE", "ADJUSTMENT"] as const;
+const TYPES = ["PURCHASE", "TOPUP_CASH", "TOPUP_STRIPE", "ADJUSTMENT", "REFUND"] as const;
 
 export default async function TransactionsPage({
   searchParams,
@@ -22,6 +23,8 @@ export default async function TransactionsPage({
     : undefined;
 
   const where: Prisma.TransactionWhereInput = {
+    // Scoped to the school selected in the header.
+    ...(await studentSchoolFilter()),
     ...(type ? { type } : {}),
     ...(params.from || params.to
       ? {
@@ -59,7 +62,12 @@ export default async function TransactionsPage({
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-slate-900">Transactions</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Transactions</h1>
+          <p className="text-sm text-slate-500">
+            {(await currentSchoolName()) ?? "All schools"}
+          </p>
+        </div>
         <a
           href={`/admin/transactions/export${query({ page: undefined })}`}
           className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
@@ -81,6 +89,7 @@ export default async function TransactionsPage({
             <option value="TOPUP_CASH">Cash top-ups</option>
             <option value="TOPUP_STRIPE">Online top-ups</option>
             <option value="ADJUSTMENT">Adjustments</option>
+            <option value="REFUND">Refunds</option>
           </select>
         </div>
         <div>
@@ -198,6 +207,8 @@ function typeLabel(type: string) {
       return "Online top-up";
     case "ADJUSTMENT":
       return "Adjustment";
+    case "REFUND":
+      return "Refund";
     default:
       return type;
   }

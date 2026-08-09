@@ -45,6 +45,13 @@ export async function signup(
 
   if (!name) return { error: "Enter your full name." };
   if (!EMAIL_RE.test(email)) return { error: "Enter a valid email address." };
+  // The office needs a way to reach a parent about their child at short
+  // notice, so a contactable number is required rather than nice-to-have.
+  // Deliberately loose: accept +61, spaces, brackets and hyphens, and only
+  // insist on enough digits to be a real number.
+  if (phone.replace(/\D/g, "").length < 8) {
+    return { error: "Enter a valid mobile number." };
+  }
   if (password.length < MIN_PASSWORD) {
     return { error: `Choose a password of at least ${MIN_PASSWORD} characters.` };
   }
@@ -63,7 +70,7 @@ export async function signup(
       name,
       username: email,
       email,
-      phone: phone || null,
+      phone,
       passwordHash: await bcrypt.hash(password, 10),
     },
   });

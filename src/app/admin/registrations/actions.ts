@@ -30,13 +30,13 @@ export async function approveRegistration(
   if (!registration) return { error: "That request has already been actioned." };
 
   const existing = await prisma.user.findUnique({
-    where: { username: registration.schoolId },
-    select: { id: true, role: true, name: true, photoId: true },
+    where: { username: registration.studentIdCode },
+    select: { id: true, role: true, name: true, photoId: true, schoolId: true },
   });
 
   if (existing && existing.role !== "STUDENT") {
     return {
-      error: `"${registration.schoolId}" is already in use by a non-student account. Ask the parent to check the ID.`,
+      error: `"${registration.studentIdCode}" is already in use by a non-student account. Ask the parent to check the ID.`,
     };
   }
 
@@ -57,6 +57,12 @@ export async function approveRegistration(
           parents: { connect: { id: registration.parentId } },
           // The photo the parent supplied becomes the student's ID photo.
           ...(registration.photoId ? { photoId: registration.photoId } : {}),
+          // An existing record may predate multi-school support, or the parent
+          // may know better than a stale roll import — take the school they
+          // named, but only to fill a gap, never to move an assigned student.
+          ...(existing.schoolId || !registration.schoolId
+            ? {}
+            : { schoolId: registration.schoolId }),
         },
       });
       if (registration.photoId && previousPhotoId) {
@@ -79,8 +85,11 @@ export async function approveRegistration(
         data: {
           role: "STUDENT",
           name: registration.name,
-          username: registration.schoolId,
+          username: registration.studentIdCode,
           className: registration.className,
+          // Carry through the school the parent chose, so the new student sees
+          // the right menu from their first scan.
+          schoolId: registration.schoolId,
           passwordHash: await bcrypt.hash(password, 10),
           photoId: registration.photoId,
           parents: { connect: { id: registration.parentId } },
@@ -102,7 +111,7 @@ export async function approveRegistration(
     success: `Created a card for ${registration.name}.`,
     credentials: {
       name: registration.name,
-      username: registration.schoolId,
+      username: registration.studentIdCode,
       password,
     },
   };

@@ -40,7 +40,8 @@ export const TxType = {
   TOPUP_CASH: 'TOPUP_CASH',
   TOPUP_STRIPE: 'TOPUP_STRIPE',
   PURCHASE: 'PURCHASE',
-  ADJUSTMENT: 'ADJUSTMENT'
+  ADJUSTMENT: 'ADJUSTMENT',
+  REFUND: 'REFUND'
 } as const
 
 export type TxType = (typeof TxType)[keyof typeof TxType]
@@ -61,3 +62,20 @@ export const VerificationPurpose = {
 } as const
 
 export type VerificationPurpose = (typeof VerificationPurpose)[keyof typeof VerificationPurpose]
+
+
+export const PreorderStatus = {
+  PENDING: 'PENDING',
+  COLLECTED: 'COLLECTED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type PreorderStatus = (typeof PreorderStatus)[keyof typeof PreorderStatus]
+
+
+export const PreorderSource = {
+  KIOSK: 'KIOSK',
+  PARENT: 'PARENT'
+} as const
+
+export type PreorderSource = (typeof PreorderSource)[keyof typeof PreorderSource]

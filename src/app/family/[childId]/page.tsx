@@ -4,8 +4,12 @@ import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { onlineTopupsAvailable } from "@/lib/settings";
+import { getDailySpend } from "@/lib/ledger";
+import { orderHeadroom, pendingPreorders, preorderWindow } from "@/lib/preorders";
 import { CashOnlyNotice } from "@/components/cash-only-notice";
 import { TopupForm } from "@/app/me/topup/topup-form";
+import { DailyLimitForm } from "./daily-limit-form";
+import { PreorderPanel } from "./preorder-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +33,21 @@ export default async function ChildPage({
   });
   if (!child) notFound();
 
-  const onlineTopups = await onlineTopupsAvailable();
+  const [onlineTopups, daily, window, pending, headroom, menu] = await Promise.all([
+    onlineTopupsAvailable(),
+    getDailySpend(child.id),
+    preorderWindow(),
+    pendingPreorders(child.id),
+    orderHeadroom(child.id),
+    prisma.menuItem.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, price: true, category: true },
+    }),
+  ]);
+  // Hidden entirely when the school doesn't do preordering, rather than
+  // teasing parents with a permanently closed panel.
+  const showPreorders = window.enabled || pending.length > 0;
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -43,6 +61,31 @@ export default async function ChildPage({
           {child.className ? ` · ${child.className}` : ""}
         </p>
         <p className="mt-1 text-4xl font-bold">{formatMoney(child.balance)}</p>
+      </div>
+
+      {showPreorders && (
+        <div className="mt-6">
+          <PreorderPanel
+            childId={child.id}
+            childName={child.name}
+            menu={menu}
+            pending={pending}
+            spendable={headroom.spendable}
+            window={{
+              open: window.open,
+              label: window.open ? window.cutoffLabel : "",
+            }}
+          />
+        </div>
+      )}
+
+      <div className="mt-6">
+        <DailyLimitForm
+          childId={child.id}
+          childName={child.name}
+          limit={daily.limit}
+          spentToday={daily.spent}
+        />
       </div>
 
       <h2 className="mb-3 mt-6 font-semibold text-slate-900">Top up</h2>
@@ -91,5 +134,6 @@ function describe(type: string, items: unknown, note: string | null): string {
   }
   if (type === "TOPUP_CASH") return "Top-up (in person)";
   if (type === "TOPUP_STRIPE") return "Top-up (online)";
+  if (type === "REFUND") return note ? `Refund — ${note}` : "Refund";
   return note ? `Adjustment — ${note}` : "Adjustment";
 }

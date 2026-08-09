@@ -10,6 +10,7 @@ import { creditStudent, LedgerError } from "@/lib/ledger";
 import { parseAmount, formatMoney } from "@/lib/money";
 import { normalizeNfcSerial } from "@/lib/nfc";
 import { normalizeUsername } from "@/lib/username";
+import { resolveSchoolId } from "@/lib/schools";
 import { PhotoError, processPhotoUpload } from "@/lib/photos";
 
 export type ActionState = {
@@ -26,7 +27,9 @@ export async function createStudent(
   const name = String(formData.get("name") || "").trim();
   const className = String(formData.get("className") || "").trim();
   const username = normalizeUsername(String(formData.get("username") || ""));
+  const schoolId = await resolveSchoolId(formData.get("school"));
   if (!name || !username) return { error: "Name and student ID are required." };
+  if (!schoolId) return { error: "Choose which school this student attends." };
 
   const existing = await prisma.user.findUnique({ where: { username } });
   if (existing) return { error: `Student ID "${username}" is already taken.` };
@@ -38,6 +41,7 @@ export async function createStudent(
       name,
       className: className || null,
       username,
+      schoolId,
       passwordHash: await bcrypt.hash(password, 10),
       cards: { create: { token: generateCardToken() } },
     },
@@ -56,13 +60,23 @@ export type BulkResult = {
  * Each line: "Name, Class" or "Name, Class, student-id".
  * Missing IDs are generated from the name plus a number.
  */
-export async function bulkImport(text: string): Promise<BulkResult> {
+export async function bulkImport(
+  text: string,
+  school: string
+): Promise<BulkResult> {
   await requireRole("ADMIN");
+  const created: BulkResult["created"] = [];
+
+  // Every row lands in one school — the import screen makes you pick which.
+  const schoolId = await resolveSchoolId(school);
+  if (!schoolId) {
+    return { created, errors: ["Choose which school these students attend."] };
+  }
+
   const lines = text
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
-  const created: BulkResult["created"] = [];
   const errors: string[] = [];
   if (lines.length > 1000) return { created, errors: ["Maximum 1000 rows per import."] };
 
@@ -86,6 +100,7 @@ export async function bulkImport(text: string): Promise<BulkResult> {
           name,
           className: className || null,
           username,
+          schoolId,
           passwordHash: await bcrypt.hash(password, 10),
           cards: { create: { token: generateCardToken() } },
         },
@@ -108,11 +123,15 @@ export async function updateStudent(
   const id = String(formData.get("id"));
   const name = String(formData.get("name") || "").trim();
   const className = String(formData.get("className") || "").trim();
+  const schoolId = await resolveSchoolId(formData.get("school"));
   if (!name) return { error: "Name is required." };
+  if (!schoolId) return { error: "Choose which school this student attends." };
 
   await prisma.user.update({
     where: { id },
-    data: { name, className: className || null },
+    // Moving a school changes which menu they're offered from the next scan.
+    // Past transactions keep the prices they were actually charged.
+    data: { name, className: className || null, schoolId },
   });
   revalidatePath(`/admin/students/${id}`);
   revalidatePath("/admin/students");

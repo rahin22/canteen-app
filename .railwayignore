@@ -1,0 +1,8 @@
+# Printer protocol reverse-engineering scratch — large and never needed at
+# runtime. The RLabel APK alone is ~41MB.
+*.apk
+jadx-*/
+
+# Local build/dev artefacts
+.next/
+node_modules/

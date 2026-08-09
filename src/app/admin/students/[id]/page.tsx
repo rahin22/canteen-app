@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import QRCode from "qrcode";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
+import { getDailySpend } from "@/lib/ledger";
+import { allSchools } from "@/lib/schools";
+import { PrintLabelButton } from "./print-label-button";
+import type { LabelData } from "@/lib/label-design";
 import {
   EditForm,
   TopupForm,
@@ -31,6 +36,7 @@ export default async function StudentDetailPage({
   const student = await prisma.user.findUnique({
     where: { id, role: "STUDENT" },
     include: {
+      school: { select: { name: true } },
       cards: { orderBy: { createdAt: "desc" } },
       parents: { select: { id: true, name: true, username: true } },
       transactions: {
@@ -41,6 +47,32 @@ export default async function StudentDetailPage({
     },
   });
   if (!student) notFound();
+
+  const [daily, schools] = await Promise.all([
+    getDailySpend(student.id),
+    allSchools(),
+  ]);
+
+  // QR matrix is built here so the label can draw each module as a whole number
+  // of printer dots — scaling a rasterised QR frays the finder patterns.
+  const qrCard = student.cards.find((c) => c.status === "ACTIVE" && c.type === "QR");
+  let label: LabelData | null = null;
+  if (qrCard) {
+    const { size, data } = QRCode.create(qrCard.token, {
+      errorCorrectionLevel: "M",
+    }).modules;
+    let bits = "";
+    for (let i = 0; i < data.length; i++) bits += data[i] ? "1" : "0";
+    label = {
+      id: student.id,
+      name: student.name,
+      username: student.username,
+      token: qrCard.token,
+      qrSize: size,
+      qrBits: bits,
+    };
+  }
+  const school = process.env.NEXT_PUBLIC_SCHOOL_NAME || "School Canteen";
 
   return (
     <div>
@@ -56,9 +88,9 @@ export default async function StudentDetailPage({
             · Password: <span className="font-mono font-bold">{pw}</span>
           </p>
           <p className="mt-1 text-xs text-emerald-700">
-            Write this down now — it won&apos;t be shown again. Print their card from{" "}
-            <Link href={`/admin/students/print?id=${student.id}`} className="underline">
-              Print cards
+            Write this down now — it won&apos;t be shown again. Print their label from{" "}
+            <Link href={`/admin/students/labels?id=${student.id}`} className="underline">
+              Print labels
             </Link>
             .
           </p>
@@ -94,6 +126,9 @@ export default async function StudentDetailPage({
           <p className="text-sm text-slate-500">
             {student.className || "No class"} · <span className="font-mono">{student.username}</span>
           </p>
+          <p className="text-sm font-medium text-indigo-600">
+            {student.school?.name ?? "No school assigned"}
+          </p>
           </div>
         </div>
         <div className="rounded-xl bg-slate-900 px-5 py-3 text-right text-white">
@@ -119,7 +154,28 @@ export default async function StudentDetailPage({
             id={student.id}
             name={student.name}
             className={student.className || ""}
+            schoolId={student.schoolId}
+            schools={schools}
           />
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Daily spending limit
+            </p>
+            {daily.limit === null ? (
+              <p className="mt-1 text-sm text-slate-500">
+                No limit set. Only a linked parent can set one, from their own
+                login.
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-slate-700">
+                <span className="font-semibold">{formatMoney(daily.limit)}</span>{" "}
+                per day, set by a parent · {formatMoney(daily.spent)} spent today
+                {daily.remaining === 0
+                  ? " — limit reached, further purchases will be declined"
+                  : ` · ${formatMoney(daily.remaining!)} left`}
+              </p>
+            )}
+          </div>
           <div className="mt-4 border-t border-slate-100 pt-4">
             <CredentialActions id={student.id} active={student.active} />
           </div>
@@ -163,14 +219,7 @@ export default async function StudentDetailPage({
             <CardActions studentId={student.id} />
           </div>
           <NfcAttach studentId={student.id} />
-          <p className="mt-3 text-xs text-slate-400">
-            <Link
-              href={`/admin/students/print?id=${student.id}`}
-              className="text-indigo-600 hover:underline"
-            >
-              Print this student&apos;s card →
-            </Link>
-          </p>
+          <PrintLabelButton label={label} school={school} />
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -207,6 +256,8 @@ export default async function StudentDetailPage({
                   ? "Cash top-up"
                   : tx.type === "TOPUP_STRIPE"
                   ? "Online top-up"
+                  : tx.type === "REFUND"
+                  ? `Refund${tx.note ? ` — ${tx.note}` : ""}`
                   : `Adjustment${tx.note ? ` — ${tx.note}` : ""}`}
               </p>
               <p className="text-xs text-slate-400">

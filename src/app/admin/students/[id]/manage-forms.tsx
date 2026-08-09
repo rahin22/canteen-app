@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { PhotoInput } from "@/components/photo-input";
+import type { SchoolOption } from "@/lib/school-constants";
 import {
   updateStudent,
   cashTopup,
@@ -48,7 +49,13 @@ function Feedback({ state }: { state: ActionState }) {
   return null;
 }
 
-export function EditForm(props: { id: string; name: string; className: string }) {
+export function EditForm(props: {
+  id: string;
+  name: string;
+  className: string;
+  schoolId: string | null;
+  schools: SchoolOption[];
+}) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     updateStudent,
     {}
@@ -65,6 +72,29 @@ export function EditForm(props: { id: string; name: string; className: string })
           <label className="mb-1 block text-xs font-medium text-slate-500">Class</label>
           <input name="className" defaultValue={props.className} className={inputCls} />
         </div>
+      </div>
+      <div>
+        <label className="mb-1 block text-xs font-medium text-slate-500">School</label>
+        <select
+          name="school"
+          defaultValue={props.schoolId ?? ""}
+          required
+          className={inputCls}
+        >
+          <option value="" disabled>
+            Choose a school…
+          </option>
+          {props.schools.map((school) => (
+            <option key={school.id} value={school.id}>
+              {school.name}
+              {school.active ? "" : " (retired)"}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-400">
+          Decides which menu they&apos;re offered. Past transactions keep the
+          prices they were charged.
+        </p>
       </div>
       <Feedback state={state} />
       <button disabled={pending} className={btnPrimary}>

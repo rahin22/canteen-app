@@ -1,17 +1,16 @@
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { logout } from "@/app/login/actions";
 import ScanClient from "./scan-client";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * The till. Deliberately not tied to a school: the menu and prices arrive with
+ * whoever presents a card, so the same device works at either canteen and
+ * nobody has to remember to configure it.
+ */
 export default async function ScanPage() {
   const session = await requireRole("ADMIN", "OPERATOR");
-  const menu = await prisma.menuItem.findMany({
-    where: { active: true },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    select: { id: true, name: true, price: true, category: true },
-  });
 
   return (
     <main className="flex flex-1 flex-col">
@@ -34,7 +33,7 @@ export default async function ScanPage() {
           </form>
         </div>
       </header>
-      <ScanClient menu={menu} />
+      <ScanClient />
     </main>
   );
 }

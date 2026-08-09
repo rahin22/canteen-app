@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>R22 Printer Protocol Lab</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 ui-sans-serif,system-ui,Segoe UI,sans-serif;
+         background:#0f1115; color:#e6e8ee; padding:20px; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.08em;
+       color:#8b93a7; margin:20px 0 8px; }
+  .sub { color:#8b93a7; margin:0 0 16px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+  button { background:#232838; color:#e6e8ee; border:1px solid #333a4d;
+           border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer; }
+  button:hover:not(:disabled) { background:#2c3346; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  button.primary { background:#3b5bdb; border-color:#4c6ef5; font-weight:600; }
+  button.primary:hover:not(:disabled) { background:#4c6ef5; }
+  button.go { background:#2f9e44; border-color:#37b24d; font-weight:600; }
+  button.go:hover:not(:disabled) { background:#37b24d; }
+  input, select { background:#181c26; color:#e6e8ee; border:1px solid #333a4d;
+                  border-radius:6px; padding:6px 8px; font-size:13px; }
+  input[type=number] { width:80px; }
+  label.f { display:flex; gap:6px; align-items:center; color:#a8b0c4; font-size:12px; }
+  #log { background:#080a0e; border:1px solid #222839; border-radius:8px;
+         padding:10px; height:340px; overflow:auto; white-space:pre-wrap;
+         font:12px/1.45 ui-monospace,Consolas,monospace; }
+  .ok{color:#69db7c}.err{color:#ff8787}.rx{color:#ffd43b}.tx{color:#74c0fc}.dim{color:#6b7280}
+  canvas { background:#fff; border-radius:6px; image-rendering:pixelated; }
+  .grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; }
+  @media(max-width:900px){ .grid{grid-template-columns:1fr} }
+  .card { border:1px solid #222839; border-radius:10px; padding:14px; background:#141822; }
+</style>
+</head>
+<body>
+
+<h1>R22 Printer Protocol Lab</h1>
+<p class="sub">Web Bluetooth &rarr; <code>0000ff00 / 0000ff02</code>. Notifications on <code>ff01</code>/<code>ff03</code> are logged — that is how we learn what the firmware wants.</p>
+
+<div class="row">
+  <button id="connect" class="primary">Connect to printer</button>
+  <button id="disconnect" disabled>Disconnect</button>
+  <button id="enumerate" disabled>Re-enumerate GATT</button>
+  <button id="clear">Clear log</button>
+  <span id="status" class="dim">not connected</span>
+</div>
+
+<div class="grid">
+  <div>
+    <h2>Label preview (384 × 240 dots = 48 × 30 mm)</h2>
+    <div class="card">
+      <canvas id="cv" width="384" height="160"></canvas>
+      <div class="row" style="margin-top:10px">
+        <input id="l1" value="ALICE NGUYEN" placeholder="name" style="width:140px">
+        <input id="l2" value="alice.nguyen" placeholder="username" style="width:110px">
+        <input id="l3" value="K7M2PQ4XVN8TRW3ZYC6H" placeholder="card token (QR)" style="width:180px">
+        <select id="pattern">
+          <option value="card">Student card (QR)</option>
+          <option value="ruler">Alignment ruler (mm)</option>
+          <option value="label">Text only</option>
+          <option value="test">Test pattern (bars)</option>
+          <option value="solid">Solid black block</option>
+          <option value="tiny">Tiny (8 rows only)</option>
+        </select>
+        <button id="render">Redraw</button>
+      </div>
+    </div>
+
+    <h2>Transmit settings</h2>
+    <div class="card">
+      <div class="row">
+        <label class="f">Characteristic
+          <select id="target">
+            <option value="ff02">ff00 / ff02 (printer)</option>
+            <option value="issc">ISSC UART / 8841</option>
+            <option value="issc3">ISSC / aca3 (write+notify)</option>
+          </select>
+        </label>
+        <label class="f">Chunk <input id="chunk" type="number" value="240" min="16" max="512"></label>
+        <label class="f">Delay ms <input id="delay" type="number" value="8" min="0" max="500"></label>
+        <label class="f">paperType <input id="paperType" type="number" value="1" min="0" max="4" style="width:56px"></label>
+        <label class="f">gap mm <input id="gapv" type="number" value="6" min="0" max="10" step="0.5" style="width:56px"></label>
+        <label class="f">yOffset <input id="yoff" type="number" value="0" min="-240" max="240" style="width:64px"></label>
+        <label class="f">chain <input id="chain" type="number" value="1" min="1" max="10" style="width:48px"></label>
+        <label class="f">height <input id="lblH" type="number" value="160" min="24" max="480" step="8" style="width:64px"></label>
+        <label class="f">Write
+          <select id="wtype">
+            <option value="nores">withoutResponse</option>
+            <option value="res">withResponse</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2>Protocol experiments</h2>
+    <div class="card">
+      <div class="row">
+        <button class="go" data-proto="escpos_gsv0" disabled>ESC/POS GS v 0</button>
+        <button class="go" data-proto="escpos_banded" disabled>GS v 0 banded</button>
+        <button class="go" data-proto="escpos_star" disabled>ESC * 24-dot</button>
+        <button class="go" data-proto="tspl_bitmap" disabled>TSPL BITMAP</button>
+        <button class="go" data-proto="cpcl_bitmap" disabled>CPCL EG</button>
+      </div>
+      <div class="row">
+        <button data-proto="init_only" disabled>ESC @ only</button>
+        <button data-proto="feed" disabled>Form feed (0x0C)</button>
+        <button data-proto="status" disabled>Status queries</button>
+        <button data-proto="wake" disabled>Wake / handshake sweep</button>
+      </div>
+      <div class="row" style="border-top:1px solid #222839;padding-top:10px;margin-top:4px">
+        <button id="reconnect">Reconnect</button>
+        <button class="primary" data-seq="info" disabled>Identify device</button>
+        <button class="go" data-seq="lujiang" disabled>PRINT — Lujiang (F1 03/45)</button>
+        <button class="go" data-seq="aiyin" disabled>PRINT — AiYin (FE 01/45)</button>
+      </div>
+      <div class="row" style="border-top:1px solid #222839;padding-top:10px;margin-top:4px">
+        <strong style="color:#69db7c;font-size:12px">PN81 (recovered)</strong>
+        <button class="primary" data-seq="pn81info" disabled>Query device</button>
+        <button class="go" data-seq="pn81selftest" disabled>Print SELF-TEST page</button>
+        <button class="go" id="pn81print" disabled>★ PRINT LABEL</button>
+        <button class="go" id="pn81printfull" disabled>★ FULL 30mm (chained, feeds 1 blank)</button>
+        <button id="pn81printinv" disabled>PRINT (inverted)</button>
+        <button data-seq="calibrate" disabled>Calibrate gap (feeds a few labels)</button>
+      </div>
+      <div class="row">
+        <input id="rawhex" placeholder="raw hex e.g. 1F 11 1A" style="flex:1;min-width:200px">
+        <button id="sendraw" disabled>Send raw</button>
+      </div>
+    </div>
+
+    <h2>Log</h2>
+    <div id="log"></div>
+  </div>
+</div>
+
+<script>
+// The printer begins printing ~80 dots (10mm) into each label and there is no
+// working back-feed (LEARN_TAG_PAPER, SET_FEEDBACK_LENGTH and MOVE_PAPER are all
+// accepted but do nothing). Two ways to live with that:
+//  - ★ PRINT LABEL: a short 160-dot image that lands inside the current label.
+//  - ★ FULL 30mm:   the firmware prints straight across gaps, so lead with
+//    blank rows that run out the current label + gap and put a full 240-dot
+//    image top-aligned on the NEXT label. Costs one blank label per job;
+//    yOffset fine-trims the lead if the real head offset isn't exactly 80.
+const W = 384, BPR = W / 8;
+let H = 160;
+// Effective values calibrated from chained ruler prints. Physical gap
+// measures 4.8mm but the printer under-feeds ~3%, so 6mm/48 dots closes the
+// observed drift; the head offset came out at 67 dots (64 printed 0.4mm low).
+const FULL_H = 240, HEAD_OFF = 67;
+
+// Every service we might need access to must be declared up front,
+// otherwise Chrome blocks getPrimaryService() for it.
+const SVC_FF00 = 0x0000ff00;
+const SVC_ISSC = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+const OPTIONAL = [
+  SVC_FF00, SVC_ISSC,
+  0x1800, 0x1801, 0x180a, 0x180f,
+  0xffe0, 0xfff0, 0x18f0, 0xfee7, 0xff10,
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+  '0000fee7-0000-1000-8000-00805f9b34fb',
+];
+const CH = {
+  ff02:  { svc: SVC_FF00, chr: 0x0000ff02 },
+  issc:  { svc: SVC_ISSC, chr: '49535343-8841-43f4-a8d4-ecbe34729bb3' },
+  issc3: { svc: SVC_ISSC, chr: '49535343-aca3-481c-91ec-d85e28a60318' },
+};
+
+let device = null, server = null;
+const cache = new Map();
+
+const $ = id => document.getElementById(id);
+const logEl = $('log');
+function log(msg, cls) {
+  const t = new Date().toISOString().substr(11, 12);
+  logEl.insertAdjacentHTML('beforeend',
+    `<span class="dim">${t}</span> <span class="${cls || ''}">${msg}</span>\n`);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+const hex = b => [...b].map(x => x.toString(16).padStart(2, '0')).join(' ');
+const ascii = b => [...b].map(x => (x >= 32 && x < 127) ? String.fromCharCode(x) : '.').join('');
+
+// ---------- rendering ----------
+const qrCache = new Map();
+async function fetchQr(text) {
+  if (qrCache.has(text)) return qrCache.get(text);
+  const res = await fetch('/api/qr?text=' + encodeURIComponent(text));
+  if (!res.ok) throw new Error(`QR ${res.status} ${res.statusText}`
+    + (res.status === 401 ? ' — log in to the app as ADMIN in this browser first' : ''));
+  const j = await res.json();
+  qrCache.set(text, j);
+  return j;
+}
+
+// Shrink until it fits; returns the font size actually used.
+function fitText(g, text, maxWidth, startPx, weight) {
+  for (let px = startPx; px >= 10; px--) {
+    g.font = `${weight || ''} ${px}px Arial`.trim();
+    if (g.measureText(text).width <= maxWidth) return px;
+  }
+  return 10;
+}
+
+async function draw() {
+  const c = $('cv'), g = c.getContext('2d');
+  const wantH = Math.max(8, (+$('lblH').value || H) & ~7);   // multiple of 8 rows
+  if (wantH !== H || c.height !== wantH) { H = wantH; c.height = H; }
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#000';
+  const mode = $('pattern').value;
+
+  if (mode === 'solid') { g.fillRect(20, 20, W - 40, H - 40); return; }
+  if (mode === 'tiny')  { g.fillRect(0, 0, W, 8); return; }
+  if (mode === 'test')  { for (let i = 0; i < 12; i++) g.fillRect(0, i * 20, W, 10); return; }
+
+  // Ruler: tells us exactly which part of the 240-row canvas reaches the label.
+  // Every 5mm (40 dots) gets a numbered tick; row 0 and row 239 get solid bars.
+  if (mode === 'ruler') {
+    g.fillStyle = '#000';
+    g.fillRect(0, 0, W, 6);                       // TOP edge marker
+    g.fillRect(0, H - 6, W, 6);                   // BOTTOM edge marker
+    g.font = 'bold 26px Arial';
+    g.fillText('TOP-0mm', 100, 34);
+    g.fillText('BOT-30mm', 100, H - 14);
+    for (let mm = 0; mm <= 30; mm += 5) {
+      const y = Math.min(H - 1, mm * 8);
+      g.fillRect(0, y, 60, 3);                    // tick from the left edge
+      g.font = '22px Arial';
+      g.fillText(String(mm), 68, Math.min(H - 4, y + 20));
+    }
+    return;
+  }
+
+  if (mode === 'label') {
+    g.lineWidth = 4; g.strokeStyle = '#000';
+    g.strokeRect(6, 6, W - 12, H - 12);
+    g.font = 'bold 34px Arial';  g.fillText($('l1').value, 24, 66);
+    g.font = '22px Arial';       g.fillText($('l2').value, 24, 108);
+    g.font = '20px monospace';   g.fillText($('l3').value, 24, 146);
+    g.fillRect(24, 168, W - 48, 6);
+    g.font = '16px Arial';       g.fillText('School Canteen', 24, 200);
+    return;
+  }
+
+  // --- student card: QR is the payload, name/username identify it by eye ---
+  // Everything is derived from H so the layout survives a height change.
+  const name = $('l1').value, user = $('l2').value, token = $('l3').value;
+  const PAD = Math.max(4, Math.round(H * 0.05));
+  let qrPx = 0;
+  try {
+    const { size, bits } = await fetchQr(token);
+    // Integer dots per module only — no resampling, so modules stay crisp.
+    const scale = Math.max(1, Math.floor((H - PAD * 2) / size));
+    qrPx = size * scale;
+    const ox = PAD, oy = Math.floor((H - qrPx) / 2);
+    g.fillStyle = '#000';
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++)
+        if (bits[y * size + x] === '1')
+          g.fillRect(ox + x * scale, oy + y * scale, scale, scale);
+    log(`QR ${size}x${size} modules @${scale} dots = ${qrPx}px`, 'dim');
+  } catch (e) {
+    qrPx = H - PAD * 2;
+    g.strokeStyle = '#000'; g.lineWidth = 3;
+    g.strokeRect(PAD, PAD, qrPx, qrPx);
+    g.font = '14px Arial';
+    g.fillText('QR failed', PAD + 8, H / 2);
+    log('QR fetch failed: ' + e.message, 'err');
+  }
+
+  const tx = PAD + qrPx + Math.round(H * 0.07);
+  const tw = W - tx - PAD;
+  g.fillStyle = '#000';
+  g.textBaseline = 'alphabetic';
+
+  let px = fitText(g, 'SCHOOL CANTEEN', tw, Math.round(H * 0.10));
+  g.font = `${px}px Arial`;
+  g.fillText('SCHOOL CANTEEN', tx, Math.round(H * 0.20));
+
+  px = fitText(g, name, tw, Math.round(H * 0.19), 'bold');
+  g.font = `bold ${px}px Arial`;
+  g.fillText(name, tx, Math.round(H * 0.48));
+
+  g.fillRect(tx, Math.round(H * 0.55), tw, Math.max(2, Math.round(H * 0.018)));
+
+  px = fitText(g, user, tw, Math.round(H * 0.13));
+  g.font = `${px}px Arial`;
+  g.fillText(user, tx, Math.round(H * 0.78));
+
+  px = fitText(g, token, tw, Math.round(H * 0.085));
+  g.font = `${px}px monospace`;
+  g.fillText(token, tx, Math.round(H * 0.96));
+}
+
+// canvas -> 1bpp packed, MSB = leftmost, bit set = black
+function raster() {
+  const d = $('cv').getContext('2d').getImageData(0, 0, W, H).data;
+  const out = new Uint8Array(BPR * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
+      const lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      if (lum < 128) out[y * BPR + (x >> 3)] |= 0x80 >> (x & 7);
+    }
+  }
+  return out;
+}
+
+// ---------- payload builders ----------
+const cat = arrs => {
+  const n = arrs.reduce((s, a) => s + a.length, 0);
+  const o = new Uint8Array(n); let p = 0;
+  for (const a of arrs) { o.set(a, p); p += a.length; }
+  return o;
+};
+const A = s => new TextEncoder().encode(s);
+
+function build(proto) {
+  const r = raster();
+  switch (proto) {
+    case 'init_only': return new Uint8Array([0x1b, 0x40]);
+    case 'feed':      return new Uint8Array([0x0c]);
+    case 'status':    return new Uint8Array([
+      0x10,0x04,0x01, 0x10,0x04,0x02, 0x10,0x04,0x03, 0x10,0x04,0x04,
+      0x1d,0x49,0x01, 0x1d,0x49,0x02, 0x1d,0x72,0x01,
+      ...A('\r\n~!@\r\n'), ...A('\r\n~!A\r\n'), ...A('! U1 getsetting\r\n'),
+    ]);
+    // Header bytes used by the common OEM firmwares in this printer class.
+    // If any of them elicits a notification we have found the family.
+    case 'wake': return new Uint8Array([
+      0x1f,0x11,0x1a, 0x1f,0x11,0x1b, 0x1f,0x11,0x02,
+      0x55,0x55, 0xaa,0xaa,
+      0x02,0x03,0x01, 0x1b,0x4a,0x00,
+      0x10,0xff,0xfe,0x01, 0x1b,0x40,
+    ]);
+    case 'escpos_gsv0':
+      return cat([ new Uint8Array([0x1b,0x40]),
+        new Uint8Array([0x1d,0x76,0x30,0x00, BPR&255,(BPR>>8)&255, H&255,(H>>8)&255]),
+        r, new Uint8Array([0x0a,0x0a,0x0a,0x0c]) ]);
+    case 'escpos_banded': {
+      const parts = [new Uint8Array([0x1b,0x40])];
+      for (let y = 0; y < H; y += 24) {
+        const rows = Math.min(24, H - y);
+        parts.push(new Uint8Array([0x1d,0x76,0x30,0x00, BPR&255,0, rows&255,0]));
+        parts.push(r.slice(y*BPR, (y+rows)*BPR));
+      }
+      parts.push(new Uint8Array([0x0a,0x0a,0x0c]));
+      return cat(parts);
+    }
+    case 'escpos_star': {
+      const parts = [new Uint8Array([0x1b,0x40,0x1b,0x33,0x18])];
+      for (let y0 = 0; y0 < H; y0 += 24) {
+        const hdr = new Uint8Array([0x1b,0x2a,33, W&255,(W>>8)&255]);
+        const col = new Uint8Array(W * 3);
+        for (let x = 0; x < W; x++)
+          for (let k = 0; k < 3; k++) {
+            let b = 0;
+            for (let bit = 0; bit < 8; bit++) {
+              const y = y0 + k*8 + bit;
+              if (y < H && (r[y*BPR + (x>>3)] & (0x80 >> (x&7)))) b |= 0x80 >> bit;
+            }
+            col[x*3 + k] = b;
+          }
+        parts.push(hdr, col, new Uint8Array([0x0a]));
+      }
+      parts.push(new Uint8Array([0x0c]));
+      return cat(parts);
+    }
+    case 'tspl_bitmap': {
+      const inv = new Uint8Array(r.length);      // TSPL BITMAP: 0 = black
+      for (let i = 0; i < r.length; i++) inv[i] = r[i] ^ 0xff;
+      return cat([ A('SIZE 50 mm,30 mm\r\nGAP 2 mm,0 mm\r\nDIRECTION 1\r\nCLS\r\n'),
+        A(`BITMAP 0,0,${BPR},${H},0,`), inv, A('\r\nPRINT 1,1\r\n') ]);
+    }
+    case 'cpcl_bitmap': {
+      let s = '';                                 // CPCL EG uses ASCII hex
+      for (const b of r) s += b.toString(16).padStart(2, '0').toUpperCase();
+      return cat([ A(`! 0 200 200 ${H} 1\r\nPAGE-WIDTH ${W}\r\n`),
+        A(`EG ${BPR} ${H} 0 0 ${s}\r\n`), A('FORM\r\nPRINT\r\n') ]);
+    }
+  }
+}
+
+// ---------- GATT ----------
+async function getChar(key) {
+  if (cache.has(key)) return cache.get(key);
+  const m = CH[key];
+  const s = await server.getPrimaryService(m.svc);
+  const c = await s.getCharacteristic(m.chr);
+  cache.set(key, c);
+  return c;
+}
+
+async function enumerate() {
+  log('--- enumerating GATT ---', 'dim');
+  let svcs = [];
+  try { svcs = await server.getPrimaryServices(); }
+  catch (e) { log('getPrimaryServices failed: ' + e.message, 'err'); return; }
+  for (const s of svcs) {
+    log('SERVICE ' + s.uuid, 'ok');
+    let chars = [];
+    try { chars = await s.getCharacteristics(); } catch (e) { log('  (chars blocked)', 'dim'); continue; }
+    for (const c of chars) {
+      // properties are prototype getters, so Object.entries() sees nothing
+      const p = ['broadcast','read','writeWithoutResponse','write','notify',
+                 'indicate','authenticatedSignedWrites','reliableWrite',
+                 'writableAuxiliaries'].filter(k => c.properties[k]).join(',');
+      log('   CHAR ' + c.uuid + '  [' + p + ']');
+      if (c.properties.read) {
+        try {
+          const v = await c.readValue();
+          const b = new Uint8Array(v.buffer);
+          if (b.length) log('      read: ' + hex(b) + '   "' + ascii(b) + '"', 'rx');
+        } catch {}
+      }
+      if (c.properties.notify || c.properties.indicate) {
+        try {
+          await c.startNotifications();
+          c.addEventListener('characteristicvaluechanged', ev => {
+            const b = new Uint8Array(ev.target.value.buffer);
+            log('<< NOTIFY ' + c.uuid.slice(4, 8) + ': ' + hex(b) + '   "' + ascii(b) + '"', 'rx');
+          });
+          log('      subscribed', 'ok');
+        } catch (e) { log('      subscribe failed: ' + e.message, 'err'); }
+      }
+    }
+  }
+  log('--- end enumeration ---', 'dim');
+}
+
+async function send(bytes) {
+  const key = $('target').value;
+  const size = +$('chunk').value, delay = +$('delay').value;
+  const useRes = $('wtype').value === 'res';
+  let c;
+  try { c = await getChar(key); }
+  catch (e) { log('characteristic unavailable: ' + e.message, 'err'); return; }
+
+  log(`>> TX ${bytes.length} bytes via ${key}, ${Math.ceil(bytes.length/size)} chunks of ${size}`, 'tx');
+  if (bytes.length <= 48) log('   ' + hex(bytes), 'tx');
+  const t0 = performance.now();
+  try {
+    for (let o = 0; o < bytes.length; o += size) {
+      const part = bytes.slice(o, o + size);
+      if (useRes || !c.properties.writeWithoutResponse) await c.writeValueWithResponse(part);
+      else await c.writeValueWithoutResponse(part);
+      if (delay) await new Promise(r => setTimeout(r, delay));
+    }
+    log(`   done in ${Math.round(performance.now() - t0)} ms`, 'ok');
+  } catch (e) { log('   TX FAILED: ' + e.message, 'err'); }
+}
+
+// ---------- Rongta PN81 protocol ----------
+// Recovered from librt_printer_sdk.so (HAL_RT_Protocol_PacketBuid) and verified
+// byte-for-byte against the real function executed under a CPU emulator.
+//
+//   A3 1E | type | enc | len16 | 11 | super | sub | plen16 | payload | crc32
+//
+// len16   = 5 + payload.length (covers the 0x11..plen16 bytes plus payload)
+// enc     = 0x00 none, 0x10 when a payload is present
+// crc32   = reflected poly 0xEDB88320 but seeded 0x896ACADE (NOT 0xFFFFFFFF),
+//           final one's-complement, little-endian, over [0x11 .. end of payload]
+const RT_TB = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (c & 1 ? 0xEDB88320 : 0);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+const RT_CRC_INIT = 0x896ACADE;
+
+function rtCrc32(bytes) {
+  let c = RT_CRC_INIT >>> 0;
+  for (let i = 0; i < bytes.length; i++)
+    c = (RT_TB[(c ^ bytes[i]) & 0xff] ^ (c >>> 8)) >>> 0;
+  return (~c) >>> 0;
+}
+
+const PROTOCOL_TYPE = 0x1c;          // 28 = PN81, from RTSDK.init(..., RTProtocolPN81)
+
+// enc: 0x00 = ENCRYPT_TYPE_NONE. The high nibble is the encrypt type, so 0x10
+// would claim ENCRYPT_TYPE_XOR. The image builders all use 0x00 even with a
+// payload — the CRC does not cover this byte, so getting it wrong is ACKed and
+// then silently misparsed.
+function pn81(sup, sub, payload, enc) {
+  payload = payload || new Uint8Array(0);
+  const body = new Uint8Array(5 + payload.length);
+  body[0] = 0x11; body[1] = sup & 0xff; body[2] = sub & 0xff;
+  body[3] = payload.length & 0xff; body[4] = (payload.length >> 8) & 0xff;
+  body.set(payload, 5);
+  const crc = rtCrc32(body);
+  const out = new Uint8Array(6 + body.length + 4);
+  out[0] = 0xa3; out[1] = 0x1e; out[2] = PROTOCOL_TYPE;
+  out[3] = enc || 0x00;
+  out[4] = body.length & 0xff; out[5] = (body.length >> 8) & 0xff;
+  out.set(body, 6);
+  const o = 6 + body.length;
+  out[o] = crc & 0xff; out[o+1] = (crc >>> 8) & 0xff;
+  out[o+2] = (crc >>> 16) & 0xff; out[o+3] = (crc >>> 24) & 0xff;
+  return out;
+}
+
+const pn81Seq = [
+  ['CONNECT_PROTOCOL  (0,0)',  pn81(0, 0)],
+  ['CONNECT_HANDSHAKE (0,1)',  pn81(0, 1)],
+  ['GET_PRODUCT_MODEL (1,4)',  pn81(1, 4)],
+  ['GET_DEV_SN        (1,6)',  pn81(1, 6)],
+  ['GET_SOFTWARE_VER  (1,11)', pn81(1, 11)],
+  ['GET_PRINT_STATUS  (1,19)', pn81(1, 19)],
+  ['GET_SHAKE_HAND    (1,23)', pn81(1, 23)],
+  ['GET_PAPER_TYPE    (5,16)', pn81(5, 16)],
+];
+const pn81SelfTest = [
+  ['GET_PRINT_STATUS   (1,19)', pn81(1, 19)],
+  ['PRINT_SELF_TEST    (5,9)',  pn81(5, 9)],
+];
+// Teaches the printer where the die-cut gaps are so it starts at the label top.
+// This feeds several labels while measuring - that is expected, and persistent.
+// Generic setter commands go through getCommandPackageWithData, whose ground
+// truth uses enc=0x10 when a payload is present. Only the image builders use
+// enc=0x00 with a payload. Getting this backwards is silently accepted.
+const pn81Calibrate = [
+  ['SET_PAPER_TYPE=GAP (5,17)', pn81(5, 17, new Uint8Array([1]), 0x10)],
+  ['LEARN_TAG_PAPER    (5,18)', pn81(5, 18)],
+  ['GET_PAPER_TYPE     (5,16)', pn81(5, 16)],
+];
+
+// Full image print over PN81.
+//   START  (5,11) payload: w16 h16 paperType gap pageMode
+//   DATA   (5,13) payload: raw 1bpp raster, chunked
+//   END    (5,12) payload: none
+// RTPaperTypeEnum: CONTINUOUS=0, GAP=1, BLACK=2, WHITE=3, TRANSPARENT=4.
+// Die-cut label rolls are GAP(1); CONTINUOUS(0) makes the printer feed forever
+// because there is no gap for it to stop at.
+async function pn81Print(opts) {
+  opts = opts || {};
+  const paperType = opts.paperType ?? (+$('paperType').value);
+  const gap       = opts.gap ?? (+$('gapv').value);
+  const pageMode  = opts.pageMode ?? 0;
+  const maxPkt    = opts.maxPkt ?? 512;
+  const invert    = opts.invert ?? false;
+  const yOffset   = opts.yOffset ?? (+$('yoff').value);
+  const fullBleed = opts.fullBleed ?? false;
+
+  if (fullBleed) { $('lblH').value = FULL_H; }   // full-bleed always renders 30mm
+  await draw();               // draw() is async (QR fetch) - never rasterise stale pixels
+  let r = raster();
+  if (invert) { r = r.slice(); for (let i = 0; i < r.length; i++) r[i] ^= 0xff; }
+  let jobH = H;
+  if (fullBleed) {
+    // Blank lead runs out the label under the head plus the gap, so the image
+    // lands top-aligned on the next label. yOffset trims the lead only: if the
+    // top N mm of the image burns into the backing before the label, add 8*N.
+    // "chain" prints that many copies in one job at (label + gap) pitch —
+    // print rulers with chain=2+ to measure lead error AND per-label drift.
+    const chainN = Math.max(1, Math.floor(+$('chain').value) || 1);
+    const gapDots = Math.max(0, Math.round((+$('gapv').value || 0) * 8));
+    const lead = Math.max(0, (FULL_H - HEAD_OFF) + gapDots + yOffset);
+    jobH = lead + chainN * H + (chainN - 1) * gapDots;
+    const chained = new Uint8Array(jobH * BPR);
+    for (let k = 0; k < chainN; k++) chained.set(r, (lead + k * (H + gapDots)) * BPR);
+    r = chained;
+    log(`full-bleed: lead ${lead} rows, chain ${chainN} labels, gap ${gapDots} dots, `
+        + `job height ${jobH}`, 'dim');
+  } else if (yOffset) {
+    // Positive yOffset pushes the image down the label, negative pulls it up,
+    // by shifting whole raster rows and padding with blank ones.
+    const shifted = new Uint8Array(r.length);
+    for (let y = 0; y < H; y++) {
+      const src = y - yOffset;
+      if (src >= 0 && src < H) shifted.set(r.subarray(src * BPR, src * BPR + BPR), y * BPR);
+    }
+    r = shifted;
+  }
+
+  const key = $('target').value, size = +$('chunk').value, delay = +$('delay').value;
+  let c;
+  try { c = await getChar(key); }
+  catch (e) { log('characteristic unavailable: ' + e.message, 'err'); return; }
+
+  const write = async (bytes, label) => {
+    for (let o = 0; o < bytes.length; o += size) {
+      const part = bytes.slice(o, o + size);
+      if (c.properties.writeWithoutResponse) await c.writeValueWithoutResponse(part);
+      else await c.writeValueWithResponse(part);
+      if (delay) await new Promise(r2 => setTimeout(r2, delay));
+    }
+    if (label) log('  ' + label, 'tx');
+  };
+
+  log(`=== PN81 print: ${W}x${jobH} dots, paper=${paperType} gap=${gap} page=${pageMode} `
+      + `invert=${invert} raster=${r.length}B ===`, 'dim');
+
+  const start = new Uint8Array([W & 255, (W >> 8) & 255, jobH & 255, (jobH >> 8) & 255,
+                                paperType, gap, pageMode]);
+  await write(pn81(5, 11, start), 'START ' + hex(pn81(5, 11, start).slice(0, 18)));
+  await new Promise(r2 => setTimeout(r2, 300));
+
+  // DATA payload = 11-byte sub-header + whole rows of raster:
+  //   [0..1] packet index   [2..3] chunkBytes+7   [4] = 1
+  //   [5..6] bytes per row  [7..8] start row      [9..10] = 0
+  const BPRow = BPR;
+  const rowsPerPkt = Math.max(1, Math.floor((maxPkt - 7) / BPRow));
+  const chunkBytes = rowsPerPkt * BPRow;
+  const t0 = performance.now();
+  let n = 0, row = 0;
+  for (let o = 0; o < r.length; o += chunkBytes, n++) {
+    const chunk = r.slice(o, Math.min(o + chunkBytes, r.length));
+    const p = new Uint8Array(11 + chunk.length);
+    p[0] = n & 255;              p[1] = (n >> 8) & 255;
+    const v = chunk.length + 7;
+    p[2] = v & 255;              p[3] = (v >> 8) & 255;
+    p[4] = 1;
+    p[5] = BPRow & 255;          p[6] = (BPRow >> 8) & 255;
+    p[7] = row & 255;            p[8] = (row >> 8) & 255;
+    p[9] = 0; p[10] = 0;
+    p.set(chunk, 11);
+    if (n === 0) log('  DATA[0] hdr ' + hex(p.slice(0, 11)), 'tx');
+    await write(pn81(5, 13, p));
+    row += chunk.length / BPRow;
+  }
+  log(`  DATA: ${n} packets (${rowsPerPkt} rows each), ${r.length} raster bytes `
+      + `in ${Math.round(performance.now()-t0)} ms`, 'tx');
+
+  await new Promise(r2 => setTimeout(r2, 300));
+  await write(pn81(5, 12), 'END');
+  log('print job sent', 'ok');
+}
+
+// ---------- multi-step sequences ----------
+// Derived from the Fichero/DP-L1S family reference. The enable/stop pair is
+// OEM-specific: Lujiang uses F1 03 / F1 45, AiYin uses FE 01 / FE 45. Sending
+// the wrong pair transfers all the data and silently prints nothing, which is
+// exactly the symptom we saw with bare GS v 0.
+function printSeq(variant) {
+  const r = raster();
+  const en = variant === 'aiyin' ? [0x10,0xff,0xfe,0x01] : [0x10,0xff,0xf1,0x03];
+  const st = variant === 'aiyin' ? [0x10,0xff,0xfe,0x45] : [0x10,0xff,0xf1,0x45];
+  return [
+    ['density  10FF100001', [0x10,0xff,0x10,0x00,0x01]],
+    ['paper=gap 10FF8400',  [0x10,0xff,0x84,0x00]],
+    ['wake x12',            new Array(12).fill(0)],
+    ['ENABLE',              en],
+    ['label-mode on 1F1151',[0x1f,0x11,0x51]],
+    ['raster GS v 0',       cat([new Uint8Array([0x1d,0x76,0x30,0x00,
+                              BPR & 255, (BPR >> 8) & 255, H & 255, (H >> 8) & 255]), r])],
+    ['feed 1D0C',           [0x1d,0x0c]],
+    ['label-mode off 1F1150',[0x1f,0x11,0x50]],
+    ['STOP',                st],
+  ];
+}
+const infoSeq = [
+  ['model    10FF20F0', [0x10,0xff,0x20,0xf0]],
+  ['firmware 10FF20F1', [0x10,0xff,0x20,0xf1]],
+  ['serial   10FF20F2', [0x10,0xff,0x20,0xf2]],
+  ['boot     10FF20EF', [0x10,0xff,0x20,0xef]],
+  ['ALLINFO  10FF70',   [0x10,0xff,0x70]],
+  ['status   10FF40',   [0x10,0xff,0x40]],
+  ['battery  10FF50F1', [0x10,0xff,0x50,0xf1]],
+];
+
+async function runSeq(steps) {
+  const key = $('target').value;
+  const size = +$('chunk').value, delay = +$('delay').value;
+  let c;
+  try { c = await getChar(key); }
+  catch (e) { log('characteristic unavailable: ' + e.message, 'err'); return; }
+  for (const [name, bytes] of steps) {
+    const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    log('>> ' + name + ' : ' + hex(b.slice(0, 20)) + (b.length > 20 ? ` ...(${b.length}B)` : ''), 'tx');
+    try {
+      for (let o = 0; o < b.length; o += size) {
+        const part = b.slice(o, o + size);
+        if (c.properties.writeWithoutResponse) await c.writeValueWithoutResponse(part);
+        else await c.writeValueWithResponse(part);
+        if (delay) await new Promise(r => setTimeout(r, delay));
+      }
+    } catch (e) { log('   step failed: ' + e.message, 'err'); return; }
+    await new Promise(r => setTimeout(r, 700));   // let the printer answer
+  }
+  log('sequence complete', 'ok');
+}
+
+async function reconnect() {
+  try {
+    if (!device) { log('no device yet — use Connect', 'err'); return; }
+    cache.clear();
+    server = await device.gatt.connect();
+    log('RECONNECTED to ' + device.name, 'ok');
+    $('status').textContent = 'connected: ' + device.name;
+    setEnabled(true);
+    await enumerate();
+  } catch (e) { log('reconnect failed: ' + e.message + ' — is the printer powered on?', 'err'); }
+}
+
+// ---------- wiring ----------
+$('connect').onclick = async () => {
+  try {
+    log('requesting device...', 'dim');
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ namePrefix: 'R22' }, { services: [SVC_FF00] }],
+      optionalServices: OPTIONAL,
+    });
+    device.addEventListener('gattserverdisconnected', () => {
+      $('status').textContent = 'disconnected'; log('!! device disconnected', 'err');
+      cache.clear(); setEnabled(false);
+    });
+    log('connecting to ' + device.name + ' ...', 'dim');
+    server = await device.gatt.connect();
+    $('status').textContent = 'connected: ' + device.name;
+    log('CONNECTED to ' + device.name, 'ok');
+    setEnabled(true);
+    await enumerate();
+  } catch (e) { log('connect failed: ' + e.message, 'err'); }
+};
+$('disconnect').onclick = () => { if (device?.gatt.connected) device.gatt.disconnect(); };
+$('enumerate').onclick = enumerate;
+$('clear').onclick = () => logEl.textContent = '';
+$('render').onclick = draw;
+$('pattern').onchange = draw;
+for (const el of ['l1','l2','l3']) $(el).oninput = draw;
+$('lblH').onchange = draw;
+document.querySelectorAll('[data-proto]').forEach(b => {
+  b.onclick = () => { const p = build(b.dataset.proto); log('--- ' + b.dataset.proto + ' ---', 'dim'); send(p); };
+});
+$('sendraw').onclick = () => {
+  const t = $('rawhex').value.trim().replace(/0x/g, '').split(/[\s,]+/).filter(Boolean);
+  const b = new Uint8Array(t.map(x => parseInt(x, 16)));
+  if (b.some(isNaN)) { log('bad hex', 'err'); return; }
+  send(b);
+};
+$('reconnect').onclick = reconnect;
+$('pn81print').onclick = () => pn81Print();
+$('pn81printfull').onclick = () => pn81Print({ fullBleed: true });
+$('pn81printinv').onclick = () => pn81Print({ invert: true });
+document.querySelectorAll('[data-seq]').forEach(b => {
+  b.onclick = () => {
+    const s = b.dataset.seq;
+    log('=== sequence: ' + s + ' ===', 'dim');
+    const seq = s === 'info' ? infoSeq
+              : s === 'pn81info' ? pn81Seq
+              : s === 'pn81selftest' ? pn81SelfTest
+              : s === 'calibrate' ? pn81Calibrate
+              : printSeq(s);
+    runSeq(seq);
+  };
+});
+function setEnabled(on) {
+  $('disconnect').disabled = !on; $('enumerate').disabled = !on; $('sendraw').disabled = !on;
+  $('pn81print').disabled = !on; $('pn81printfull').disabled = !on;
+  $('pn81printinv').disabled = !on;
+  document.querySelectorAll('[data-proto]').forEach(b => b.disabled = !on);
+  document.querySelectorAll('[data-seq]').forEach(b => b.disabled = !on);
+}
+
+if (!navigator.bluetooth) log('Web Bluetooth NOT available — use Chrome/Edge over localhost or https.', 'err');
+draw();
+</script>
+</body>
+</html>

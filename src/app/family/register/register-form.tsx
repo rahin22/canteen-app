@@ -3,12 +3,13 @@
 import { useActionState } from "react";
 import { PhotoInput } from "@/components/photo-input";
 import { registerChild, type RegisterState } from "../actions";
+import type { SchoolOption } from "@/lib/school-constants";
 
 const field =
   "w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200";
 const label = "mb-1 block text-sm font-medium text-slate-700";
 
-export function RegisterForm() {
+export function RegisterForm({ schools }: { schools: SchoolOption[] }) {
   const [state, formAction, pending] = useActionState<RegisterState, FormData>(
     registerChild,
     {}
@@ -27,12 +28,41 @@ export function RegisterForm() {
       </div>
 
       <div>
-        <label className={label} htmlFor="schoolId">
+        <label className={label} htmlFor="school">
+          School
+        </label>
+        {/* Pre-selected only when there's genuinely no choice to make. */}
+        <select
+          id="school"
+          name="school"
+          required
+          defaultValue={schools.length === 1 ? schools[0].id : ""}
+          className={field}
+        >
+          {schools.length !== 1 && (
+            <option value="" disabled>
+              Choose a school…
+            </option>
+          )}
+          {schools.map((school) => (
+            <option key={school.id} value={school.id}>
+              {school.name}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-500">
+          Each school has its own canteen and menu — pick the one your child
+          attends.
+        </p>
+      </div>
+
+      <div>
+        <label className={label} htmlFor="studentIdCode">
           School student ID
         </label>
         <input
-          id="schoolId"
-          name="schoolId"
+          id="studentIdCode"
+          name="studentIdCode"
           autoCapitalize="none"
           required
           className={field}

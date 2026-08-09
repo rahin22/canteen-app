@@ -55,10 +55,12 @@ export const ModelName = {
   Photo: 'Photo',
   ChildRegistration: 'ChildRegistration',
   VerificationCode: 'VerificationCode',
+  School: 'School',
   Setting: 'Setting',
   Card: 'Card',
   MenuItem: 'MenuItem',
-  Transaction: 'Transaction'
+  Transaction: 'Transaction',
+  Preorder: 'Preorder'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -84,11 +86,13 @@ export const UserScalarFieldEnum = {
   username: 'username',
   passwordHash: 'passwordHash',
   className: 'className',
+  schoolId: 'schoolId',
   email: 'email',
   phone: 'phone',
   emailVerifiedAt: 'emailVerifiedAt',
   sessionVersion: 'sessionVersion',
   balance: 'balance',
+  dailyLimit: 'dailyLimit',
   active: 'active',
   photoId: 'photoId',
   createdAt: 'createdAt'
@@ -112,6 +116,7 @@ export const ChildRegistrationScalarFieldEnum = {
   id: 'id',
   parentId: 'parentId',
   name: 'name',
+  studentIdCode: 'studentIdCode',
   schoolId: 'schoolId',
   className: 'className',
   photoId: 'photoId',
@@ -138,6 +143,17 @@ export const VerificationCodeScalarFieldEnum = {
 } as const
 
 export type VerificationCodeScalarFieldEnum = (typeof VerificationCodeScalarFieldEnum)[keyof typeof VerificationCodeScalarFieldEnum]
+
+
+export const SchoolScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  active: 'active',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt'
+} as const
+
+export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
 export const SettingScalarFieldEnum = {
@@ -167,7 +183,8 @@ export const MenuItemScalarFieldEnum = {
   price: 'price',
   category: 'category',
   active: 'active',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  schoolId: 'schoolId'
 } as const
 
 export type MenuItemScalarFieldEnum = (typeof MenuItemScalarFieldEnum)[keyof typeof MenuItemScalarFieldEnum]
@@ -188,6 +205,24 @@ export const TransactionScalarFieldEnum = {
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
 
 
+export const PreorderScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  placedById: 'placedById',
+  source: 'source',
+  items: 'items',
+  total: 'total',
+  status: 'status',
+  serviceDate: 'serviceDate',
+  transactionId: 'transactionId',
+  collectedAt: 'collectedAt',
+  cancelledAt: 'cancelledAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PreorderScalarFieldEnum = (typeof PreorderScalarFieldEnum)[keyof typeof PreorderScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -202,6 +237,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

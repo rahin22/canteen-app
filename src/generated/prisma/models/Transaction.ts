@@ -246,6 +246,7 @@ export type TransactionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   operator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  preorder?: Prisma.XOR<Prisma.PreorderNullableScalarRelationFilter, Prisma.PreorderWhereInput> | null
 }
 
 export type TransactionOrderByWithRelationInput = {
@@ -260,6 +261,7 @@ export type TransactionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   student?: Prisma.UserOrderByWithRelationInput
   operator?: Prisma.UserOrderByWithRelationInput
+  preorder?: Prisma.PreorderOrderByWithRelationInput
 }
 
 export type TransactionWhereUniqueInput = Prisma.AtLeast<{
@@ -277,6 +279,7 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   operator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  preorder?: Prisma.XOR<Prisma.PreorderNullableScalarRelationFilter, Prisma.PreorderWhereInput> | null
 }, "id" | "stripeSessionId">
 
 export type TransactionOrderByWithAggregationInput = {
@@ -321,6 +324,7 @@ export type TransactionCreateInput = {
   createdAt?: Date | string
   student: Prisma.UserCreateNestedOneWithoutTransactionsInput
   operator?: Prisma.UserCreateNestedOneWithoutOperatedInput
+  preorder?: Prisma.PreorderCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionUncheckedCreateInput = {
@@ -333,6 +337,7 @@ export type TransactionUncheckedCreateInput = {
   note?: string | null
   stripeSessionId?: string | null
   createdAt?: Date | string
+  preorder?: Prisma.PreorderUncheckedCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionUpdateInput = {
@@ -345,6 +350,7 @@ export type TransactionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserUpdateOneRequiredWithoutTransactionsNestedInput
   operator?: Prisma.UserUpdateOneWithoutOperatedNestedInput
+  preorder?: Prisma.PreorderUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionUncheckedUpdateInput = {
@@ -357,6 +363,7 @@ export type TransactionUncheckedUpdateInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preorder?: Prisma.PreorderUncheckedUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionCreateManyInput = {
@@ -443,6 +450,11 @@ export type TransactionMinOrderByAggregateInput = {
 
 export type TransactionSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+}
+
+export type TransactionNullableScalarRelationFilter = {
+  is?: Prisma.TransactionWhereInput | null
+  isNot?: Prisma.TransactionWhereInput | null
 }
 
 export type TransactionCreateNestedManyWithoutStudentInput = {
@@ -533,6 +545,22 @@ export type EnumTxTypeFieldUpdateOperationsInput = {
   set?: $Enums.TxType
 }
 
+export type TransactionCreateNestedOneWithoutPreorderInput = {
+  create?: Prisma.XOR<Prisma.TransactionCreateWithoutPreorderInput, Prisma.TransactionUncheckedCreateWithoutPreorderInput>
+  connectOrCreate?: Prisma.TransactionCreateOrConnectWithoutPreorderInput
+  connect?: Prisma.TransactionWhereUniqueInput
+}
+
+export type TransactionUpdateOneWithoutPreorderNestedInput = {
+  create?: Prisma.XOR<Prisma.TransactionCreateWithoutPreorderInput, Prisma.TransactionUncheckedCreateWithoutPreorderInput>
+  connectOrCreate?: Prisma.TransactionCreateOrConnectWithoutPreorderInput
+  upsert?: Prisma.TransactionUpsertWithoutPreorderInput
+  disconnect?: Prisma.TransactionWhereInput | boolean
+  delete?: Prisma.TransactionWhereInput | boolean
+  connect?: Prisma.TransactionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TransactionUpdateToOneWithWhereWithoutPreorderInput, Prisma.TransactionUpdateWithoutPreorderInput>, Prisma.TransactionUncheckedUpdateWithoutPreorderInput>
+}
+
 export type TransactionCreateWithoutStudentInput = {
   id?: string
   type: $Enums.TxType
@@ -542,6 +570,7 @@ export type TransactionCreateWithoutStudentInput = {
   stripeSessionId?: string | null
   createdAt?: Date | string
   operator?: Prisma.UserCreateNestedOneWithoutOperatedInput
+  preorder?: Prisma.PreorderCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionUncheckedCreateWithoutStudentInput = {
@@ -553,6 +582,7 @@ export type TransactionUncheckedCreateWithoutStudentInput = {
   note?: string | null
   stripeSessionId?: string | null
   createdAt?: Date | string
+  preorder?: Prisma.PreorderUncheckedCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionCreateOrConnectWithoutStudentInput = {
@@ -574,6 +604,7 @@ export type TransactionCreateWithoutOperatorInput = {
   stripeSessionId?: string | null
   createdAt?: Date | string
   student: Prisma.UserCreateNestedOneWithoutTransactionsInput
+  preorder?: Prisma.PreorderCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionUncheckedCreateWithoutOperatorInput = {
@@ -585,6 +616,7 @@ export type TransactionUncheckedCreateWithoutOperatorInput = {
   note?: string | null
   stripeSessionId?: string | null
   createdAt?: Date | string
+  preorder?: Prisma.PreorderUncheckedCreateNestedOneWithoutTransactionInput
 }
 
 export type TransactionCreateOrConnectWithoutOperatorInput = {
@@ -644,6 +676,70 @@ export type TransactionUpdateManyWithWhereWithoutOperatorInput = {
   data: Prisma.XOR<Prisma.TransactionUpdateManyMutationInput, Prisma.TransactionUncheckedUpdateManyWithoutOperatorInput>
 }
 
+export type TransactionCreateWithoutPreorderInput = {
+  id?: string
+  type: $Enums.TxType
+  amount: number
+  items?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  note?: string | null
+  stripeSessionId?: string | null
+  createdAt?: Date | string
+  student: Prisma.UserCreateNestedOneWithoutTransactionsInput
+  operator?: Prisma.UserCreateNestedOneWithoutOperatedInput
+}
+
+export type TransactionUncheckedCreateWithoutPreorderInput = {
+  id?: string
+  type: $Enums.TxType
+  amount: number
+  studentId: string
+  operatorId?: string | null
+  items?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  note?: string | null
+  stripeSessionId?: string | null
+  createdAt?: Date | string
+}
+
+export type TransactionCreateOrConnectWithoutPreorderInput = {
+  where: Prisma.TransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.TransactionCreateWithoutPreorderInput, Prisma.TransactionUncheckedCreateWithoutPreorderInput>
+}
+
+export type TransactionUpsertWithoutPreorderInput = {
+  update: Prisma.XOR<Prisma.TransactionUpdateWithoutPreorderInput, Prisma.TransactionUncheckedUpdateWithoutPreorderInput>
+  create: Prisma.XOR<Prisma.TransactionCreateWithoutPreorderInput, Prisma.TransactionUncheckedCreateWithoutPreorderInput>
+  where?: Prisma.TransactionWhereInput
+}
+
+export type TransactionUpdateToOneWithWhereWithoutPreorderInput = {
+  where?: Prisma.TransactionWhereInput
+  data: Prisma.XOR<Prisma.TransactionUpdateWithoutPreorderInput, Prisma.TransactionUncheckedUpdateWithoutPreorderInput>
+}
+
+export type TransactionUpdateWithoutPreorderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumTxTypeFieldUpdateOperationsInput | $Enums.TxType
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  items?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.UserUpdateOneRequiredWithoutTransactionsNestedInput
+  operator?: Prisma.UserUpdateOneWithoutOperatedNestedInput
+}
+
+export type TransactionUncheckedUpdateWithoutPreorderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumTxTypeFieldUpdateOperationsInput | $Enums.TxType
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  operatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type TransactionCreateManyStudentInput = {
   id?: string
   type: $Enums.TxType
@@ -675,6 +771,7 @@ export type TransactionUpdateWithoutStudentInput = {
   stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   operator?: Prisma.UserUpdateOneWithoutOperatedNestedInput
+  preorder?: Prisma.PreorderUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionUncheckedUpdateWithoutStudentInput = {
@@ -686,6 +783,7 @@ export type TransactionUncheckedUpdateWithoutStudentInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preorder?: Prisma.PreorderUncheckedUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionUncheckedUpdateManyWithoutStudentInput = {
@@ -708,6 +806,7 @@ export type TransactionUpdateWithoutOperatorInput = {
   stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserUpdateOneRequiredWithoutTransactionsNestedInput
+  preorder?: Prisma.PreorderUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionUncheckedUpdateWithoutOperatorInput = {
@@ -719,6 +818,7 @@ export type TransactionUncheckedUpdateWithoutOperatorInput = {
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preorder?: Prisma.PreorderUncheckedUpdateOneWithoutTransactionNestedInput
 }
 
 export type TransactionUncheckedUpdateManyWithoutOperatorInput = {
@@ -746,6 +846,7 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   operator?: boolean | Prisma.Transaction$operatorArgs<ExtArgs>
+  preorder?: boolean | Prisma.Transaction$preorderArgs<ExtArgs>
 }, ExtArgs["result"]["transaction"]>
 
 export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -792,6 +893,7 @@ export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   operator?: boolean | Prisma.Transaction$operatorArgs<ExtArgs>
+  preorder?: boolean | Prisma.Transaction$preorderArgs<ExtArgs>
 }
 export type TransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -807,6 +909,7 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     student: Prisma.$UserPayload<ExtArgs>
     operator: Prisma.$UserPayload<ExtArgs> | null
+    preorder: Prisma.$PreorderPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1214,6 +1317,7 @@ export interface Prisma__TransactionClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   student<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   operator<T extends Prisma.Transaction$operatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transaction$operatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  preorder<T extends Prisma.Transaction$preorderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Transaction$preorderArgs<ExtArgs>>): Prisma.Prisma__PreorderClient<runtime.Types.Result.GetResult<Prisma.$PreorderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1669,6 +1773,25 @@ export type Transaction$operatorArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Transaction.preorder
+ */
+export type Transaction$preorderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Preorder
+   */
+  select?: Prisma.PreorderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Preorder
+   */
+  omit?: Prisma.PreorderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PreorderInclude<ExtArgs> | null
+  where?: Prisma.PreorderWhereInput
 }
 
 /**

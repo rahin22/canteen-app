@@ -2,19 +2,29 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
+import { startOfSchoolDay } from "@/lib/day";
+import { currentSchoolName, schoolFilter, studentSchoolFilter } from "@/lib/schools";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   await requireRole("ADMIN");
 
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
+  // Shares its idea of "today" with the daily spend caps, so the dashboard and
+  // the till can't disagree about when the day rolled over.
+  const startOfDay = startOfSchoolDay();
+  // Every figure below is scoped to the school selected in the header, so the
+  // dashboard answers "how is this school doing" rather than mixing them.
+  const [txScope, studentScope, schoolName] = await Promise.all([
+    studentSchoolFilter(),
+    schoolFilter(),
+    currentSchoolName(),
+  ]);
 
   const [salesToday, topupsToday, studentCount, lowBalance, outstanding, recent] =
     await Promise.all([
       prisma.transaction.aggregate({
-        where: { type: "PURCHASE", createdAt: { gte: startOfDay } },
+        where: { type: "PURCHASE", createdAt: { gte: startOfDay }, ...txScope },
         _sum: { amount: true },
         _count: true,
       }),
@@ -22,21 +32,23 @@ export default async function AdminDashboard() {
         where: {
           type: { in: ["TOPUP_CASH", "TOPUP_STRIPE"] },
           createdAt: { gte: startOfDay },
+          ...txScope,
         },
         _sum: { amount: true },
         _count: true,
       }),
-      prisma.user.count({ where: { role: "STUDENT", active: true } }),
+      prisma.user.count({ where: { role: "STUDENT", active: true, ...studentScope } }),
       prisma.user.count({
-        where: { role: "STUDENT", active: true, balance: { lt: 500 } },
+        where: { role: "STUDENT", active: true, balance: { lt: 500 }, ...studentScope },
       }),
       prisma.user.aggregate({
-        where: { role: "STUDENT", active: true },
+        where: { role: "STUDENT", active: true, ...studentScope },
         _sum: { balance: true },
       }),
       prisma.transaction.findMany({
         orderBy: { createdAt: "desc" },
         take: 10,
+        where: txScope,
         include: { student: { select: { name: true } } },
       }),
     ]);
@@ -67,7 +79,10 @@ export default async function AdminDashboard() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm text-slate-500">{schoolName ?? "All schools"}</p>
+        </div>
         <Link
           href="/scan"
           className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
@@ -134,6 +149,8 @@ function txLabel(type: string) {
       return "Online top-up";
     case "ADJUSTMENT":
       return "Adjustment";
+    case "REFUND":
+      return "Refund";
     default:
       return type;
   }

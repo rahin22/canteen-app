@@ -44,15 +44,20 @@ export function SignupForm() {
       </div>
       <div>
         <label className={label} htmlFor="phone">
-          Mobile number <span className="font-normal text-slate-400">(optional)</span>
+          Mobile number
         </label>
         <input
           id="phone"
           name="phone"
           type="tel"
           autoComplete="tel"
+          inputMode="tel"
+          required
           className={field}
         />
+        <p className="mt-1 text-xs text-slate-500">
+          So the office can reach you about your child.
+        </p>
       </div>
       <div>
         <label className={label} htmlFor="password">
