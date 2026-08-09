@@ -25,9 +25,11 @@ export default async function ScanPage() {
           <span className="font-semibold text-slate-900">Canteen till</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          {session.role === "ADMIN" && (
+          {/* Operators get here too — it's how they reach today's orders,
+              top-ups and transactions for their school. */}
+          {!stranded && (
             <a href="/admin" className="font-medium text-indigo-600 hover:underline">
-              Admin
+              {session.role === "ADMIN" ? "Admin" : "Orders & top-ups"}
             </a>
           )}
           <a href="/password" className="text-slate-500 hover:text-slate-800">

@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
  * the length of one order and nothing more.
  */
 export default async function KioskPage() {
-  const session = await requireRole("ADMIN", "OPERATOR");
+  await requireRole("ADMIN", "OPERATOR");
 
   // No menu is loaded here on purpose — it arrives with whichever student
   // taps their card, so one kiosk works in either school's front office.
@@ -32,11 +32,12 @@ export default async function KioskPage() {
         {/* Deliberately understated: this is staff plumbing on a device kids
             use, not something to invite them to press. */}
         <div className="flex items-center gap-3 text-xs text-slate-400">
-          {session.role === "ADMIN" && (
-            <Link href="/admin/preorders" className="hover:text-slate-700">
-              Orders
-            </Link>
-          )}
+          <Link href="/admin/preorders" className="hover:text-slate-700">
+            Orders
+          </Link>
+          <Link href="/scan" className="hover:text-slate-700">
+            Till
+          </Link>
           <form action={logout}>
             <button className="hover:text-slate-700">Sign out</button>
           </form>
