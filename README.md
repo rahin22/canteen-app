@@ -84,6 +84,36 @@ Settings → Schools**.
   where new students and orders are created, and every past student,
   transaction and order stays attached to it.
 
+### Operators are restricted to one school
+
+Each operator account belongs to exactly one school, set when it's created
+under **Admin → Staff** and changeable there afterwards. They only ever see
+that school — there's no school selector in their header, and the cookie
+admins use to switch is ignored for them entirely.
+
+What an operator can do, for their own school only:
+
+- Run the till (`/scan`) and the office kiosk (`/kiosk`) — scan cards, make
+  sales, hand over preorders
+- View and manage today's preorders, including cancelling with a refund
+- Record cash top-ups on a student's card
+- View and export transactions
+
+What stays with admins: the menu, staff, settings, parent registrations,
+creating/importing students, printing labels, balance adjustments, and student
+credentials, cards, photos and parent links.
+
+The check lives in `canActOnSchool()` / `canActOnStudent()` and runs inside
+every server action that touches a student, sale or order — not just in the
+navigation — so a crafted request can't reach across schools either. Scanning
+another school's card gives a plain "that student is at another school" rather
+than pretending the card is invalid, so staff can redirect the student instead
+of chasing a phantom fault.
+
+An operator with **no** school assigned sees nothing rather than everything.
+That case is a distinct state in the scope type precisely so a missing
+assignment can't be mistaken for an admin's "all schools".
+
 ### The till and kiosk aren't tied to a school
 
 Neither device is configured for one. The menu, prices and school name arrive

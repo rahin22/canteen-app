@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
  * from — then lists the individual orders for packing and handing over.
  */
 export default async function PreordersPage() {
-  await requireRole("ADMIN");
+  await requireRole("ADMIN", "OPERATOR");
 
   const today = startOfSchoolDay();
   // Each canteen only cooks its own school's orders, so this list follows the

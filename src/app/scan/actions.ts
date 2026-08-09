@@ -10,7 +10,7 @@ import {
   type PurchaseLine,
 } from "@/lib/ledger";
 import { resolveCardInput } from "@/lib/cards";
-import { schoolMenu } from "@/lib/schools";
+import { canActOnSchool, schoolMenu } from "@/lib/schools";
 import {
   handOverPreorder,
   pendingPreorders,
@@ -77,6 +77,15 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
   if (!found.ok) return { ok: false, error: found.error };
 
   const user = found.student;
+  // An operator's till only serves their own school. Refuses by name rather
+  // than pretending the card doesn't exist, so staff can tell a wrong-school
+  // card from a broken one and send the student to the right counter.
+  if (!(await canActOnSchool(user.schoolId))) {
+    return {
+      ok: false,
+      error: "That card belongs to a student at another school.",
+    };
+  }
   const studentId = user.id;
   const [daily, recent, pendingOrders, menu, school] = await Promise.all([
     getDailySpend(studentId),
@@ -153,6 +162,15 @@ export type HandOverResult =
  */
 export async function handOverOrder(preorderId: string): Promise<HandOverResult> {
   const session = await requireRole("ADMIN", "OPERATOR");
+
+  const order = await prisma.preorder.findUnique({
+    where: { id: preorderId },
+    select: { student: { select: { schoolId: true } } },
+  });
+  if (!order || !(await canActOnSchool(order.student.schoolId))) {
+    return { ok: false, error: "That order belongs to another school." };
+  }
+
   try {
     const result = await handOverPreorder({ preorderId, operatorId: session.uid });
     return { ok: true, total: result.total };
@@ -185,6 +203,9 @@ export async function charge(input: ChargeInput): Promise<ChargeResult> {
     select: { schoolId: true },
   });
   if (!student) return { ok: false, error: "Student not found." };
+  if (!(await canActOnSchool(student.schoolId))) {
+    return { ok: false, error: "That student is at another school." };
+  }
   if (!student.schoolId && input.lines.length > 0) {
     return {
       ok: false,

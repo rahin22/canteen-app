@@ -8,7 +8,7 @@ import { currentSchoolName, schoolFilter, studentSchoolFilter } from "@/lib/scho
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  await requireRole("ADMIN");
+  await requireRole("ADMIN", "OPERATOR");
 
   // Shares its idea of "today" with the daily spend caps, so the dashboard and
   // the till can't disagree about when the day rolled over.

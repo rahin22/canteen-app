@@ -11,7 +11,10 @@ export default async function StudentsPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  await requireRole("ADMIN");
+  const session = await requireRole("ADMIN", "OPERATOR");
+  // Operators come here to top up cards, not to run the roll — creating,
+  // importing and label-printing stay with the office.
+  const isAdmin = session.role === "ADMIN";
   const { q = "" } = await searchParams;
   const [scope, schoolName, schools] = await Promise.all([
     schoolFilter(),
@@ -48,6 +51,7 @@ export default async function StudentsPage({
             {schoolName ?? "All schools"}
           </p>
         </div>
+        {isAdmin && (
         <div className="flex gap-2">
           <Link
             href="/admin/students/labels"
@@ -68,6 +72,7 @@ export default async function StudentsPage({
             + Add student
           </Link>
         </div>
+        )}
       </div>
 
       <form className="mb-4">

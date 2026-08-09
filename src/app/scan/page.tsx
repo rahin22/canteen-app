@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth";
+import { schoolScope } from "@/lib/schools";
 import { logout } from "@/app/login/actions";
 import ScanClient from "./scan-client";
 
@@ -11,6 +12,10 @@ export const dynamic = "force-dynamic";
  */
 export default async function ScanPage() {
   const session = await requireRole("ADMIN", "OPERATOR");
+  // An operator with no school can't serve anyone — say so plainly rather than
+  // letting every scan fail with "another school".
+  const scope = await schoolScope();
+  const stranded = session.role === "OPERATOR" && scope.kind === "none";
 
   return (
     <main className="flex flex-1 flex-col">
@@ -33,7 +38,20 @@ export default async function ScanPage() {
           </form>
         </div>
       </header>
-      <ScanClient />
+      {stranded ? (
+        <div className="mx-auto mt-16 max-w-md px-6 text-center">
+          <div className="text-5xl">🏫</div>
+          <h1 className="mt-4 text-xl font-bold text-slate-900">
+            No school assigned
+          </h1>
+          <p className="mt-2 text-slate-600">
+            Ask an admin to set your school under Admin → Staff before using the
+            till.
+          </p>
+        </div>
+      ) : (
+        <ScanClient />
+      )}
     </main>
   );
 }

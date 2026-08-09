@@ -4,19 +4,29 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/db";
 import { startOfSchoolDay } from "@/lib/day";
-import { allSchools, currentSchoolId, studentSchoolFilter } from "@/lib/schools";
+import {
+  allSchools,
+  currentSchoolId,
+  currentSchoolName,
+  studentSchoolFilter,
+} from "@/lib/schools";
 import { SchoolSwitcher } from "./school-switcher";
 
+/**
+ * `operator: true` marks the pages a canteen operator may use. Everything else
+ * — the menu, staff, settings, registrations — stays admin-only. This list is
+ * for the navigation; each page enforces its own access.
+ */
 const NAV = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/students", label: "Students" },
+  { href: "/admin", label: "Dashboard", operator: true },
+  { href: "/admin/students", label: "Students", operator: true },
   { href: "/admin/registrations", label: "Registrations", badge: "registrations" },
-  { href: "/admin/preorders", label: "Orders", badge: "preorders" },
+  { href: "/admin/preorders", label: "Orders", badge: "preorders", operator: true },
   { href: "/admin/menu", label: "Menu" },
-  { href: "/admin/transactions", label: "Transactions" },
+  { href: "/admin/transactions", label: "Transactions", operator: true },
   { href: "/admin/staff", label: "Staff" },
   { href: "/admin/settings", label: "Settings" },
-  { href: "/scan", label: "Till" },
+  { href: "/scan", label: "Till", operator: true },
 ] as const;
 
 export default async function AdminLayout({
@@ -24,11 +34,15 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireRole("ADMIN");
-  const [schools, selectedSchool, schoolScope] = await Promise.all([
+  const session = await requireRole("ADMIN", "OPERATOR");
+  const isAdmin = session.role === "ADMIN";
+  const nav = NAV.filter((item) => isAdmin || "operator" in item);
+
+  const [schools, selectedSchool, schoolScope, pinnedSchool] = await Promise.all([
     allSchools(),
     currentSchoolId(),
     studentSchoolFilter(),
+    currentSchoolName(),
   ]);
   const [pendingRegistrations, pendingPreorders] = await Promise.all([
     prisma.childRegistration.count({
@@ -59,7 +73,15 @@ export default async function AdminLayout({
             {process.env.NEXT_PUBLIC_SCHOOL_NAME || "School Canteen"}
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            <SchoolSwitcher schools={schools} current={selectedSchool} />
+            {isAdmin ? (
+              <SchoolSwitcher schools={schools} current={selectedSchool} />
+            ) : (
+              /* Operators are pinned to one school — show it, don't offer a
+                 choice they don't have. */
+              <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-sm font-medium text-slate-700">
+                {pinnedSchool ?? "No school assigned"}
+              </span>
+            )}
             <Link href="/password" className="text-slate-500 hover:text-slate-800">
               Password
             </Link>
@@ -71,7 +93,7 @@ export default async function AdminLayout({
           </div>
         </div>
         <nav className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 pb-2">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}

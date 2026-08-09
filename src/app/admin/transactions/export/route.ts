@@ -8,7 +8,7 @@ const TYPES = ["PURCHASE", "TOPUP_CASH", "TOPUP_STRIPE", "ADJUSTMENT", "REFUND"]
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  if (!session || (session.role !== "ADMIN" && session.role !== "OPERATOR")) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 

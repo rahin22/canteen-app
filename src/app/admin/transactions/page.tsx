@@ -15,7 +15,7 @@ export default async function TransactionsPage({
 }: {
   searchParams: Promise<{ type?: string; page?: string; from?: string; to?: string }>;
 }) {
-  await requireRole("ADMIN");
+  await requireRole("ADMIN", "OPERATOR");
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
   const type = TYPES.includes(params.type as (typeof TYPES)[number])

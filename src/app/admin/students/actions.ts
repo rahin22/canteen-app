@@ -10,7 +10,7 @@ import { creditStudent, LedgerError } from "@/lib/ledger";
 import { parseAmount, formatMoney } from "@/lib/money";
 import { normalizeNfcSerial } from "@/lib/nfc";
 import { normalizeUsername } from "@/lib/username";
-import { resolveSchoolId } from "@/lib/schools";
+import { canActOnStudent, resolveSchoolId } from "@/lib/schools";
 import { PhotoError, processPhotoUpload } from "@/lib/photos";
 
 export type ActionState = {
@@ -215,12 +215,17 @@ export async function cashTopup(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await requireRole("ADMIN");
+  // Operators take cash at the counter, so this is one of the few admin
+  // actions they're trusted with — for their own school's students only.
+  const session = await requireRole("ADMIN", "OPERATOR");
   const studentId = String(formData.get("studentId"));
   const amount = parseAmount(String(formData.get("amount") || ""));
   const note = String(formData.get("note") || "").trim();
   if (amount === null) return { error: "Enter a valid amount." };
   if (amount > 100000) return { error: "Amount too large." };
+  if (!(await canActOnStudent(studentId))) {
+    return { error: "That student is at another school." };
+  }
 
   try {
     const result = await creditStudent({

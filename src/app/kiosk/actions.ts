@@ -2,7 +2,7 @@
 
 import { requireRole } from "@/lib/auth";
 import { resolveCardInput } from "@/lib/cards";
-import { schoolMenu } from "@/lib/schools";
+import { canActOnSchool, canActOnStudent, schoolMenu } from "@/lib/schools";
 import {
   cancelPreorder,
   orderHeadroom,
@@ -90,6 +90,11 @@ export async function kioskLookup(rawInput: string): Promise<KioskLookupResult> 
   if (found.student.role !== "STUDENT") {
     return { ok: false, error: "Only student cards can order here." };
   }
+  // A kiosk signed in as one school's operator won't serve the other school,
+  // so an iPad in the wrong office can't take orders it shouldn't.
+  if (!(await canActOnSchool(found.student.schoolId))) {
+    return { ok: false, error: "That card belongs to a student at another school." };
+  }
 
   return { ok: true, student: await loadStudent(found.student.id) };
 }
@@ -103,6 +108,9 @@ export async function kioskPlaceOrder(
   lines: PreorderLine[]
 ): Promise<KioskOrderResult> {
   await requireRole("ADMIN", "OPERATOR");
+  if (!(await canActOnStudent(studentId))) {
+    return { ok: false, error: "That student is at another school." };
+  }
   try {
     const placed = await placePreorder({
       studentId,
@@ -127,6 +135,9 @@ export async function kioskCancelOrder(
   preorderId: string
 ): Promise<KioskLookupResult> {
   await requireRole("ADMIN", "OPERATOR");
+  if (!(await canActOnStudent(studentId))) {
+    return { ok: false, error: "That student is at another school." };
+  }
 
   // Scope the cancel to the student on screen so a stale id can't reach
   // somebody else's lunch.

@@ -5,8 +5,10 @@ import {
   createOperator,
   resetOperatorPassword,
   setOperatorActive,
+  setOperatorSchool,
   type StaffActionState,
 } from "./actions";
+import type { SchoolOption } from "@/lib/school-constants";
 
 type Staff = {
   id: string;
@@ -14,6 +16,9 @@ type Staff = {
   username: string;
   role: string;
   active: boolean;
+  /** Operators are pinned to one school; admins oversee all, so null. */
+  schoolId: string | null;
+  schoolName: string | null;
 };
 
 const inputCls =
@@ -41,7 +46,13 @@ function Feedback({ state }: { state: StaffActionState }) {
   return null;
 }
 
-export function StaffManager({ staff }: { staff: Staff[] }) {
+export function StaffManager({
+  staff,
+  schools,
+}: {
+  staff: Staff[];
+  schools: SchoolOption[];
+}) {
   const [createState, createAction, createPending] = useActionState<
     StaffActionState,
     FormData
@@ -63,6 +74,21 @@ export function StaffManager({ staff }: { staff: Staff[] }) {
             autoCapitalize="none"
             className={inputCls + " flex-1 min-w-36"}
           />
+          <select
+            name="school"
+            required
+            defaultValue={schools.length === 1 ? schools[0].id : ""}
+            className={inputCls + " flex-1 min-w-36"}
+          >
+            <option value="" disabled>
+              School…
+            </option>
+            {schools.map((school) => (
+              <option key={school.id} value={school.id}>
+                {school.name}
+              </option>
+            ))}
+          </select>
           <button
             disabled={createPending}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
@@ -75,14 +101,20 @@ export function StaffManager({ staff }: { staff: Staff[] }) {
 
       <div className="space-y-2">
         {staff.map((member) => (
-          <StaffRow key={member.id} member={member} />
+          <StaffRow key={member.id} member={member} schools={schools} />
         ))}
       </div>
     </div>
   );
 }
 
-function StaffRow({ member }: { member: Staff }) {
+function StaffRow({
+  member,
+  schools,
+}: {
+  member: Staff;
+  schools: SchoolOption[];
+}) {
   const [result, setResult] = useState<StaffActionState>({});
   const [pending, startTransition] = useTransition();
   const isOperator = member.role === "OPERATOR";
@@ -113,6 +145,31 @@ function StaffRow({ member }: { member: Staff }) {
             )}
           </p>
           <p className="font-mono text-xs text-slate-400">{member.username}</p>
+          {isOperator && (
+            <label className="mt-1.5 flex items-center gap-2 text-xs text-slate-500">
+              School
+              <select
+                value={member.schoolId ?? ""}
+                disabled={pending}
+                onChange={(e) =>
+                  startTransition(async () =>
+                    setResult(await setOperatorSchool(member.id, e.target.value))
+                  )
+                }
+                className="rounded-lg border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 outline-none focus:border-indigo-500 disabled:opacity-50"
+              >
+                <option value="" disabled>
+                  Not set — sees nothing
+                </option>
+                {schools.map((school) => (
+                  <option key={school.id} value={school.id}>
+                    {school.name}
+                    {school.active ? "" : " (retired)"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
         {isOperator && (
           <div className="flex gap-2">
