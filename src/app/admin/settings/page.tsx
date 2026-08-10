@@ -4,12 +4,28 @@ import { emailConfigured } from "@/lib/email";
 import { allSchools } from "@/lib/schools";
 import { CutoffField, Toggle } from "./settings-toggles";
 import { SchoolsManager } from "./schools-manager";
+import { PickupSlotsManager } from "./pickup-slots-manager";
+import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   await requireRole("ADMIN");
-  const [flags, schools] = await Promise.all([getFlags(), allSchools()]);
+  const [flags, schools, pickupSlots] = await Promise.all([
+    getFlags(),
+    allSchools(),
+    prisma.pickupSlot.findMany({
+      orderBy: [{ sortOrder: "asc" }, { startTime: "asc" }],
+      select: {
+        id: true,
+        schoolId: true,
+        label: true,
+        startTime: true,
+        endTime: true,
+        active: true,
+      },
+    }),
+  ]);
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
   // Configured = a provider exists; on = configured *and* switched on.
   const mailWorks = emailConfigured();
@@ -67,10 +83,20 @@ export default async function SettingsPage() {
           settingKey={SETTINGS.preorders}
           initial={flags.preorders}
           title="Preordering"
-          description="Lets students order at the office kiosk and parents order from their own login. Orders are paid for at the counter when they're collected — nothing is deducted when one is placed."
+          description="Lets students order at the office kiosk, parents order from their own login, and staff take pre-orders at the till. Orders are paid for from the student's card as they're placed."
         />
         <CutoffField initial={flags.preorderCutoff} />
       </div>
+
+      <h2 className="mb-2 mt-8 text-lg font-semibold text-slate-900">
+        Pick-up times
+      </h2>
+      <p className="mb-3 text-sm text-slate-500">
+        The windows students and parents choose from when they order ahead. Each
+        school keeps its own, since the bells differ. Retiring a window hides it
+        from new orders but leaves existing ones readable.
+      </p>
+      <PickupSlotsManager schools={schools} slots={pickupSlots} />
 
       {flags.preorders && (
         <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">

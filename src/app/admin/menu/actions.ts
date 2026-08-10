@@ -54,6 +54,23 @@ export async function updateMenuItem(
   return { success: "Saved." };
 }
 
+/**
+ * Marks an item out of stock, or back in.
+ *
+ * Separate from hiding it: sold-out is a daily switch the canteen flips when
+ * they run out, and it drops the item from every ordering surface without
+ * disturbing how it's set up. Orders already paid for are untouched — the
+ * kitchen still owes that food.
+ */
+export async function setMenuItemSoldOut(id: string, soldOut: boolean) {
+  await requireRole("ADMIN");
+  await prisma.menuItem.update({ where: { id }, data: { soldOut } });
+  revalidatePath("/admin/menu");
+  revalidatePath("/scan");
+  revalidatePath("/kiosk");
+  revalidatePath("/family");
+}
+
 export async function setMenuItemActive(id: string, active: boolean) {
   await requireRole("ADMIN");
   await prisma.menuItem.update({ where: { id }, data: { active } });

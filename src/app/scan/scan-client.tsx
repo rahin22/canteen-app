@@ -5,10 +5,12 @@ import { formatMoney, parseAmount } from "@/lib/money";
 import type { DailySpend } from "@/lib/ledger";
 import { CardScanner } from "@/components/card-scanner";
 import { describeLines } from "@/lib/preorder-format";
+import { OrderComposer, type ComposerLine } from "@/components/order-composer";
 import {
   lookupCard,
   charge,
   handOverOrder,
+  tillPreorder,
   type ScanStudent,
   type ChargeInput,
   type LastPurchase,
@@ -178,6 +180,28 @@ function OrderBuilder({
 }) {
   // The menu arrives with the student so one till can serve either school.
   const menu = student.menu;
+  // Staff can either take payment now or put the order in for a later
+  // pick-up window — the second of the two options the canteen asked for.
+  const [mode, setMode] = useState<"now" | "later">("now");
+  const [placed, setPlaced] = useState<string | null>(null);
+
+  const submitPreorder = async (lines: ComposerLine[], pickupSlotId: string) => {
+    setBusy(true);
+    setError(null);
+    const result = await tillPreorder(student.studentId, lines, pickupSlotId);
+    setBusy(false);
+    if (result.ok) {
+      setPlaced(
+        `${describeLines(result.summary.items)} — ${formatMoney(
+          result.summary.total
+        )} paid, for ${result.summary.dayLabel}${
+          result.summary.pickup ? ` · ${result.summary.pickup}` : ""
+        }.`
+      );
+    } else {
+      setError(result.error);
+    }
+  };
   const [cart, setCart] = useState<CartLine[]>([]);
   const [customInput, setCustomInput] = useState("");
   const [customAmount, setCustomAmount] = useState(0);
@@ -361,7 +385,70 @@ function OrderBuilder({
         </div>
       )}
 
-      {menu.length > 0 && (
+      {placed && (
+        <div className="mt-3 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4">
+          <p className="font-bold text-emerald-900">✅ Pre-order placed</p>
+          <p className="mt-1 text-sm text-emerald-800">{placed}</p>
+          <button
+            onClick={onCancel}
+            className="mt-3 w-full rounded-xl bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700"
+          >
+            Scan next student
+          </button>
+        </div>
+      )}
+
+      {!placed && student.plan.open && (
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setMode("now")}
+            className={`rounded-xl border-2 p-3 text-left transition ${
+              mode === "now"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-slate-200 bg-white"
+            }`}
+          >
+            <p className="font-semibold text-slate-900">Pay now</p>
+            <p className="text-xs text-slate-500">Serve it over the counter</p>
+          </button>
+          <button
+            onClick={() => setMode("later")}
+            className={`rounded-xl border-2 p-3 text-left transition ${
+              mode === "later"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-slate-200 bg-white"
+            }`}
+          >
+            <p className="font-semibold text-slate-900">Pre-order</p>
+            <p className="text-xs text-slate-500">
+              Collect {student.plan.forNextDay ? student.plan.dayLabel : "later today"}
+            </p>
+          </button>
+        </div>
+      )}
+
+      {!placed && mode === "later" && student.plan.open && (
+        <div className="mt-4">
+          <OrderComposer
+            menu={menu}
+            slots={student.plan.slots}
+            dayLabel={student.plan.dayLabel}
+            forNextDay={student.plan.forNextDay}
+            spendable={
+              daily.remaining === null
+                ? student.balance
+                : Math.min(student.balance, daily.remaining)
+            }
+            submitLabel="Place pre-order"
+            busy={busy}
+            error={error}
+            onSubmit={submitPreorder}
+            onCancel={() => setMode("now")}
+          />
+        </div>
+      )}
+
+      {!placed && mode === "now" && menu.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {menu.map((item) => {
             const inCart = cart.find((l) => l.menuItemId === item.id);
@@ -388,6 +475,8 @@ function OrderBuilder({
         </div>
       )}
 
+      {!placed && mode === "now" && (
+      <>
       <div className="mt-3 flex gap-2">
         <input
           value={customInput}
@@ -487,6 +576,8 @@ function OrderBuilder({
           {busy ? "Charging…" : `Charge ${total > 0 ? formatMoney(total) : ""}`}
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 }

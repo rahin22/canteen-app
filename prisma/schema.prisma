@@ -53,10 +53,14 @@ enum PreorderStatus {
   CANCELLED
 }
 
-/** Where an order was placed — the office kiosk, or a parent's own login. */
+/**
+ * Where an order was placed — the office kiosk, a parent's own login, or a
+ * staff member taking it at the counter on a student's behalf.
+ */
 enum PreorderSource {
   KIOSK
   PARENT
+  STAFF
 }
 
 model User {
@@ -198,7 +202,32 @@ model School {
   users         User[]
   menuItems     MenuItem[]
   registrations ChildRegistration[]
+  pickupSlots   PickupSlot[]
   createdAt     DateTime            @default(now())
+}
+
+/**
+ * A window during the school day when preordered food can be collected —
+ * "Primary Lunch, 1:10pm–1:50pm" and so on.
+ *
+ * Per school, because the two schools ring their bells at different times.
+ * Times are stored as local "HH:MM" strings rather than DateTimes: they're a
+ * repeating fact about the timetable, not an instant, and storing them as
+ * dates would drag timezone conversion into something that never moves.
+ */
+model PickupSlot {
+  id        String     @id @default(cuid())
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  String
+  label     String
+  startTime String
+  endTime   String
+  sortOrder Int        @default(0)
+  active    Boolean    @default(true)
+  preorders Preorder[]
+  createdAt DateTime   @default(now())
+
+  @@index([schoolId, active])
 }
 
 /** Simple key/value app settings editable by an admin at /admin/settings. */
@@ -226,6 +255,11 @@ model MenuItem {
   price     Int
   category  String?
   active    Boolean @default(true)
+  // Temporarily unavailable — the kitchen ran out. Distinct from `active`,
+  // which means "not on the menu at all": sold-out is an everyday switch the
+  // canteen flips back tomorrow, and keeping them separate means doing so
+  // doesn't disturb how the item is set up.
+  soldOut   Boolean @default(false)
   sortOrder Int     @default(0)
   // Menus are per-school. The two schools run similar lists, but they price
   // and stock them independently, so an item belongs to exactly one.
@@ -281,7 +315,13 @@ model Preorder {
   total      Int
   status     PreorderStatus @default(PENDING)
   // Local midnight of the canteen day the order is for (see src/lib/day.ts).
+  // Orders placed after the cutoff are for the *next* school day, so this is
+  // not always the day the order was created.
   serviceDate DateTime
+  // When the student will collect it. Optional so orders taken before pickup
+  // slots existed still load.
+  pickupSlot   PickupSlot? @relation(fields: [pickupSlotId], references: [id], onDelete: SetNull)
+  pickupSlotId String?
   // The purchase that fulfilled this order, once it's been collected.
   transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
   transactionId String?      @unique

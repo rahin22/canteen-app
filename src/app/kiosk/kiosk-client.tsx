@@ -91,6 +91,11 @@ export default function KioskClient({ cutoffLabel }: { cutoffLabel: string }) {
               <span className="font-bold">{formatMoney(mode.placed.total)}</span>{" "}
               paid from your card. Just pick it up at the canteen.
             </p>
+            {mode.placed.pickup && (
+              <p className="mt-3 text-2xl font-bold text-emerald-900">
+                {mode.placed.dayLabel} · {mode.placed.pickup}
+              </p>
+            )}
             <p className="mt-1 text-lg text-emerald-700">
               {formatMoney(mode.student.balance)} left on your card.
             </p>
@@ -157,10 +162,10 @@ function OrderStep({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submit = async (lines: ComposerLine[]) => {
+  const submit = async (lines: ComposerLine[], pickupSlotId: string) => {
     setBusy(true);
     setError(null);
-    const result = await kioskPlaceOrder(student.studentId, lines);
+    const result = await kioskPlaceOrder(student.studentId, lines, pickupSlotId);
     setBusy(false);
     if (result.ok) onPlaced(result.student, result.placed);
     else {
@@ -213,6 +218,9 @@ function OrderStep({
             >
               <span className="text-lg text-emerald-900">
                 {describeLines(order.items)} · {formatMoney(order.total)}
+                <span className="block text-base text-emerald-700">
+                  {[order.dayLabel, order.pickup].filter(Boolean).join(" · ")}
+                </span>
               </span>
               <button
                 type="button"
@@ -227,16 +235,25 @@ function OrderStep({
         </div>
       )}
 
-      <OrderComposer
-        size="kiosk"
-        menu={student.menu}
-        spendable={student.spendable}
-        submitLabel="Place order"
-        busy={busy}
-        error={error}
-        onSubmit={submit}
-        onCancel={onCancel}
-      />
+      {student.plan.open ? (
+        <OrderComposer
+          size="kiosk"
+          menu={student.menu}
+          slots={student.plan.slots}
+          dayLabel={student.plan.dayLabel}
+          forNextDay={student.plan.forNextDay}
+          spendable={student.spendable}
+          submitLabel="Place order"
+          busy={busy}
+          error={error}
+          onSubmit={submit}
+          onCancel={onCancel}
+        />
+      ) : (
+        <p className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 text-xl text-amber-900">
+          {student.plan.reason}
+        </p>
+      )}
     </div>
   );
 }

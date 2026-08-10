@@ -3,12 +3,12 @@
 import { requireRole } from "@/lib/auth";
 import { resolveCardInput } from "@/lib/cards";
 import { canActOnSchool, canActOnStudent, schoolMenu } from "@/lib/schools";
+import { orderingPlan, type OrderingPlan } from "@/lib/pickup";
 import {
   cancelPreorder,
   orderHeadroom,
-  pendingPreorders,
   placePreorder,
-  preorderWindow,
+  upcomingPreorders,
   PreorderError,
   type PreorderLine,
   type PreorderSummary,
@@ -42,6 +42,8 @@ export type KioskStudent = {
    */
   menu: { id: string; name: string; price: number; category: string | null }[];
   schoolName: string | null;
+  /** Which day this student is ordering for, and the free windows. */
+  plan: OrderingPlan;
 };
 
 export type KioskLookupResult =
@@ -62,7 +64,7 @@ async function loadStudent(studentId: string): Promise<KioskStudent> {
       },
     }),
     orderHeadroom(studentId),
-    pendingPreorders(studentId),
+    upcomingPreorders(studentId),
   ]);
   return {
     studentId: student.id,
@@ -73,17 +75,13 @@ async function loadStudent(studentId: string): Promise<KioskStudent> {
     dailyLimit: headroom.dailyLimit,
     pending,
     menu: await schoolMenu(student.schoolId),
+    plan: await orderingPlan(student.schoolId),
     schoolName: student.school?.name ?? null,
   };
 }
 
 export async function kioskLookup(rawInput: string): Promise<KioskLookupResult> {
   await requireRole("ADMIN", "OPERATOR");
-
-  // Re-checked here as well as on the page: an iPad left running overnight
-  // would otherwise still be taking orders after the cutoff.
-  const window = await preorderWindow();
-  if (!window.open) return { ok: false, error: window.reason };
 
   const found = await resolveCardInput(rawInput);
   if (!found.ok) return { ok: false, error: found.error };
@@ -105,7 +103,8 @@ export type KioskOrderResult =
 
 export async function kioskPlaceOrder(
   studentId: string,
-  lines: PreorderLine[]
+  lines: PreorderLine[],
+  pickupSlotId: string
 ): Promise<KioskOrderResult> {
   await requireRole("ADMIN", "OPERATOR");
   if (!(await canActOnStudent(studentId))) {
@@ -119,6 +118,7 @@ export async function kioskPlaceOrder(
       placedById: null,
       source: "KIOSK",
       lines,
+      pickupSlotId,
     });
     return { ok: true, student: await loadStudent(studentId), placed };
   } catch (err) {

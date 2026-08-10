@@ -50,6 +50,7 @@ export type PreorderMinAggregateOutputType = {
   total: number | null
   status: $Enums.PreorderStatus | null
   serviceDate: Date | null
+  pickupSlotId: string | null
   transactionId: string | null
   collectedAt: Date | null
   cancelledAt: Date | null
@@ -64,6 +65,7 @@ export type PreorderMaxAggregateOutputType = {
   total: number | null
   status: $Enums.PreorderStatus | null
   serviceDate: Date | null
+  pickupSlotId: string | null
   transactionId: string | null
   collectedAt: Date | null
   cancelledAt: Date | null
@@ -79,6 +81,7 @@ export type PreorderCountAggregateOutputType = {
   total: number
   status: number
   serviceDate: number
+  pickupSlotId: number
   transactionId: number
   collectedAt: number
   cancelledAt: number
@@ -103,6 +106,7 @@ export type PreorderMinAggregateInputType = {
   total?: true
   status?: true
   serviceDate?: true
+  pickupSlotId?: true
   transactionId?: true
   collectedAt?: true
   cancelledAt?: true
@@ -117,6 +121,7 @@ export type PreorderMaxAggregateInputType = {
   total?: true
   status?: true
   serviceDate?: true
+  pickupSlotId?: true
   transactionId?: true
   collectedAt?: true
   cancelledAt?: true
@@ -132,6 +137,7 @@ export type PreorderCountAggregateInputType = {
   total?: true
   status?: true
   serviceDate?: true
+  pickupSlotId?: true
   transactionId?: true
   collectedAt?: true
   cancelledAt?: true
@@ -234,6 +240,7 @@ export type PreorderGroupByOutputType = {
   total: number
   status: $Enums.PreorderStatus
   serviceDate: Date
+  pickupSlotId: string | null
   transactionId: string | null
   collectedAt: Date | null
   cancelledAt: Date | null
@@ -272,12 +279,14 @@ export type PreorderWhereInput = {
   total?: Prisma.IntFilter<"Preorder"> | number
   status?: Prisma.EnumPreorderStatusFilter<"Preorder"> | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFilter<"Preorder"> | Date | string
+  pickupSlotId?: Prisma.StringNullableFilter<"Preorder"> | string | null
   transactionId?: Prisma.StringNullableFilter<"Preorder"> | string | null
   collectedAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
   cancelledAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Preorder"> | Date | string
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  pickupSlot?: Prisma.XOR<Prisma.PickupSlotNullableScalarRelationFilter, Prisma.PickupSlotWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionNullableScalarRelationFilter, Prisma.TransactionWhereInput> | null
 }
 
@@ -290,12 +299,14 @@ export type PreorderOrderByWithRelationInput = {
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   serviceDate?: Prisma.SortOrder
+  pickupSlotId?: Prisma.SortOrderInput | Prisma.SortOrder
   transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   collectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   student?: Prisma.UserOrderByWithRelationInput
   placedBy?: Prisma.UserOrderByWithRelationInput
+  pickupSlot?: Prisma.PickupSlotOrderByWithRelationInput
   transaction?: Prisma.TransactionOrderByWithRelationInput
 }
 
@@ -312,11 +323,13 @@ export type PreorderWhereUniqueInput = Prisma.AtLeast<{
   total?: Prisma.IntFilter<"Preorder"> | number
   status?: Prisma.EnumPreorderStatusFilter<"Preorder"> | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFilter<"Preorder"> | Date | string
+  pickupSlotId?: Prisma.StringNullableFilter<"Preorder"> | string | null
   collectedAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
   cancelledAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Preorder"> | Date | string
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  pickupSlot?: Prisma.XOR<Prisma.PickupSlotNullableScalarRelationFilter, Prisma.PickupSlotWhereInput> | null
   transaction?: Prisma.XOR<Prisma.TransactionNullableScalarRelationFilter, Prisma.TransactionWhereInput> | null
 }, "id" | "transactionId">
 
@@ -329,6 +342,7 @@ export type PreorderOrderByWithAggregationInput = {
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   serviceDate?: Prisma.SortOrder
+  pickupSlotId?: Prisma.SortOrderInput | Prisma.SortOrder
   transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   collectedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -352,6 +366,7 @@ export type PreorderScalarWhereWithAggregatesInput = {
   total?: Prisma.IntWithAggregatesFilter<"Preorder"> | number
   status?: Prisma.EnumPreorderStatusWithAggregatesFilter<"Preorder"> | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeWithAggregatesFilter<"Preorder"> | Date | string
+  pickupSlotId?: Prisma.StringNullableWithAggregatesFilter<"Preorder"> | string | null
   transactionId?: Prisma.StringNullableWithAggregatesFilter<"Preorder"> | string | null
   collectedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Preorder"> | Date | string | null
   cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Preorder"> | Date | string | null
@@ -370,6 +385,7 @@ export type PreorderCreateInput = {
   createdAt?: Date | string
   student: Prisma.UserCreateNestedOneWithoutPreordersInput
   placedBy?: Prisma.UserCreateNestedOneWithoutPlacedPreordersInput
+  pickupSlot?: Prisma.PickupSlotCreateNestedOneWithoutPreordersInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutPreorderInput
 }
 
@@ -382,6 +398,7 @@ export type PreorderUncheckedCreateInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -400,6 +417,7 @@ export type PreorderUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserUpdateOneRequiredWithoutPreordersNestedInput
   placedBy?: Prisma.UserUpdateOneWithoutPlacedPreordersNestedInput
+  pickupSlot?: Prisma.PickupSlotUpdateOneWithoutPreordersNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutPreorderNestedInput
 }
 
@@ -412,6 +430,7 @@ export type PreorderUncheckedUpdateInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -427,6 +446,7 @@ export type PreorderCreateManyInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -454,6 +474,7 @@ export type PreorderUncheckedUpdateManyInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -484,6 +505,7 @@ export type PreorderCountOrderByAggregateInput = {
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   serviceDate?: Prisma.SortOrder
+  pickupSlotId?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
   cancelledAt?: Prisma.SortOrder
@@ -502,6 +524,7 @@ export type PreorderMaxOrderByAggregateInput = {
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   serviceDate?: Prisma.SortOrder
+  pickupSlotId?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
   cancelledAt?: Prisma.SortOrder
@@ -516,6 +539,7 @@ export type PreorderMinOrderByAggregateInput = {
   total?: Prisma.SortOrder
   status?: Prisma.SortOrder
   serviceDate?: Prisma.SortOrder
+  pickupSlotId?: Prisma.SortOrder
   transactionId?: Prisma.SortOrder
   collectedAt?: Prisma.SortOrder
   cancelledAt?: Prisma.SortOrder
@@ -610,6 +634,48 @@ export type PreorderUncheckedUpdateManyWithoutPlacedByNestedInput = {
   deleteMany?: Prisma.PreorderScalarWhereInput | Prisma.PreorderScalarWhereInput[]
 }
 
+export type PreorderCreateNestedManyWithoutPickupSlotInput = {
+  create?: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput> | Prisma.PreorderCreateWithoutPickupSlotInput[] | Prisma.PreorderUncheckedCreateWithoutPickupSlotInput[]
+  connectOrCreate?: Prisma.PreorderCreateOrConnectWithoutPickupSlotInput | Prisma.PreorderCreateOrConnectWithoutPickupSlotInput[]
+  createMany?: Prisma.PreorderCreateManyPickupSlotInputEnvelope
+  connect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+}
+
+export type PreorderUncheckedCreateNestedManyWithoutPickupSlotInput = {
+  create?: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput> | Prisma.PreorderCreateWithoutPickupSlotInput[] | Prisma.PreorderUncheckedCreateWithoutPickupSlotInput[]
+  connectOrCreate?: Prisma.PreorderCreateOrConnectWithoutPickupSlotInput | Prisma.PreorderCreateOrConnectWithoutPickupSlotInput[]
+  createMany?: Prisma.PreorderCreateManyPickupSlotInputEnvelope
+  connect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+}
+
+export type PreorderUpdateManyWithoutPickupSlotNestedInput = {
+  create?: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput> | Prisma.PreorderCreateWithoutPickupSlotInput[] | Prisma.PreorderUncheckedCreateWithoutPickupSlotInput[]
+  connectOrCreate?: Prisma.PreorderCreateOrConnectWithoutPickupSlotInput | Prisma.PreorderCreateOrConnectWithoutPickupSlotInput[]
+  upsert?: Prisma.PreorderUpsertWithWhereUniqueWithoutPickupSlotInput | Prisma.PreorderUpsertWithWhereUniqueWithoutPickupSlotInput[]
+  createMany?: Prisma.PreorderCreateManyPickupSlotInputEnvelope
+  set?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  disconnect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  delete?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  connect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  update?: Prisma.PreorderUpdateWithWhereUniqueWithoutPickupSlotInput | Prisma.PreorderUpdateWithWhereUniqueWithoutPickupSlotInput[]
+  updateMany?: Prisma.PreorderUpdateManyWithWhereWithoutPickupSlotInput | Prisma.PreorderUpdateManyWithWhereWithoutPickupSlotInput[]
+  deleteMany?: Prisma.PreorderScalarWhereInput | Prisma.PreorderScalarWhereInput[]
+}
+
+export type PreorderUncheckedUpdateManyWithoutPickupSlotNestedInput = {
+  create?: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput> | Prisma.PreorderCreateWithoutPickupSlotInput[] | Prisma.PreorderUncheckedCreateWithoutPickupSlotInput[]
+  connectOrCreate?: Prisma.PreorderCreateOrConnectWithoutPickupSlotInput | Prisma.PreorderCreateOrConnectWithoutPickupSlotInput[]
+  upsert?: Prisma.PreorderUpsertWithWhereUniqueWithoutPickupSlotInput | Prisma.PreorderUpsertWithWhereUniqueWithoutPickupSlotInput[]
+  createMany?: Prisma.PreorderCreateManyPickupSlotInputEnvelope
+  set?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  disconnect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  delete?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  connect?: Prisma.PreorderWhereUniqueInput | Prisma.PreorderWhereUniqueInput[]
+  update?: Prisma.PreorderUpdateWithWhereUniqueWithoutPickupSlotInput | Prisma.PreorderUpdateWithWhereUniqueWithoutPickupSlotInput[]
+  updateMany?: Prisma.PreorderUpdateManyWithWhereWithoutPickupSlotInput | Prisma.PreorderUpdateManyWithWhereWithoutPickupSlotInput[]
+  deleteMany?: Prisma.PreorderScalarWhereInput | Prisma.PreorderScalarWhereInput[]
+}
+
 export type PreorderCreateNestedOneWithoutTransactionInput = {
   create?: Prisma.XOR<Prisma.PreorderCreateWithoutTransactionInput, Prisma.PreorderUncheckedCreateWithoutTransactionInput>
   connectOrCreate?: Prisma.PreorderCreateOrConnectWithoutTransactionInput
@@ -661,6 +727,7 @@ export type PreorderCreateWithoutStudentInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   placedBy?: Prisma.UserCreateNestedOneWithoutPlacedPreordersInput
+  pickupSlot?: Prisma.PickupSlotCreateNestedOneWithoutPreordersInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutPreorderInput
 }
 
@@ -672,6 +739,7 @@ export type PreorderUncheckedCreateWithoutStudentInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -699,6 +767,7 @@ export type PreorderCreateWithoutPlacedByInput = {
   cancelledAt?: Date | string | null
   createdAt?: Date | string
   student: Prisma.UserCreateNestedOneWithoutPreordersInput
+  pickupSlot?: Prisma.PickupSlotCreateNestedOneWithoutPreordersInput
   transaction?: Prisma.TransactionCreateNestedOneWithoutPreorderInput
 }
 
@@ -710,6 +779,7 @@ export type PreorderUncheckedCreateWithoutPlacedByInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -754,6 +824,7 @@ export type PreorderScalarWhereInput = {
   total?: Prisma.IntFilter<"Preorder"> | number
   status?: Prisma.EnumPreorderStatusFilter<"Preorder"> | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFilter<"Preorder"> | Date | string
+  pickupSlotId?: Prisma.StringNullableFilter<"Preorder"> | string | null
   transactionId?: Prisma.StringNullableFilter<"Preorder"> | string | null
   collectedAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
   cancelledAt?: Prisma.DateTimeNullableFilter<"Preorder"> | Date | string | null
@@ -776,6 +847,62 @@ export type PreorderUpdateManyWithWhereWithoutPlacedByInput = {
   data: Prisma.XOR<Prisma.PreorderUpdateManyMutationInput, Prisma.PreorderUncheckedUpdateManyWithoutPlacedByInput>
 }
 
+export type PreorderCreateWithoutPickupSlotInput = {
+  id?: string
+  source: $Enums.PreorderSource
+  items: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total: number
+  status?: $Enums.PreorderStatus
+  serviceDate: Date | string
+  collectedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  createdAt?: Date | string
+  student: Prisma.UserCreateNestedOneWithoutPreordersInput
+  placedBy?: Prisma.UserCreateNestedOneWithoutPlacedPreordersInput
+  transaction?: Prisma.TransactionCreateNestedOneWithoutPreorderInput
+}
+
+export type PreorderUncheckedCreateWithoutPickupSlotInput = {
+  id?: string
+  studentId: string
+  placedById?: string | null
+  source: $Enums.PreorderSource
+  items: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total: number
+  status?: $Enums.PreorderStatus
+  serviceDate: Date | string
+  transactionId?: string | null
+  collectedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type PreorderCreateOrConnectWithoutPickupSlotInput = {
+  where: Prisma.PreorderWhereUniqueInput
+  create: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput>
+}
+
+export type PreorderCreateManyPickupSlotInputEnvelope = {
+  data: Prisma.PreorderCreateManyPickupSlotInput | Prisma.PreorderCreateManyPickupSlotInput[]
+  skipDuplicates?: boolean
+}
+
+export type PreorderUpsertWithWhereUniqueWithoutPickupSlotInput = {
+  where: Prisma.PreorderWhereUniqueInput
+  update: Prisma.XOR<Prisma.PreorderUpdateWithoutPickupSlotInput, Prisma.PreorderUncheckedUpdateWithoutPickupSlotInput>
+  create: Prisma.XOR<Prisma.PreorderCreateWithoutPickupSlotInput, Prisma.PreorderUncheckedCreateWithoutPickupSlotInput>
+}
+
+export type PreorderUpdateWithWhereUniqueWithoutPickupSlotInput = {
+  where: Prisma.PreorderWhereUniqueInput
+  data: Prisma.XOR<Prisma.PreorderUpdateWithoutPickupSlotInput, Prisma.PreorderUncheckedUpdateWithoutPickupSlotInput>
+}
+
+export type PreorderUpdateManyWithWhereWithoutPickupSlotInput = {
+  where: Prisma.PreorderScalarWhereInput
+  data: Prisma.XOR<Prisma.PreorderUpdateManyMutationInput, Prisma.PreorderUncheckedUpdateManyWithoutPickupSlotInput>
+}
+
 export type PreorderCreateWithoutTransactionInput = {
   id?: string
   source: $Enums.PreorderSource
@@ -788,6 +915,7 @@ export type PreorderCreateWithoutTransactionInput = {
   createdAt?: Date | string
   student: Prisma.UserCreateNestedOneWithoutPreordersInput
   placedBy?: Prisma.UserCreateNestedOneWithoutPlacedPreordersInput
+  pickupSlot?: Prisma.PickupSlotCreateNestedOneWithoutPreordersInput
 }
 
 export type PreorderUncheckedCreateWithoutTransactionInput = {
@@ -799,6 +927,7 @@ export type PreorderUncheckedCreateWithoutTransactionInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
   createdAt?: Date | string
@@ -832,6 +961,7 @@ export type PreorderUpdateWithoutTransactionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserUpdateOneRequiredWithoutPreordersNestedInput
   placedBy?: Prisma.UserUpdateOneWithoutPlacedPreordersNestedInput
+  pickupSlot?: Prisma.PickupSlotUpdateOneWithoutPreordersNestedInput
 }
 
 export type PreorderUncheckedUpdateWithoutTransactionInput = {
@@ -843,6 +973,7 @@ export type PreorderUncheckedUpdateWithoutTransactionInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -856,6 +987,7 @@ export type PreorderCreateManyStudentInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -870,6 +1002,7 @@ export type PreorderCreateManyPlacedByInput = {
   total: number
   status?: $Enums.PreorderStatus
   serviceDate: Date | string
+  pickupSlotId?: string | null
   transactionId?: string | null
   collectedAt?: Date | string | null
   cancelledAt?: Date | string | null
@@ -887,6 +1020,7 @@ export type PreorderUpdateWithoutStudentInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   placedBy?: Prisma.UserUpdateOneWithoutPlacedPreordersNestedInput
+  pickupSlot?: Prisma.PickupSlotUpdateOneWithoutPreordersNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutPreorderNestedInput
 }
 
@@ -898,6 +1032,7 @@ export type PreorderUncheckedUpdateWithoutStudentInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -912,6 +1047,7 @@ export type PreorderUncheckedUpdateManyWithoutStudentInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -929,6 +1065,7 @@ export type PreorderUpdateWithoutPlacedByInput = {
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   student?: Prisma.UserUpdateOneRequiredWithoutPreordersNestedInput
+  pickupSlot?: Prisma.PickupSlotUpdateOneWithoutPreordersNestedInput
   transaction?: Prisma.TransactionUpdateOneWithoutPreorderNestedInput
 }
 
@@ -940,6 +1077,7 @@ export type PreorderUncheckedUpdateWithoutPlacedByInput = {
   total?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
   serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -949,6 +1087,67 @@ export type PreorderUncheckedUpdateWithoutPlacedByInput = {
 export type PreorderUncheckedUpdateManyWithoutPlacedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumPreorderSourceFieldUpdateOperationsInput | $Enums.PreorderSource
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickupSlotId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PreorderCreateManyPickupSlotInput = {
+  id?: string
+  studentId: string
+  placedById?: string | null
+  source: $Enums.PreorderSource
+  items: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total: number
+  status?: $Enums.PreorderStatus
+  serviceDate: Date | string
+  transactionId?: string | null
+  collectedAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type PreorderUpdateWithoutPickupSlotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.EnumPreorderSourceFieldUpdateOperationsInput | $Enums.PreorderSource
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  student?: Prisma.UserUpdateOneRequiredWithoutPreordersNestedInput
+  placedBy?: Prisma.UserUpdateOneWithoutPlacedPreordersNestedInput
+  transaction?: Prisma.TransactionUpdateOneWithoutPreorderNestedInput
+}
+
+export type PreorderUncheckedUpdateWithoutPickupSlotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  placedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.EnumPreorderSourceFieldUpdateOperationsInput | $Enums.PreorderSource
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumPreorderStatusFieldUpdateOperationsInput | $Enums.PreorderStatus
+  serviceDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  collectedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PreorderUncheckedUpdateManyWithoutPickupSlotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.StringFieldUpdateOperationsInput | string
+  placedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   source?: Prisma.EnumPreorderSourceFieldUpdateOperationsInput | $Enums.PreorderSource
   items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   total?: Prisma.IntFieldUpdateOperationsInput | number
@@ -971,12 +1170,14 @@ export type PreorderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   total?: boolean
   status?: boolean
   serviceDate?: boolean
+  pickupSlotId?: boolean
   transactionId?: boolean
   collectedAt?: boolean
   cancelledAt?: boolean
   createdAt?: boolean
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }, ExtArgs["result"]["preorder"]>
 
@@ -989,12 +1190,14 @@ export type PreorderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   total?: boolean
   status?: boolean
   serviceDate?: boolean
+  pickupSlotId?: boolean
   transactionId?: boolean
   collectedAt?: boolean
   cancelledAt?: boolean
   createdAt?: boolean
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }, ExtArgs["result"]["preorder"]>
 
@@ -1007,12 +1210,14 @@ export type PreorderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   total?: boolean
   status?: boolean
   serviceDate?: boolean
+  pickupSlotId?: boolean
   transactionId?: boolean
   collectedAt?: boolean
   cancelledAt?: boolean
   createdAt?: boolean
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }, ExtArgs["result"]["preorder"]>
 
@@ -1025,26 +1230,30 @@ export type PreorderSelectScalar = {
   total?: boolean
   status?: boolean
   serviceDate?: boolean
+  pickupSlotId?: boolean
   transactionId?: boolean
   collectedAt?: boolean
   cancelledAt?: boolean
   createdAt?: boolean
 }
 
-export type PreorderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placedById" | "source" | "items" | "total" | "status" | "serviceDate" | "transactionId" | "collectedAt" | "cancelledAt" | "createdAt", ExtArgs["result"]["preorder"]>
+export type PreorderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placedById" | "source" | "items" | "total" | "status" | "serviceDate" | "pickupSlotId" | "transactionId" | "collectedAt" | "cancelledAt" | "createdAt", ExtArgs["result"]["preorder"]>
 export type PreorderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }
 export type PreorderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }
 export type PreorderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placedBy?: boolean | Prisma.Preorder$placedByArgs<ExtArgs>
+  pickupSlot?: boolean | Prisma.Preorder$pickupSlotArgs<ExtArgs>
   transaction?: boolean | Prisma.Preorder$transactionArgs<ExtArgs>
 }
 
@@ -1053,6 +1262,7 @@ export type $PreorderPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     student: Prisma.$UserPayload<ExtArgs>
     placedBy: Prisma.$UserPayload<ExtArgs> | null
+    pickupSlot: Prisma.$PickupSlotPayload<ExtArgs> | null
     transaction: Prisma.$TransactionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1064,6 +1274,7 @@ export type $PreorderPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     total: number
     status: $Enums.PreorderStatus
     serviceDate: Date
+    pickupSlotId: string | null
     transactionId: string | null
     collectedAt: Date | null
     cancelledAt: Date | null
@@ -1464,6 +1675,7 @@ export interface Prisma__PreorderClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   student<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   placedBy<T extends Prisma.Preorder$placedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Preorder$placedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pickupSlot<T extends Prisma.Preorder$pickupSlotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Preorder$pickupSlotArgs<ExtArgs>>): Prisma.Prisma__PickupSlotClient<runtime.Types.Result.GetResult<Prisma.$PickupSlotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   transaction<T extends Prisma.Preorder$transactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Preorder$transactionArgs<ExtArgs>>): Prisma.Prisma__TransactionClient<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1502,6 +1714,7 @@ export interface PreorderFieldRefs {
   readonly total: Prisma.FieldRef<"Preorder", 'Int'>
   readonly status: Prisma.FieldRef<"Preorder", 'PreorderStatus'>
   readonly serviceDate: Prisma.FieldRef<"Preorder", 'DateTime'>
+  readonly pickupSlotId: Prisma.FieldRef<"Preorder", 'String'>
   readonly transactionId: Prisma.FieldRef<"Preorder", 'String'>
   readonly collectedAt: Prisma.FieldRef<"Preorder", 'DateTime'>
   readonly cancelledAt: Prisma.FieldRef<"Preorder", 'DateTime'>
@@ -1923,6 +2136,25 @@ export type Preorder$placedByArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Preorder.pickupSlot
+ */
+export type Preorder$pickupSlotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PickupSlot
+   */
+  select?: Prisma.PickupSlotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PickupSlot
+   */
+  omit?: Prisma.PickupSlotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PickupSlotInclude<ExtArgs> | null
+  where?: Prisma.PickupSlotWhereInput
 }
 
 /**

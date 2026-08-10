@@ -87,6 +87,18 @@ export type VerificationCode = Prisma.VerificationCodeModel
  */
 export type School = Prisma.SchoolModel
 /**
+ * Model PickupSlot
+ * *
+ *  * A window during the school day when preordered food can be collected —
+ *  * "Primary Lunch, 1:10pm–1:50pm" and so on.
+ *  *
+ *  * Per school, because the two schools ring their bells at different times.
+ *  * Times are stored as local "HH:MM" strings rather than DateTimes: they're a
+ *  * repeating fact about the timetable, not an instant, and storing them as
+ *  * dates would drag timezone conversion into something that never moves.
+ */
+export type PickupSlot = Prisma.PickupSlotModel
+/**
  * Model Setting
  * * Simple key/value app settings editable by an admin at /admin/settings.
  */

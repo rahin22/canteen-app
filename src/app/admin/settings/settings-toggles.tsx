@@ -78,12 +78,12 @@ export function CutoffField({ initial }: { initial: string }) {
         htmlFor="cutoff"
         className="font-medium text-slate-900"
       >
-        Orders close at
+        Same-day orders close at
       </label>
       <p className="mt-0.5 text-sm text-slate-500">
-        After this time the kiosk and the parent portal stop accepting orders
-        for the day, so the kitchen knows what it&apos;s making. Uses the
-        school&apos;s local time.
+        Orders placed after this time go on the next school day&apos;s list
+        instead of today&apos;s, so the kitchen knows what it&apos;s making.
+        Uses the school&apos;s local time.
       </p>
       <div className="mt-2 flex items-center gap-2">
         <input

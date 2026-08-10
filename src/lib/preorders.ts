@@ -1,10 +1,6 @@
 import { prisma } from "./db";
-import {
-  formatClock,
-  parseClockMinutes,
-  schoolClockMinutes,
-  startOfSchoolDay,
-} from "./day";
+import { formatClock, formatSchoolDay, startOfSchoolDay } from "./day";
+import { describeSlot, orderingPlan } from "./pickup";
 import { formatMoney } from "./money";
 import { readLines } from "./preorder-format";
 import { preorderCutoff, preordersOpen } from "./settings";
@@ -40,6 +36,25 @@ const MAX_QTY_PER_LINE = 10;
 
 export type PreorderLine = { menuItemId: string; qty: number };
 
+/** Orders a student still has coming, today or on a later service day. */
+export async function upcomingPreorders(
+  studentId: string
+): Promise<PreorderSummary[]> {
+  const rows = await prisma.preorder.findMany({
+    where: {
+      studentId,
+      status: "PENDING",
+      serviceDate: { gte: startOfSchoolDay() },
+    },
+    orderBy: [{ serviceDate: "asc" }, { createdAt: "asc" }],
+    include: {
+      placedBy: { select: { name: true } },
+      pickupSlot: true,
+    },
+  });
+  return rows.map(toSummary);
+}
+
 export type PreorderSummary = {
   id: string;
   items: PurchaseLine[];
@@ -47,46 +62,27 @@ export type PreorderSummary = {
   source: PreorderSource;
   placedByName: string | null;
   createdAt: number;
+  /** Which day the food is for, and when it can be collected. */
+  serviceDate: number;
+  dayLabel: string;
+  pickup: string | null;
 };
 
-/**
- * Whether orders are being taken, and if not, why.
- *
- * `enabled` separates "the school doesn't do preordering" from "today's
- * orders have closed" — surfaces hide the feature outright in the first case
- * and explain the cutoff in the second.
- */
-export type PreorderWindow =
-  | { open: true; enabled: true; cutoff: string; cutoffLabel: string }
-  | { open: false; enabled: boolean; reason: string };
-
-/**
- * Whether orders can be placed at this moment.
- *
- * Checked on every render *and* again inside placePreorder — a kiosk left
- * open on a windowsill would otherwise happily submit an order at 2pm.
- */
-export async function preorderWindow(now: Date = new Date()): Promise<PreorderWindow> {
-  if (!(await preordersOpen())) {
-    return {
-      open: false,
-      enabled: false,
-      reason: "Preordering is switched off at the moment.",
-    };
-  }
-  const cutoff = await preorderCutoff();
-  const cutoffLabel = formatClock(cutoff);
-  if (schoolClockMinutes(now) >= parseClockMinutes(cutoff)) {
-    return {
-      open: false,
-      enabled: true,
-      reason: `Orders for today closed at ${cutoffLabel}. Come to the canteen counter instead.`,
-    };
-  }
-  return { open: true, enabled: true, cutoff, cutoffLabel };
+/** Whether the school does preordering at all, for admin headings. */
+export async function preorderStatus(): Promise<{
+  enabled: boolean;
+  cutoffLabel: string;
+}> {
+  return {
+    enabled: await preordersOpen(),
+    cutoffLabel: formatClock(await preorderCutoff()),
+  };
 }
 
-/** Pending orders a student has for today, newest first. */
+/**
+ * Orders for *today* that are still to be collected — what the till offers to
+ * hand over. Deliberately not tomorrow's: that food doesn't exist yet.
+ */
 export async function pendingPreorders(
   studentId: string,
   client: Prisma.TransactionClient | typeof prisma = prisma
@@ -98,7 +94,7 @@ export async function pendingPreorders(
       serviceDate: startOfSchoolDay(),
     },
     orderBy: { createdAt: "desc" },
-    include: { placedBy: { select: { name: true } } },
+    include: { placedBy: { select: { name: true } }, pickupSlot: true },
   });
   return rows.map(toSummary);
 }
@@ -109,7 +105,13 @@ function toSummary(row: {
   total: number;
   source: PreorderSource;
   createdAt: Date;
+  serviceDate: Date;
   placedBy?: { name: string } | null;
+  pickupSlot?: {
+    label: string;
+    startTime: string;
+    endTime: string;
+  } | null;
 }): PreorderSummary {
   return {
     id: row.id,
@@ -118,6 +120,9 @@ function toSummary(row: {
     source: row.source,
     placedByName: row.placedBy?.name ?? null,
     createdAt: row.createdAt.getTime(),
+    serviceDate: row.serviceDate.getTime(),
+    dayLabel: formatSchoolDay(row.serviceDate),
+    pickup: row.pickupSlot ? describeSlot(row.pickupSlot) : null,
   };
 }
 
@@ -139,7 +144,7 @@ async function priceLines(
   // Scoped to the student's own school, so neither the kiosk nor a crafted
   // request can order from the other school's menu.
   const menuItems = await prisma.menuItem.findMany({
-    where: { id: { in: ids }, active: true, schoolId },
+    where: { id: { in: ids }, active: true, soldOut: false, schoolId },
   });
   if (menuItems.length !== new Set(ids).size) {
     throw new PreorderError("The menu changed — please choose again.");
@@ -207,11 +212,10 @@ export async function placePreorder(opts: {
   placedById: string | null;
   source: PreorderSource;
   lines: PreorderLine[];
+  /** Which collection window; must be one the plan currently offers. */
+  pickupSlotId: string;
 }): Promise<PreorderSummary> {
-  const { studentId, placedById, source, lines } = opts;
-
-  const window = await preorderWindow();
-  if (!window.open) throw new PreorderError(window.reason);
+  const { studentId, placedById, source, lines, pickupSlotId } = opts;
 
   const student = await prisma.user.findUnique({
     where: { id: studentId },
@@ -227,12 +231,27 @@ export async function placePreorder(opts: {
     );
   }
 
+  // Which day this order lands on, and which windows are still collectable,
+  // is decided here rather than trusted from the client — the page may have
+  // been open since before the cutoff.
+  const plan = await orderingPlan(student.schoolId);
+  if (!plan.open) throw new PreorderError(plan.reason);
+
+  const slot = plan.slots.find((s) => s.id === pickupSlotId);
+  if (!slot) {
+    throw new PreorderError(
+      "That pickup time isn't available any more — choose another."
+    );
+  }
+
   const { priced, total } = await priceLines(lines, student.schoolId);
 
-  const existing = await pendingPreorders(studentId);
-  if (existing.length >= MAX_PENDING_PER_DAY) {
+  const existing = await prisma.preorder.count({
+    where: { studentId, status: "PENDING", serviceDate: plan.serviceDate },
+  });
+  if (existing >= MAX_PENDING_PER_DAY) {
     throw new PreorderError(
-      `There are already ${existing.length} orders waiting to be collected today.`
+      `There are already ${existing} orders waiting for ${plan.dayLabel}.`
     );
   }
 
@@ -254,7 +273,7 @@ export async function placePreorder(opts: {
       // who wasn't there.
       operatorId: placedById ?? undefined,
       items: priced,
-      note: source === "KIOSK" ? "Preorder (kiosk)" : "Preorder (parent)",
+      note: `Preorder — ${slot.label}, ${plan.dayLabel}`,
       onCharged: async (tx, transactionId) => {
         created = await tx.preorder.create({
           data: {
@@ -263,9 +282,11 @@ export async function placePreorder(opts: {
             source,
             items: priced as unknown as Prisma.InputJsonValue,
             total,
-            serviceDate: startOfSchoolDay(),
+            serviceDate: plan.serviceDate,
+            pickupSlotId: slot.id,
             transactionId,
           },
+          include: { pickupSlot: true },
         });
       },
     });

@@ -10,11 +10,14 @@ import {
   type PurchaseLine,
 } from "@/lib/ledger";
 import { resolveCardInput } from "@/lib/cards";
-import { canActOnSchool, schoolMenu } from "@/lib/schools";
+import { canActOnSchool, canActOnStudent, schoolMenu } from "@/lib/schools";
+import { orderingPlan, type OrderingPlan } from "@/lib/pickup";
 import {
   handOverPreorder,
   pendingPreorders,
+  placePreorder,
   PreorderError,
+  type PreorderLine,
   type PreorderSummary,
 } from "@/lib/preorders";
 
@@ -54,6 +57,8 @@ export type ScanStudent = {
    */
   menu: MenuItem[];
   schoolName: string | null;
+  /** Where a staff-placed preorder would land, and which windows are free. */
+  plan: OrderingPlan;
 };
 
 export type MenuItem = {
@@ -87,7 +92,7 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
     };
   }
   const studentId = user.id;
-  const [daily, recent, pendingOrders, menu, school] = await Promise.all([
+  const [daily, recent, pendingOrders, menu, plan, school] = await Promise.all([
     getDailySpend(studentId),
     prisma.transaction.findMany({
       where: { studentId, type: "PURCHASE" },
@@ -100,6 +105,7 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
     }),
     pendingPreorders(studentId),
     schoolMenu(user.schoolId),
+    orderingPlan(user.schoolId),
     user.schoolId
       ? prisma.school.findUnique({
           where: { id: user.schoolId },
@@ -137,6 +143,7 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
         : null,
       pendingOrders,
       menu,
+      plan,
       schoolName: school?.name ?? null,
     },
   };
@@ -182,6 +189,47 @@ export async function handOverOrder(preorderId: string): Promise<HandOverResult>
   }
 }
 
+export type TillPreorderResult =
+  | { ok: true; summary: PreorderSummary }
+  | { ok: false; error: string };
+
+/**
+ * Staff placing a preorder on a student's behalf at the counter — the second
+ * of the two options after a card scan.
+ *
+ * Goes through the same path as the kiosk and parent portal, so it lands on
+ * the same day, the same collection windows and the same limits.
+ */
+export async function tillPreorder(
+  studentId: string,
+  lines: PreorderLine[],
+  pickupSlotId: string
+): Promise<TillPreorderResult> {
+  const session = await requireRole("ADMIN", "OPERATOR");
+  if (!(await canActOnStudent(studentId))) {
+    return { ok: false, error: "That student is at another school." };
+  }
+  try {
+    return {
+      ok: true,
+      summary: await placePreorder({
+        studentId,
+        // Recorded against the staff member who took it, unlike a kiosk order
+        // where the child served themselves.
+        placedById: session.uid,
+        source: "STAFF",
+        lines,
+        pickupSlotId,
+      }),
+    };
+  } catch (err) {
+    if (err instanceof PreorderError || err instanceof LedgerError) {
+      return { ok: false, error: err.message };
+    }
+    throw err;
+  }
+}
+
 export type ChargeInput = {
   studentId: string;
   lines: { menuItemId: string; qty: number }[];
@@ -219,6 +267,7 @@ export async function charge(input: ChargeInput): Promise<ChargeResult> {
         where: {
           id: { in: ids },
           active: true,
+          soldOut: false,
           schoolId: student.schoolId!,
         },
       })

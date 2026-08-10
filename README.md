@@ -254,6 +254,50 @@ cutoffs, limits or affordability. The menu picker (`OrderComposer`) and the
 card reader (`CardScanner`) are shared components too, the kiosk just renders
 them at iPad size.
 
+### Pick-up times and the day-ahead rollover
+
+Every order names a collection window. The windows are per school (the two ring
+their bells at different times) and are managed in **Admin → Settings →
+Pick-up times**; both schools are seeded with the standard six:
+
+| Window | Time |
+|---|---|
+| Secondary Recess | 9:50 – 10:20 am |
+| Primary Recess | 10:40 – 11:10 am |
+| Secondary Lunch | 12:00 – 12:20 pm |
+| Primary Lunch | 1:10 – 1:50 pm |
+| Secondary Break | 2:20 – 2:40 pm |
+| Pick-up Time | 3:00 – 4:00 pm |
+
+**Ordering never closes.** Before the cutoff (4:00 pm by default) you're
+ordering for today; after it, for the next school day. Windows that have
+already finished drop off today's list — you can't collect at first recess at
+two in the afternoon — and if that leaves nothing, the order rolls to tomorrow
+rather than being refused. That also covers the gap between the last window and
+the cutoff.
+
+Which day an order lands on is decided server-side at submission, never trusted
+from the page, which may have been open since before the cutoff. A window that
+is no longer on offer is rejected with a message rather than silently accepted.
+
+### Sold out
+
+**Admin → Menu** has a *Sold out* toggle per item. It drops the item from the
+till, kiosk and parent portal immediately, and is separate from *Hide*: hiding
+withdraws an item from the menu altogether, whereas sold-out is a daily switch
+the canteen flips back tomorrow without disturbing how the item is set up.
+Orders already paid for are untouched — the kitchen still owes that food.
+
+### Three ways to place an order
+
+- **Parent portal** — Family → child → *Order ahead*. Each child is ordered for
+  separately from the one parent account, and pays from that child's own card.
+- **Office kiosk** — students order for themselves after tapping their card.
+- **The till** — after scanning a card, staff choose **Pay now** (serve it over
+  the counter) or **Pre-order** (book it into a later window on the student's
+  behalf). Same windows, same rules; the kitchen list shows it as *Taken by*
+  the staff member.
+
 ### Orders are paid for when they're placed
 
 The money comes off the card at order time. The ledger charge and the order row

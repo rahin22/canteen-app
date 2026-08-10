@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
-import { preorderWindow } from "@/lib/preorders";
+import { preorderStatus } from "@/lib/preorders";
 import { logout } from "@/app/login/actions";
 import KioskClient from "./kiosk-client";
 
@@ -16,9 +16,9 @@ export const dynamic = "force-dynamic";
 export default async function KioskPage() {
   await requireRole("ADMIN", "OPERATOR");
 
-  // No menu is loaded here on purpose — it arrives with whichever student
-  // taps their card, so one kiosk works in either school's front office.
-  const window = await preorderWindow();
+  // No menu or pickup times are loaded here on purpose — they arrive with
+  // whichever student taps their card, so one kiosk works in either school.
+  const status = await preorderStatus();
 
   return (
     <main className="flex flex-1 flex-col bg-slate-50">
@@ -44,15 +44,17 @@ export default async function KioskPage() {
         </div>
       </header>
 
-      {window.open ? (
-        <KioskClient cutoffLabel={window.cutoffLabel} />
+      {status.enabled ? (
+        <KioskClient cutoffLabel={status.cutoffLabel} />
       ) : (
         <div className="mx-auto mt-20 max-w-lg px-6 text-center">
           <div className="text-6xl">🕘</div>
           <h1 className="mt-4 text-3xl font-bold text-slate-900">
             Ordering is closed
           </h1>
-          <p className="mt-3 text-xl text-slate-600">{window.reason}</p>
+          <p className="mt-3 text-xl text-slate-600">
+            Preordering is switched off at the moment.
+          </p>
         </div>
       )}
     </main>

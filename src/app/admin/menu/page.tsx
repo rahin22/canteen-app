@@ -52,6 +52,7 @@ export default async function MenuPage() {
           price: i.price,
           category: i.category,
           active: i.active,
+          soldOut: i.soldOut,
         }))}
       />
     </div>

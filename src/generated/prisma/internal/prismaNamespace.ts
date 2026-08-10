@@ -402,6 +402,7 @@ export const ModelName = {
   ChildRegistration: 'ChildRegistration',
   VerificationCode: 'VerificationCode',
   School: 'School',
+  PickupSlot: 'PickupSlot',
   Setting: 'Setting',
   Card: 'Card',
   MenuItem: 'MenuItem',
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "school" | "setting" | "card" | "menuItem" | "transaction" | "preorder"
+    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "school" | "pickupSlot" | "setting" | "card" | "menuItem" | "transaction" | "preorder"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -793,6 +794,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SchoolCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SchoolCountAggregateOutputType> | number
+        }
+      }
+    }
+    PickupSlot: {
+      payload: Prisma.$PickupSlotPayload<ExtArgs>
+      fields: Prisma.PickupSlotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PickupSlotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PickupSlotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        findFirst: {
+          args: Prisma.PickupSlotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PickupSlotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        findMany: {
+          args: Prisma.PickupSlotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>[]
+        }
+        create: {
+          args: Prisma.PickupSlotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        createMany: {
+          args: Prisma.PickupSlotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PickupSlotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>[]
+        }
+        delete: {
+          args: Prisma.PickupSlotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        update: {
+          args: Prisma.PickupSlotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        deleteMany: {
+          args: Prisma.PickupSlotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PickupSlotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PickupSlotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>[]
+        }
+        upsert: {
+          args: Prisma.PickupSlotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PickupSlotPayload>
+        }
+        aggregate: {
+          args: Prisma.PickupSlotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePickupSlot>
+        }
+        groupBy: {
+          args: Prisma.PickupSlotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PickupSlotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PickupSlotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PickupSlotCountAggregateOutputType> | number
         }
       }
     }
@@ -1282,6 +1357,20 @@ export const SchoolScalarFieldEnum = {
 export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
+export const PickupSlotScalarFieldEnum = {
+  id: 'id',
+  schoolId: 'schoolId',
+  label: 'label',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  sortOrder: 'sortOrder',
+  active: 'active',
+  createdAt: 'createdAt'
+} as const
+
+export type PickupSlotScalarFieldEnum = (typeof PickupSlotScalarFieldEnum)[keyof typeof PickupSlotScalarFieldEnum]
+
+
 export const SettingScalarFieldEnum = {
   key: 'key',
   value: 'value',
@@ -1309,6 +1398,7 @@ export const MenuItemScalarFieldEnum = {
   price: 'price',
   category: 'category',
   active: 'active',
+  soldOut: 'soldOut',
   sortOrder: 'sortOrder',
   schoolId: 'schoolId'
 } as const
@@ -1340,6 +1430,7 @@ export const PreorderScalarFieldEnum = {
   total: 'total',
   status: 'status',
   serviceDate: 'serviceDate',
+  pickupSlotId: 'pickupSlotId',
   transactionId: 'transactionId',
   collectedAt: 'collectedAt',
   cancelledAt: 'cancelledAt',
@@ -1761,6 +1852,7 @@ export type GlobalOmitConfig = {
   childRegistration?: Prisma.ChildRegistrationOmit
   verificationCode?: Prisma.VerificationCodeOmit
   school?: Prisma.SchoolOmit
+  pickupSlot?: Prisma.PickupSlotOmit
   setting?: Prisma.SettingOmit
   card?: Prisma.CardOmit
   menuItem?: Prisma.MenuItemOmit

@@ -10,6 +10,7 @@ import {
 } from "@/components/order-composer";
 import { parentPlaceOrder, parentCancelOrder } from "../actions";
 import type { PreorderSummary } from "@/lib/preorders";
+import type { OrderingPlan } from "@/lib/pickup";
 
 /**
  * The parent-facing half of preordering. Same component and same server rules
@@ -22,24 +23,24 @@ export function PreorderPanel({
   menu,
   pending,
   spendable,
-  window,
+  plan,
 }: {
   childId: string;
   childName: string;
   menu: ComposerMenuItem[];
   pending: PreorderSummary[];
   spendable: number;
-  window: { open: boolean; label: string };
+  plan: OrderingPlan;
 }) {
   const [composing, setComposing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cancelling, startCancelling] = useTransition();
 
-  const submit = async (lines: ComposerLine[]) => {
+  const submit = async (lines: ComposerLine[], pickupSlotId: string) => {
     setBusy(true);
     setError(null);
-    const result = await parentPlaceOrder(childId, lines);
+    const result = await parentPlaceOrder(childId, lines, pickupSlotId);
     setBusy(false);
     if (result.ok) setComposing(false);
     else setError(result.error);
@@ -50,7 +51,7 @@ export function PreorderPanel({
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-semibold text-slate-900">Order ahead</h2>
         <span className="text-xs font-medium text-slate-400">
-          {window.open ? `Closes ${window.label}` : "Closed for today"}
+          {plan.open ? `For ${plan.dayLabel}` : "Unavailable"}
         </span>
       </div>
       <p className="mt-1 text-sm text-slate-500">
@@ -71,9 +72,12 @@ export function PreorderPanel({
                   {describeLines(order.items)}
                 </p>
                 <p className="text-sm text-emerald-700">
-                  {formatMoney(order.total)} paid · to collect today
-                  {order.source === "KIOSK" ? " · ordered at school" : ""}
+                  {formatMoney(order.total)} paid · {order.dayLabel}
+                  {order.pickup ? ` · ${order.pickup}` : ""}
                 </p>
+                {order.source === "KIOSK" && (
+                  <p className="text-xs text-emerald-600">Ordered at school</p>
+                )}
               </div>
               <button
                 type="button"
@@ -92,16 +96,17 @@ export function PreorderPanel({
         </div>
       )}
 
-      {!window.open ? (
+      {!plan.open ? (
         <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-          {pending.length > 0
-            ? "Orders for today are closed, but the one above is paid for and still waiting to be collected."
-            : "Orders for today are closed. Anything bought now happens at the counter as usual."}
+          {plan.reason}
         </p>
       ) : composing ? (
         <div className="mt-4">
           <OrderComposer
             menu={menu}
+            slots={plan.slots}
+            dayLabel={plan.dayLabel}
+            forNextDay={plan.forNextDay}
             spendable={spendable}
             submitLabel="Place order"
             busy={busy}
@@ -119,7 +124,7 @@ export function PreorderPanel({
           onClick={() => setComposing(true)}
           className="mt-4 w-full rounded-xl border-2 border-dashed border-slate-300 py-3 font-semibold text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50"
         >
-          + Order{pending.length > 0 ? " something else" : " today's food"}
+          + Order for {plan.dayLabel}
         </button>
       )}
     </div>

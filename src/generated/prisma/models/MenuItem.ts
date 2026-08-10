@@ -42,6 +42,7 @@ export type MenuItemMinAggregateOutputType = {
   price: number | null
   category: string | null
   active: boolean | null
+  soldOut: boolean | null
   sortOrder: number | null
   schoolId: string | null
 }
@@ -52,6 +53,7 @@ export type MenuItemMaxAggregateOutputType = {
   price: number | null
   category: string | null
   active: boolean | null
+  soldOut: boolean | null
   sortOrder: number | null
   schoolId: string | null
 }
@@ -62,6 +64,7 @@ export type MenuItemCountAggregateOutputType = {
   price: number
   category: number
   active: number
+  soldOut: number
   sortOrder: number
   schoolId: number
   _all: number
@@ -84,6 +87,7 @@ export type MenuItemMinAggregateInputType = {
   price?: true
   category?: true
   active?: true
+  soldOut?: true
   sortOrder?: true
   schoolId?: true
 }
@@ -94,6 +98,7 @@ export type MenuItemMaxAggregateInputType = {
   price?: true
   category?: true
   active?: true
+  soldOut?: true
   sortOrder?: true
   schoolId?: true
 }
@@ -104,6 +109,7 @@ export type MenuItemCountAggregateInputType = {
   price?: true
   category?: true
   active?: true
+  soldOut?: true
   sortOrder?: true
   schoolId?: true
   _all?: true
@@ -201,6 +207,7 @@ export type MenuItemGroupByOutputType = {
   price: number
   category: string | null
   active: boolean
+  soldOut: boolean
   sortOrder: number
   schoolId: string
   _count: MenuItemCountAggregateOutputType | null
@@ -234,6 +241,7 @@ export type MenuItemWhereInput = {
   price?: Prisma.IntFilter<"MenuItem"> | number
   category?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   active?: Prisma.BoolFilter<"MenuItem"> | boolean
+  soldOut?: Prisma.BoolFilter<"MenuItem"> | boolean
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   schoolId?: Prisma.StringFilter<"MenuItem"> | string
   school?: Prisma.XOR<Prisma.SchoolScalarRelationFilter, Prisma.SchoolWhereInput>
@@ -245,6 +253,7 @@ export type MenuItemOrderByWithRelationInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
+  soldOut?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
   school?: Prisma.SchoolOrderByWithRelationInput
@@ -259,6 +268,7 @@ export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
   price?: Prisma.IntFilter<"MenuItem"> | number
   category?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   active?: Prisma.BoolFilter<"MenuItem"> | boolean
+  soldOut?: Prisma.BoolFilter<"MenuItem"> | boolean
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   schoolId?: Prisma.StringFilter<"MenuItem"> | string
   school?: Prisma.XOR<Prisma.SchoolScalarRelationFilter, Prisma.SchoolWhereInput>
@@ -270,6 +280,7 @@ export type MenuItemOrderByWithAggregationInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
+  soldOut?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
   _count?: Prisma.MenuItemCountOrderByAggregateInput
@@ -288,6 +299,7 @@ export type MenuItemScalarWhereWithAggregatesInput = {
   price?: Prisma.IntWithAggregatesFilter<"MenuItem"> | number
   category?: Prisma.StringNullableWithAggregatesFilter<"MenuItem"> | string | null
   active?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
+  soldOut?: Prisma.BoolWithAggregatesFilter<"MenuItem"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"MenuItem"> | number
   schoolId?: Prisma.StringWithAggregatesFilter<"MenuItem"> | string
 }
@@ -298,6 +310,7 @@ export type MenuItemCreateInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
   school: Prisma.SchoolCreateNestedOneWithoutMenuItemsInput
 }
@@ -308,6 +321,7 @@ export type MenuItemUncheckedCreateInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
   schoolId: string
 }
@@ -318,6 +332,7 @@ export type MenuItemUpdateInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   school?: Prisma.SchoolUpdateOneRequiredWithoutMenuItemsNestedInput
 }
@@ -328,6 +343,7 @@ export type MenuItemUncheckedUpdateInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -338,6 +354,7 @@ export type MenuItemCreateManyInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
   schoolId: string
 }
@@ -348,6 +365,7 @@ export type MenuItemUpdateManyMutationInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -357,6 +375,7 @@ export type MenuItemUncheckedUpdateManyInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -377,6 +396,7 @@ export type MenuItemCountOrderByAggregateInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  soldOut?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
 }
@@ -392,6 +412,7 @@ export type MenuItemMaxOrderByAggregateInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  soldOut?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
 }
@@ -402,6 +423,7 @@ export type MenuItemMinOrderByAggregateInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  soldOut?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
 }
@@ -459,6 +481,7 @@ export type MenuItemCreateWithoutSchoolInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
 }
 
@@ -468,6 +491,7 @@ export type MenuItemUncheckedCreateWithoutSchoolInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
 }
 
@@ -506,6 +530,7 @@ export type MenuItemScalarWhereInput = {
   price?: Prisma.IntFilter<"MenuItem"> | number
   category?: Prisma.StringNullableFilter<"MenuItem"> | string | null
   active?: Prisma.BoolFilter<"MenuItem"> | boolean
+  soldOut?: Prisma.BoolFilter<"MenuItem"> | boolean
   sortOrder?: Prisma.IntFilter<"MenuItem"> | number
   schoolId?: Prisma.StringFilter<"MenuItem"> | string
 }
@@ -516,6 +541,7 @@ export type MenuItemCreateManySchoolInput = {
   price: number
   category?: string | null
   active?: boolean
+  soldOut?: boolean
   sortOrder?: number
 }
 
@@ -525,6 +551,7 @@ export type MenuItemUpdateWithoutSchoolInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -534,6 +561,7 @@ export type MenuItemUncheckedUpdateWithoutSchoolInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -543,6 +571,7 @@ export type MenuItemUncheckedUpdateManyWithoutSchoolInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  soldOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -554,6 +583,7 @@ export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   price?: boolean
   category?: boolean
   active?: boolean
+  soldOut?: boolean
   sortOrder?: boolean
   schoolId?: boolean
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
@@ -565,6 +595,7 @@ export type MenuItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   price?: boolean
   category?: boolean
   active?: boolean
+  soldOut?: boolean
   sortOrder?: boolean
   schoolId?: boolean
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
@@ -576,6 +607,7 @@ export type MenuItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   price?: boolean
   category?: boolean
   active?: boolean
+  soldOut?: boolean
   sortOrder?: boolean
   schoolId?: boolean
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
@@ -587,11 +619,12 @@ export type MenuItemSelectScalar = {
   price?: boolean
   category?: boolean
   active?: boolean
+  soldOut?: boolean
   sortOrder?: boolean
   schoolId?: boolean
 }
 
-export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "active" | "sortOrder" | "schoolId", ExtArgs["result"]["menuItem"]>
+export type MenuItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "active" | "soldOut" | "sortOrder" | "schoolId", ExtArgs["result"]["menuItem"]>
 export type MenuItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
 }
@@ -613,6 +646,7 @@ export type $MenuItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     price: number
     category: string | null
     active: boolean
+    soldOut: boolean
     sortOrder: number
     schoolId: string
   }, ExtArgs["result"]["menuItem"]>
@@ -1044,6 +1078,7 @@ export interface MenuItemFieldRefs {
   readonly price: Prisma.FieldRef<"MenuItem", 'Int'>
   readonly category: Prisma.FieldRef<"MenuItem", 'String'>
   readonly active: Prisma.FieldRef<"MenuItem", 'Boolean'>
+  readonly soldOut: Prisma.FieldRef<"MenuItem", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"MenuItem", 'Int'>
   readonly schoolId: Prisma.FieldRef<"MenuItem", 'String'>
 }

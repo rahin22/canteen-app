@@ -186,7 +186,7 @@ export async function canActOnStudent(studentId: string): Promise<boolean> {
 export async function schoolMenu(schoolId: string | null) {
   if (!schoolId) return [];
   return prisma.menuItem.findMany({
-    where: { schoolId, active: true },
+    where: { schoolId, active: true, soldOut: false },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     select: { id: true, name: true, price: true, category: true },
   });

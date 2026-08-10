@@ -5,7 +5,9 @@ import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { onlineTopupsAvailable } from "@/lib/settings";
 import { getDailySpend } from "@/lib/ledger";
-import { orderHeadroom, pendingPreorders, preorderWindow } from "@/lib/preorders";
+import { orderHeadroom, upcomingPreorders } from "@/lib/preorders";
+import { orderingPlan } from "@/lib/pickup";
+import { schoolMenu } from "@/lib/schools";
 import { CashOnlyNotice } from "@/components/cash-only-notice";
 import { TopupForm } from "@/app/me/topup/topup-form";
 import { DailyLimitForm } from "./daily-limit-form";
@@ -33,21 +35,18 @@ export default async function ChildPage({
   });
   if (!child) notFound();
 
-  const [onlineTopups, daily, window, pending, headroom, menu] = await Promise.all([
+  const [onlineTopups, daily, plan, pending, headroom, menu] = await Promise.all([
     onlineTopupsAvailable(),
     getDailySpend(child.id),
-    preorderWindow(),
-    pendingPreorders(child.id),
+    orderingPlan(child.schoolId),
+    upcomingPreorders(child.id),
     orderHeadroom(child.id),
-    prisma.menuItem.findMany({
-      where: { active: true },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      select: { id: true, name: true, price: true, category: true },
-    }),
+    // The child's own school menu, minus anything sold out.
+    schoolMenu(child.schoolId),
   ]);
   // Hidden entirely when the school doesn't do preordering, rather than
   // teasing parents with a permanently closed panel.
-  const showPreorders = window.enabled || pending.length > 0;
+  const showPreorders = plan.open || pending.length > 0;
 
   return (
     <main className="mx-auto w-full max-w-lg flex-1 p-4">
@@ -71,10 +70,7 @@ export default async function ChildPage({
             menu={menu}
             pending={pending}
             spendable={headroom.spendable}
-            window={{
-              open: window.open,
-              label: window.open ? window.cutoffLabel : "",
-            }}
+            plan={plan}
           />
         </div>
       )}

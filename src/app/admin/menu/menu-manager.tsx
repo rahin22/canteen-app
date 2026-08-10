@@ -6,6 +6,7 @@ import {
   createMenuItem,
   updateMenuItem,
   setMenuItemActive,
+  setMenuItemSoldOut,
   type MenuActionState,
 } from "./actions";
 
@@ -15,6 +16,8 @@ type Item = {
   price: number;
   category: string | null;
   active: boolean;
+  /** Out of stock today — hidden from ordering, still on the menu. */
+  soldOut: boolean;
 };
 
 const inputCls =
@@ -145,6 +148,11 @@ function MenuRow({ item }: { item: Item }) {
           {!item.active && (
             <span className="ml-2 text-xs text-slate-400">(hidden from till)</span>
           )}
+          {item.active && item.soldOut && (
+            <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold text-amber-800">
+              Sold out
+            </span>
+          )}
         </p>
         <p className="text-sm text-slate-500">{formatMoney(item.price)}</p>
       </div>
@@ -155,6 +163,23 @@ function MenuRow({ item }: { item: Item }) {
         >
           Edit
         </button>
+        {item.active && (
+          <button
+            disabled={togglePending}
+            onClick={() =>
+              startTransition(async () => {
+                await setMenuItemSoldOut(item.id, !item.soldOut);
+              })
+            }
+            className={
+              item.soldOut
+                ? "rounded-lg border border-emerald-300 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+                : "rounded-lg border border-amber-300 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+            }
+          >
+            {item.soldOut ? "Back in stock" : "Sold out"}
+          </button>
+        )}
         <button
           disabled={togglePending}
           onClick={() =>

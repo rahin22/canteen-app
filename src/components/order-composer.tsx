@@ -12,6 +12,12 @@ export type ComposerMenuItem = {
 
 export type ComposerLine = { menuItemId: string; qty: number };
 
+export type ComposerSlot = {
+  id: string;
+  label: string;
+  timeLabel: string;
+};
+
 type CartLine = { menuItemId: string; name: string; price: number; qty: number };
 
 /**
@@ -30,6 +36,9 @@ export function OrderComposer({
   busy,
   error,
   size = "portal",
+  slots,
+  dayLabel,
+  forNextDay,
   onSubmit,
   onCancel,
 }: {
@@ -40,10 +49,18 @@ export function OrderComposer({
   busy?: boolean;
   error?: string | null;
   size?: "portal" | "kiosk";
-  onSubmit: (lines: ComposerLine[]) => void;
+  /** Collection windows still available for the day being ordered for. */
+  slots: ComposerSlot[];
+  dayLabel: string;
+  /** True when the cutoff has passed and this order is for the next day. */
+  forNextDay: boolean;
+  onSubmit: (lines: ComposerLine[], pickupSlotId: string) => void;
   onCancel?: () => void;
 }) {
   const [cart, setCart] = useState<CartLine[]>([]);
+  // Pre-selected when there's only one window left, so the common
+  // last-minute case is one tap fewer.
+  const [slotId, setSlotId] = useState(slots.length === 1 ? slots[0].id : "");
   const kiosk = size === "kiosk";
 
   const total = cart.reduce((sum, l) => sum + l.price * l.qty, 0);
@@ -80,6 +97,62 @@ export function OrderComposer({
 
   return (
     <div>
+      <div
+        className={`mb-4 rounded-2xl border-2 p-4 ${
+          forNextDay
+            ? "border-amber-300 bg-amber-50"
+            : "border-slate-200 bg-white"
+        }`}
+      >
+        <p
+          className={`font-bold ${
+            kiosk ? "text-xl" : "text-sm"
+          } ${forNextDay ? "text-amber-900" : "text-slate-900"}`}
+        >
+          {forNextDay ? `📅 For ${dayLabel}` : `Collecting today, ${dayLabel}`}
+        </p>
+        {forNextDay && (
+          <p className={`mt-0.5 text-amber-800 ${kiosk ? "text-lg" : "text-sm"}`}>
+            Today&apos;s orders have closed, so this one is for the next school
+            day.
+          </p>
+        )}
+        <p
+          className={`mb-2 mt-3 font-medium text-slate-600 ${
+            kiosk ? "text-lg" : "text-sm"
+          }`}
+        >
+          Pick-up time
+        </p>
+        <div className={`grid gap-2 ${kiosk ? "sm:grid-cols-2" : ""}`}>
+          {slots.map((slot) => (
+            <button
+              key={slot.id}
+              type="button"
+              onClick={() => setSlotId(slot.id)}
+              className={`rounded-xl border text-left transition ${
+                kiosk ? "p-4" : "p-3"
+              } ${
+                slotId === slot.id
+                  ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200"
+                  : "border-slate-200 bg-white hover:border-slate-300"
+              }`}
+            >
+              <p
+                className={`font-semibold text-slate-900 ${
+                  kiosk ? "text-lg" : "text-sm"
+                }`}
+              >
+                {slot.label}
+              </p>
+              <p className={`text-slate-500 ${kiosk ? "text-base" : "text-xs"}`}>
+                {slot.timeLabel}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {spendable !== null && (
         <p
           className={`mb-3 rounded-xl px-4 py-2.5 ${
@@ -212,6 +285,11 @@ export function OrderComposer({
           {error}
         </p>
       )}
+      {total > 0 && !slotId && (
+        <p className="mt-3 rounded-xl bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-600">
+          Choose a pick-up time above to finish.
+        </p>
+      )}
 
       <div className={`mt-4 flex gap-2 ${kiosk ? "pb-4" : "pb-8"}`}>
         {onCancel && (
@@ -227,8 +305,13 @@ export function OrderComposer({
         )}
         <button
           type="button"
-          onClick={() => onSubmit(cart.map((l) => ({ menuItemId: l.menuItemId, qty: l.qty })))}
-          disabled={busy || total <= 0 || overBudget}
+          onClick={() =>
+            onSubmit(
+              cart.map((l) => ({ menuItemId: l.menuItemId, qty: l.qty })),
+              slotId
+            )
+          }
+          disabled={busy || total <= 0 || overBudget || !slotId}
           className={`flex-1 rounded-2xl bg-indigo-600 font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-40 ${
             kiosk ? "py-6 text-2xl" : "py-3.5 text-lg"
           }`}

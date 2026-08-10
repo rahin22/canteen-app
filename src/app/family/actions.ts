@@ -125,7 +125,8 @@ export async function registerChild(
  */
 export async function parentPlaceOrder(
   childId: string,
-  lines: PreorderLine[]
+  lines: PreorderLine[],
+  pickupSlotId: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const session = await requireRole("PARENT");
   const child = await ownChild(session.uid, childId);
@@ -137,6 +138,7 @@ export async function parentPlaceOrder(
       placedById: session.uid,
       source: "PARENT",
       lines,
+      pickupSlotId,
     });
   } catch (err) {
     if (err instanceof PreorderError) return { ok: false, error: err.message };

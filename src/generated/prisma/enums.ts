@@ -75,7 +75,8 @@ export type PreorderStatus = (typeof PreorderStatus)[keyof typeof PreorderStatus
 
 export const PreorderSource = {
   KIOSK: 'KIOSK',
-  PARENT: 'PARENT'
+  PARENT: 'PARENT',
+  STAFF: 'STAFF'
 } as const
 
 export type PreorderSource = (typeof PreorderSource)[keyof typeof PreorderSource]
