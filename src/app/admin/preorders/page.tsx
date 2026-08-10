@@ -2,7 +2,7 @@ import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { formatClock, formatSchoolDay, startOfSchoolDay } from "@/lib/day";
-import { describeLines, readLines } from "@/lib/preorder-format";
+import { describeLinesDetailed, readLines } from "@/lib/preorder-format";
 import { preorderStatus } from "@/lib/preorders";
 import { nextSchoolDay } from "@/lib/pickup";
 import { currentSchoolName, studentSchoolFilter } from "@/lib/schools";
@@ -53,14 +53,19 @@ export default async function PreordersPage() {
   const pending = orders.filter((o) => o.status === "PENDING");
   const collected = orders.filter((o) => o.status === "COLLECTED");
 
-  // Tally across everything still to be made.
+  // Tally across everything still to be made, counting each *variant*
+  // separately — three combos are three different burgers as far as the
+  // kitchen is concerned, so collapsing them by base name would be useless.
   const tally = new Map<string, { qty: number; value: number }>();
   for (const order of pending) {
     for (const line of readLines(order.items)) {
-      const entry = tally.get(line.name) ?? { qty: 0, value: 0 };
+      const label = line.options?.length
+        ? `${line.name} (${line.options.map((o) => o.name).join(", ")})`
+        : line.name;
+      const entry = tally.get(label) ?? { qty: 0, value: 0 };
       entry.qty += line.qty;
       entry.value += line.price * line.qty;
-      tally.set(line.name, entry);
+      tally.set(label, entry);
     }
   }
   const tallied = [...tally.entries()].sort((a, b) => b[1].qty - a[1].qty);
@@ -135,7 +140,7 @@ export default async function PreordersPage() {
                     )}
                   </p>
                   <p className="text-sm text-slate-600">
-                    {describeLines(readLines(order.items))}
+                    {describeLinesDetailed(readLines(order.items))}
                   </p>
                   <p className="text-sm font-medium text-indigo-600">
                     {order.pickupSlot
@@ -197,7 +202,7 @@ export default async function PreordersPage() {
                     )}
                   </p>
                   <p className="text-sm text-slate-600">
-                    {describeLines(readLines(order.items))}
+                    {describeLinesDetailed(readLines(order.items))}
                   </p>
                   <p className="text-xs font-medium text-indigo-600">
                     {order.pickupSlot
@@ -239,7 +244,7 @@ export default async function PreordersPage() {
                     {order.student.name}
                   </p>
                   <p className="text-xs text-slate-400">
-                    {describeLines(readLines(order.items))}
+                    {describeLinesDetailed(readLines(order.items))}
                   </p>
                 </div>
                 <span className="text-sm text-slate-500">

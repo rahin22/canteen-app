@@ -19,7 +19,14 @@ export class DailyLimitError extends LedgerError {
   }
 }
 
-export type PurchaseLine = { name: string; price: number; qty: number };
+export type PurchaseLine = {
+  name: string;
+  /** Unit price including any chosen options. */
+  price: number;
+  qty: number;
+  /** Sauces, salad, drink and the like, as chosen at order time. */
+  options?: { groupName: string; name: string; price: number }[];
+};
 
 /** Largest cap a parent may set, so a typo can't become a $10,000 allowance. */
 export const MAX_DAILY_LIMIT = 20000;

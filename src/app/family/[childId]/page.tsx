@@ -7,7 +7,7 @@ import { onlineTopupsAvailable } from "@/lib/settings";
 import { getDailySpend } from "@/lib/ledger";
 import { orderHeadroom, upcomingPreorders } from "@/lib/preorders";
 import { orderingPlan } from "@/lib/pickup";
-import { schoolMenu } from "@/lib/schools";
+import { schoolMenuWithModifiers } from "@/lib/modifiers";
 import { CashOnlyNotice } from "@/components/cash-only-notice";
 import { TopupForm } from "@/app/me/topup/topup-form";
 import { DailyLimitForm } from "./daily-limit-form";
@@ -42,7 +42,7 @@ export default async function ChildPage({
     upcomingPreorders(child.id),
     orderHeadroom(child.id),
     // The child's own school menu, minus anything sold out.
-    schoolMenu(child.schoolId),
+    schoolMenuWithModifiers(child.schoolId),
   ]);
   // Hidden entirely when the school doesn't do preordering, rather than
   // teasing parents with a permanently closed panel.

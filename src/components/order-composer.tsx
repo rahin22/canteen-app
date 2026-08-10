@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { formatMoney } from "@/lib/money";
+import { ItemChoices } from "./item-choices";
+import type { ItemOffer } from "@/lib/modifiers";
 
-export type ComposerMenuItem = {
-  id: string;
-  name: string;
-  price: number;
-  category: string | null;
+export type ComposerMenuItem = ItemOffer;
+
+export type ComposerLine = {
+  menuItemId: string;
+  qty: number;
+  optionIds?: string[];
 };
-
-export type ComposerLine = { menuItemId: string; qty: number };
 
 export type ComposerSlot = {
   id: string;
@@ -18,7 +19,17 @@ export type ComposerSlot = {
   timeLabel: string;
 };
 
-type CartLine = { menuItemId: string; name: string; price: number; qty: number };
+type CartLine = {
+  /** Unique per distinct set of choices, so two differently-sauced rolls
+   *  stay separate lines rather than merging into a quantity. */
+  key: string;
+  menuItemId: string;
+  name: string;
+  price: number;
+  qty: number;
+  optionIds: string[];
+  optionLabel: string;
+};
 
 /**
  * Menu picker and running total, shared by the office kiosk and the parent
@@ -77,23 +88,65 @@ export function OrderComposer({
     return [...groups.entries()];
   }, [menu]);
 
-  const add = (item: ComposerMenuItem) =>
+  // Items with choices open the sheet first; plain ones go straight in.
+  const [choosing, setChoosing] = useState<ItemOffer | null>(null);
+
+  const addToCart = (
+    item: ComposerMenuItem,
+    optionIds: string[],
+    unitPrice: number
+  ) =>
     setCart((prev) => {
-      const existing = prev.find((l) => l.menuItemId === item.id);
+      const key = [item.id, ...[...optionIds].sort()].join("|");
+      const existing = prev.find((l) => l.key === key);
       if (existing) {
-        return prev.map((l) =>
-          l.menuItemId === item.id ? { ...l, qty: l.qty + 1 } : l
-        );
+        return prev.map((l) => (l.key === key ? { ...l, qty: l.qty + 1 } : l));
       }
-      return [...prev, { menuItemId: item.id, name: item.name, price: item.price, qty: 1 }];
+      const optionLabel = item.groups
+        .flatMap((g) => g.options.filter((o) => optionIds.includes(o.id)))
+        .map((o) => o.name)
+        .join(", ");
+      return [
+        ...prev,
+        {
+          key,
+          menuItemId: item.id,
+          name: item.name,
+          price: unitPrice,
+          qty: 1,
+          optionIds,
+          optionLabel,
+        },
+      ];
     });
 
-  const remove = (id: string) =>
+  const add = (item: ComposerMenuItem) => {
+    if (item.groups.length > 0) setChoosing(item);
+    else addToCart(item, [], item.price);
+  };
+
+  const remove = (key: string) =>
     setCart((prev) =>
       prev
-        .map((l) => (l.menuItemId === id ? { ...l, qty: l.qty - 1 } : l))
+        .map((l) => (l.key === key ? { ...l, qty: l.qty - 1 } : l))
         .filter((l) => l.qty > 0)
     );
+
+  // While choosing, the sheet takes over — a child part-way through building a
+  // combo shouldn't be able to wander off into the rest of the menu.
+  if (choosing) {
+    return (
+      <ItemChoices
+        item={choosing}
+        size={size}
+        onConfirm={(optionIds, unitPrice) => {
+          addToCart(choosing, optionIds, unitPrice);
+          setChoosing(null);
+        }}
+        onCancel={() => setChoosing(null)}
+      />
+    );
+  }
 
   return (
     <div>
@@ -185,6 +238,9 @@ export function OrderComposer({
           >
             {items.map((item) => {
               const inCart = cart.find((l) => l.menuItemId === item.id);
+              const qty = cart
+                .filter((l) => l.menuItemId === item.id)
+                .reduce((sum, l) => sum + l.qty, 0);
               return (
                 <button
                   key={item.id}
@@ -204,14 +260,29 @@ export function OrderComposer({
                     }`}
                   >
                     {item.name}
-                    {inCart && (
-                      <span className="ml-1.5 text-indigo-600">×{inCart.qty}</span>
+                    {qty > 0 && (
+                      <span className="ml-1.5 text-indigo-600">×{qty}</span>
                     )}
                   </p>
+                  {item.description && (
+                    <p
+                      className={`mt-0.5 leading-tight text-slate-500 ${
+                        kiosk ? "text-base" : "text-xs"
+                      }`}
+                    >
+                      {item.description}
+                    </p>
+                  )}
                   <p
                     className={`mt-1 text-slate-500 ${kiosk ? "text-lg" : "text-sm"}`}
                   >
                     {formatMoney(item.price)}
+                    {item.groups.length > 0 && (
+                      <span className={kiosk ? "text-base" : "text-xs"}>
+                        {" "}
+                        · choices
+                      </span>
+                    )}
                   </p>
                 </button>
               );
@@ -234,11 +305,20 @@ export function OrderComposer({
         >
           {cart.map((line) => (
             <div
-              key={line.menuItemId}
-              className="flex items-center justify-between py-1.5"
+              key={line.key}
+              className="flex items-start justify-between py-1.5"
             >
               <span className={`text-slate-700 ${kiosk ? "text-lg" : "text-sm"}`}>
                 {line.name} × {line.qty}
+                {line.optionLabel && (
+                  <span
+                    className={`block text-slate-500 ${
+                      kiosk ? "text-base" : "text-xs"
+                    }`}
+                  >
+                    {line.optionLabel}
+                  </span>
+                )}
               </span>
               <span className="flex items-center gap-3">
                 <span
@@ -248,7 +328,7 @@ export function OrderComposer({
                 </span>
                 <button
                   type="button"
-                  onClick={() => remove(line.menuItemId)}
+                  onClick={() => remove(line.key)}
                   aria-label={`Remove one ${line.name}`}
                   className={`flex items-center justify-center rounded-full bg-slate-100 text-slate-600 ${
                     kiosk ? "h-10 w-10 text-xl" : "h-7 w-7"
@@ -307,7 +387,11 @@ export function OrderComposer({
           type="button"
           onClick={() =>
             onSubmit(
-              cart.map((l) => ({ menuItemId: l.menuItemId, qty: l.qty })),
+              cart.map((l) => ({
+                menuItemId: l.menuItemId,
+                qty: l.qty,
+                optionIds: l.optionIds,
+              })),
               slotId
             )
           }

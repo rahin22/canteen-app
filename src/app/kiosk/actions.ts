@@ -2,7 +2,8 @@
 
 import { requireRole } from "@/lib/auth";
 import { resolveCardInput } from "@/lib/cards";
-import { canActOnSchool, canActOnStudent, schoolMenu } from "@/lib/schools";
+import { canActOnSchool, canActOnStudent } from "@/lib/schools";
+import { schoolMenuWithModifiers, type ItemOffer } from "@/lib/modifiers";
 import { orderingPlan, type OrderingPlan } from "@/lib/pickup";
 import {
   cancelPreorder,
@@ -40,7 +41,7 @@ export type KioskStudent = {
    * This student's own school menu. Sent with the lookup so one kiosk can sit
    * in either front office without being configured for a school.
    */
-  menu: { id: string; name: string; price: number; category: string | null }[];
+  menu: ItemOffer[];
   schoolName: string | null;
   /** Which day this student is ordering for, and the free windows. */
   plan: OrderingPlan;
@@ -74,7 +75,7 @@ async function loadStudent(studentId: string): Promise<KioskStudent> {
     spendable: headroom.spendable,
     dailyLimit: headroom.dailyLimit,
     pending,
-    menu: await schoolMenu(student.schoolId),
+    menu: await schoolMenuWithModifiers(student.schoolId),
     plan: await orderingPlan(student.schoolId),
     schoolName: student.school?.name ?? null,
   };

@@ -59,6 +59,8 @@ export const ModelName = {
   PickupSlot: 'PickupSlot',
   Setting: 'Setting',
   Card: 'Card',
+  ModifierGroup: 'ModifierGroup',
+  ModifierOption: 'ModifierOption',
   MenuItem: 'MenuItem',
   Transaction: 'Transaction',
   Preorder: 'Preorder'
@@ -192,11 +194,38 @@ export const CardScalarFieldEnum = {
 export type CardScalarFieldEnum = (typeof CardScalarFieldEnum)[keyof typeof CardScalarFieldEnum]
 
 
+export const ModifierGroupScalarFieldEnum = {
+  id: 'id',
+  schoolId: 'schoolId',
+  name: 'name',
+  minSelect: 'minSelect',
+  maxSelect: 'maxSelect',
+  sortOrder: 'sortOrder',
+  active: 'active',
+  createdAt: 'createdAt'
+} as const
+
+export type ModifierGroupScalarFieldEnum = (typeof ModifierGroupScalarFieldEnum)[keyof typeof ModifierGroupScalarFieldEnum]
+
+
+export const ModifierOptionScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  name: 'name',
+  price: 'price',
+  soldOut: 'soldOut',
+  sortOrder: 'sortOrder'
+} as const
+
+export type ModifierOptionScalarFieldEnum = (typeof ModifierOptionScalarFieldEnum)[keyof typeof ModifierOptionScalarFieldEnum]
+
+
 export const MenuItemScalarFieldEnum = {
   id: 'id',
   name: 'name',
   price: 'price',
   category: 'category',
+  description: 'description',
   active: 'active',
   soldOut: 'soldOut',
   sortOrder: 'sortOrder',

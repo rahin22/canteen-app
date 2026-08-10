@@ -3,6 +3,7 @@ import { formatClock, formatSchoolDay, startOfSchoolDay } from "./day";
 import { describeSlot, orderingPlan } from "./pickup";
 import { formatMoney } from "./money";
 import { readLines } from "./preorder-format";
+import { ModifierError, priceLinesWithModifiers } from "./modifiers";
 import { preorderCutoff, preordersOpen } from "./settings";
 import {
   chargeStudent,
@@ -34,7 +35,12 @@ export const MAX_PENDING_PER_DAY = 3;
 const MAX_LINES = 20;
 const MAX_QTY_PER_LINE = 10;
 
-export type PreorderLine = { menuItemId: string; qty: number };
+export type PreorderLine = {
+  menuItemId: string;
+  qty: number;
+  /** Chosen sauces, salad, drink — validated and priced server-side. */
+  optionIds?: string[];
+};
 
 /** Orders a student still has coming, today or on a later service day. */
 export async function upcomingPreorders(
@@ -127,45 +133,6 @@ function toSummary(row: {
 }
 
 /**
- * Prices an order from the live menu. Never trusts client-supplied prices —
- * the kiosk in particular is a device children can poke at all day.
- */
-async function priceLines(
-  lines: PreorderLine[],
-  schoolId: string
-): Promise<{
-  priced: PurchaseLine[];
-  total: number;
-}> {
-  if (lines.length === 0) throw new PreorderError("Nothing chosen yet.");
-  if (lines.length > MAX_LINES) throw new PreorderError("That's too many items for one order.");
-
-  const ids = lines.map((l) => l.menuItemId);
-  // Scoped to the student's own school, so neither the kiosk nor a crafted
-  // request can order from the other school's menu.
-  const menuItems = await prisma.menuItem.findMany({
-    where: { id: { in: ids }, active: true, soldOut: false, schoolId },
-  });
-  if (menuItems.length !== new Set(ids).size) {
-    throw new PreorderError("The menu changed — please choose again.");
-  }
-
-  const priced: PurchaseLine[] = [];
-  let total = 0;
-  for (const line of lines) {
-    const item = menuItems.find((m) => m.id === line.menuItemId)!;
-    const qty = Math.floor(line.qty);
-    if (!Number.isFinite(qty) || qty < 1 || qty > MAX_QTY_PER_LINE) {
-      throw new PreorderError("Invalid quantity.");
-    }
-    priced.push({ name: item.name, price: item.price, qty });
-    total += item.price * qty;
-  }
-  if (total <= 0) throw new PreorderError("Nothing chosen yet.");
-  return { priced, total };
-}
-
-/**
  * What a student can spend right now.
  *
  * Orders are paid for as they're placed, so the balance and the day's spend
@@ -244,7 +211,20 @@ export async function placePreorder(opts: {
     );
   }
 
-  const { priced, total } = await priceLines(lines, student.schoolId);
+  // Modifier problems ("choose a drink", "that sauce just sold out") are
+  // ordinary user-facing messages, so they surface as PreorderError like
+  // everything else the caller already knows how to display.
+  let priced: PurchaseLine[];
+  let total: number;
+  try {
+    ({ priced, total } = await priceLinesWithModifiers(lines, student.schoolId, {
+      maxLines: MAX_LINES,
+      maxQtyPerLine: MAX_QTY_PER_LINE,
+    }));
+  } catch (err) {
+    if (err instanceof ModifierError) throw new PreorderError(err.message);
+    throw err;
+  }
 
   const existing = await prisma.preorder.count({
     where: { studentId, status: "PENDING", serviceDate: plan.serviceDate },

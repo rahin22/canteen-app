@@ -203,6 +203,7 @@ model School {
   menuItems     MenuItem[]
   registrations ChildRegistration[]
   pickupSlots   PickupSlot[]
+  modifierGroups ModifierGroup[]
   createdAt     DateTime            @default(now())
 }
 
@@ -249,11 +250,55 @@ model Card {
   @@index([userId])
 }
 
+/**
+ * A set of choices attached to a menu item — sauces, salad, the drink in a
+ * combo, or which meal a combo is built around.
+ *
+ * Deliberately generic rather than hardcoding "sauces": the canteen edits
+ * these themselves as the menu changes, and one shape covers free multi-picks
+ * (salad), a required single pick (combo drink) and priced extras alike.
+ * `minSelect`/`maxSelect` express the rule; `price` on each option covers
+ * whether a choice costs anything.
+ */
+model ModifierGroup {
+  id        String           @id @default(cuid())
+  school    School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  String
+  name      String
+  /** 0 makes the whole group optional; 1+ forces a choice. */
+  minSelect Int              @default(0)
+  /** How many options may be picked at once. */
+  maxSelect Int              @default(1)
+  sortOrder Int              @default(0)
+  active    Boolean          @default(true)
+  options   ModifierOption[]
+  items     MenuItem[]       @relation("MenuItemModifiers")
+  createdAt DateTime         @default(now())
+
+  @@index([schoolId, active])
+}
+
+model ModifierOption {
+  id        String        @id @default(cuid())
+  group     ModifierGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String
+  name      String
+  /** Extra cost in cents. Zero for the usual free sauce or salad choice. */
+  price     Int           @default(0)
+  soldOut   Boolean       @default(false)
+  sortOrder Int           @default(0)
+
+  @@index([groupId])
+}
+
 model MenuItem {
   id        String  @id @default(cuid())
   name      String
   price     Int
   category  String?
+  /** Shown under the name when ordering, e.g. "Includes chips". */
+  description String?
+  modifierGroups ModifierGroup[] @relation("MenuItemModifiers")
   active    Boolean @default(true)
   // Temporarily unavailable — the kitchen ran out. Distinct from `active`,
   // which means "not on the menu at all": sold-out is an everyday switch the

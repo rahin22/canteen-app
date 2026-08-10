@@ -280,6 +280,37 @@ Which day an order lands on is decided server-side at submission, never trusted
 from the page, which may have been open since before the cutoff. A window that
 is no longer on offer is rejected with a message rather than silently accepted.
 
+### Choices, sauces and combos
+
+Menu items can carry **choice groups** — sauces, salad, a combo's meal and
+drink. Managed under **Admin → Menu → Choices & combos**, per school.
+
+A group is just a name plus two numbers:
+
+- `min 0, max 3` — optional, pick up to three (sauces, salad)
+- `min 1, max 1` — must pick exactly one (which meal, which drink)
+
+Each choice can carry an extra price; leave it blank and it's free, which is
+the usual case. There's no hardcoded notion of "sauce" anywhere — the rules
+live in the data, so the canteen adds and retimes them without a deploy.
+
+Groups are **reusable**: one *Sauces* group attached to every roll and burger
+means adding a sauce adds it everywhere at once. Items also have an optional
+description for lines like *"Includes chips"*.
+
+A combo is therefore an ordinary item with three groups attached: *Choose your
+meal* (1 of 6), *Sauces* (up to 2), *Drink* (1 of 3).
+
+Every rule is enforced when the order is priced, not just in the UI, so a
+stale page or a crafted request can't produce a combo with no drink or two
+mains. Options are checked to belong to a group actually attached to that item.
+Sold-out choices vanish from the menu and are refused if submitted, exactly
+like sold-out items.
+
+The kitchen list shows each order in full — *"Combo ×1 (Beef Burger, Garlic,
+Slushy)"* — and the prep tally counts **variants separately**, since three
+combos are three different burgers as far as the person cooking is concerned.
+
 ### Sold out
 
 **Admin → Menu** has a *Sold out* toggle per item. It drops the item from the

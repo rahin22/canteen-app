@@ -20,8 +20,22 @@ export function readLines(items: unknown): PurchaseLine[] {
   );
 }
 
-/** e.g. "Chicken roll ×2, Juice". */
+/** e.g. "Chicken roll ×2, Juice" — names only, for tight spaces. */
 export function describeLines(items: PurchaseLine[]): string {
   const parts = items.map((l) => (l.qty > 1 ? `${l.name} ×${l.qty}` : l.name));
+  return parts.length ? parts.join(", ") : "Order";
+}
+
+/**
+ * The full order including chosen options, for anyone who has to *make* it —
+ * "Combo ×1 (Beef Burger, Garlic, Slushy)". Names only, no prices: the kitchen
+ * is reading this to assemble food, not to check the maths.
+ */
+export function describeLinesDetailed(items: PurchaseLine[]): string {
+  const parts = items.map((line) => {
+    const base = line.qty > 1 ? `${line.name} ×${line.qty}` : line.name;
+    if (!line.options?.length) return base;
+    return `${base} (${line.options.map((o) => o.name).join(", ")})`;
+  });
   return parts.length ? parts.join(", ") : "Order";
 }

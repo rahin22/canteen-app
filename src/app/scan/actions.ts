@@ -10,8 +10,14 @@ import {
   type PurchaseLine,
 } from "@/lib/ledger";
 import { resolveCardInput } from "@/lib/cards";
-import { canActOnSchool, canActOnStudent, schoolMenu } from "@/lib/schools";
+import { canActOnSchool, canActOnStudent } from "@/lib/schools";
 import { orderingPlan, type OrderingPlan } from "@/lib/pickup";
+import {
+  ModifierError,
+  priceLinesWithModifiers,
+  schoolMenuWithModifiers,
+  type ItemOffer,
+} from "@/lib/modifiers";
 import {
   handOverPreorder,
   pendingPreorders,
@@ -55,7 +61,7 @@ export type ScanStudent = {
    * the page so one till can serve either school — the menu follows whoever
    * presents a card, and nobody has to configure the device.
    */
-  menu: MenuItem[];
+  menu: ItemOffer[];
   schoolName: string | null;
   /** Where a staff-placed preorder would land, and which windows are free. */
   plan: OrderingPlan;
@@ -104,7 +110,7 @@ export async function lookupCard(rawInput: string): Promise<LookupResult> {
       },
     }),
     pendingPreorders(studentId),
-    schoolMenu(user.schoolId),
+    schoolMenuWithModifiers(user.schoolId),
     orderingPlan(user.schoolId),
     user.schoolId
       ? prisma.school.findUnique({
@@ -232,7 +238,7 @@ export async function tillPreorder(
 
 export type ChargeInput = {
   studentId: string;
-  lines: { menuItemId: string; qty: number }[];
+  lines: PreorderLine[];
   customAmount?: number; // cents
 };
 
@@ -261,29 +267,22 @@ export async function charge(input: ChargeInput): Promise<ChargeResult> {
     };
   }
 
-  const ids = input.lines.map((l) => l.menuItemId);
-  const menuItems = ids.length
-    ? await prisma.menuItem.findMany({
-        where: {
-          id: { in: ids },
-          active: true,
-          soldOut: false,
-          schoolId: student.schoolId!,
-        },
-      })
-    : [];
-  if (menuItems.length !== new Set(ids).size) {
-    return { ok: false, error: "Menu changed — please rebuild the order." };
-  }
-
+  // Shares the preorder pricing path, so a sale over the counter and one
+  // ordered ahead validate and cost exactly the same.
   const lines: PurchaseLine[] = [];
   let total = 0;
-  for (const l of input.lines) {
-    const item = menuItems.find((m) => m.id === l.menuItemId)!;
-    const qty = Math.floor(l.qty);
-    if (qty < 1 || qty > 50) return { ok: false, error: "Invalid quantity." };
-    lines.push({ name: item.name, price: item.price, qty });
-    total += item.price * qty;
+  if (input.lines.length > 0) {
+    try {
+      const result = await priceLinesWithModifiers(input.lines, student.schoolId!, {
+        maxLines: 50,
+        maxQtyPerLine: 50,
+      });
+      lines.push(...result.priced);
+      total += result.total;
+    } catch (err) {
+      if (err instanceof ModifierError) return { ok: false, error: err.message };
+      throw err;
+    }
   }
   if (input.customAmount) {
     const c = Math.floor(input.customAmount);

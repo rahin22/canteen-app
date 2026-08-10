@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { allSchools, currentSchoolId, currentSchoolName } from "@/lib/schools";
 import { MenuManager } from "./menu-manager";
+import { ModifiersManager } from "./modifiers-manager";
 import { PickSchool } from "./pick-school";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +31,21 @@ export default async function MenuPage() {
     );
   }
 
-  const items = await prisma.menuItem.findMany({
-    where: { schoolId },
-    orderBy: [{ active: "desc" }, { category: "asc" }, { name: "asc" }],
-  });
+  const [items, groups] = await Promise.all([
+    prisma.menuItem.findMany({
+      where: { schoolId },
+      orderBy: [{ active: "desc" }, { category: "asc" }, { name: "asc" }],
+      include: { modifierGroups: { select: { id: true } } },
+    }),
+    prisma.modifierGroup.findMany({
+      where: { schoolId },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        options: { orderBy: [{ sortOrder: "asc" }, { name: "asc" }] },
+        items: { select: { id: true } },
+      },
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -53,6 +65,33 @@ export default async function MenuPage() {
           category: i.category,
           active: i.active,
           soldOut: i.soldOut,
+        }))}
+      />
+
+      <h2 className="mb-1 mt-10 text-lg font-semibold text-slate-900">
+        Choices &amp; combos
+      </h2>
+      <p className="mb-4 text-sm text-slate-500">
+        Sauces, salad, drinks and the meals inside a combo. Build a group once
+        and attach it to as many items as you like — adding a sauce then adds it
+        everywhere at once.
+      </p>
+      <ModifiersManager
+        schoolId={schoolId}
+        items={items.map((i) => ({ id: i.id, name: i.name }))}
+        groups={groups.map((g) => ({
+          id: g.id,
+          name: g.name,
+          minSelect: g.minSelect,
+          maxSelect: g.maxSelect,
+          active: g.active,
+          options: g.options.map((o) => ({
+            id: o.id,
+            name: o.name,
+            price: o.price,
+            soldOut: o.soldOut,
+          })),
+          itemIds: g.items.map((i) => i.id),
         }))}
       />
     </div>

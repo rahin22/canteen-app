@@ -109,6 +109,24 @@ export type Setting = Prisma.SettingModel
  */
 export type Card = Prisma.CardModel
 /**
+ * Model ModifierGroup
+ * *
+ *  * A set of choices attached to a menu item — sauces, salad, the drink in a
+ *  * combo, or which meal a combo is built around.
+ *  *
+ *  * Deliberately generic rather than hardcoding "sauces": the canteen edits
+ *  * these themselves as the menu changes, and one shape covers free multi-picks
+ *  * (salad), a required single pick (combo drink) and priced extras alike.
+ *  * `minSelect`/`maxSelect` express the rule; `price` on each option covers
+ *  * whether a choice costs anything.
+ */
+export type ModifierGroup = Prisma.ModifierGroupModel
+/**
+ * Model ModifierOption
+ * 
+ */
+export type ModifierOption = Prisma.ModifierOptionModel
+/**
  * Model MenuItem
  * 
  */

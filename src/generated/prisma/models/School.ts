@@ -226,6 +226,7 @@ export type SchoolWhereInput = {
   menuItems?: Prisma.MenuItemListRelationFilter
   registrations?: Prisma.ChildRegistrationListRelationFilter
   pickupSlots?: Prisma.PickupSlotListRelationFilter
+  modifierGroups?: Prisma.ModifierGroupListRelationFilter
 }
 
 export type SchoolOrderByWithRelationInput = {
@@ -238,6 +239,7 @@ export type SchoolOrderByWithRelationInput = {
   menuItems?: Prisma.MenuItemOrderByRelationAggregateInput
   registrations?: Prisma.ChildRegistrationOrderByRelationAggregateInput
   pickupSlots?: Prisma.PickupSlotOrderByRelationAggregateInput
+  modifierGroups?: Prisma.ModifierGroupOrderByRelationAggregateInput
 }
 
 export type SchoolWhereUniqueInput = Prisma.AtLeast<{
@@ -253,6 +255,7 @@ export type SchoolWhereUniqueInput = Prisma.AtLeast<{
   menuItems?: Prisma.MenuItemListRelationFilter
   registrations?: Prisma.ChildRegistrationListRelationFilter
   pickupSlots?: Prisma.PickupSlotListRelationFilter
+  modifierGroups?: Prisma.ModifierGroupListRelationFilter
 }, "id">
 
 export type SchoolOrderByWithAggregationInput = {
@@ -289,6 +292,7 @@ export type SchoolCreateInput = {
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateInput = {
@@ -301,6 +305,7 @@ export type SchoolUncheckedCreateInput = {
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUpdateInput = {
@@ -313,6 +318,7 @@ export type SchoolUpdateInput = {
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateInput = {
@@ -325,6 +331,7 @@ export type SchoolUncheckedUpdateInput = {
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateManyInput = {
@@ -439,6 +446,20 @@ export type SchoolUpdateOneRequiredWithoutPickupSlotsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutPickupSlotsInput, Prisma.SchoolUpdateWithoutPickupSlotsInput>, Prisma.SchoolUncheckedUpdateWithoutPickupSlotsInput>
 }
 
+export type SchoolCreateNestedOneWithoutModifierGroupsInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutModifierGroupsInput, Prisma.SchoolUncheckedCreateWithoutModifierGroupsInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutModifierGroupsInput
+  connect?: Prisma.SchoolWhereUniqueInput
+}
+
+export type SchoolUpdateOneRequiredWithoutModifierGroupsNestedInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutModifierGroupsInput, Prisma.SchoolUncheckedCreateWithoutModifierGroupsInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutModifierGroupsInput
+  upsert?: Prisma.SchoolUpsertWithoutModifierGroupsInput
+  connect?: Prisma.SchoolWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutModifierGroupsInput, Prisma.SchoolUpdateWithoutModifierGroupsInput>, Prisma.SchoolUncheckedUpdateWithoutModifierGroupsInput>
+}
+
 export type SchoolCreateNestedOneWithoutMenuItemsInput = {
   create?: Prisma.XOR<Prisma.SchoolCreateWithoutMenuItemsInput, Prisma.SchoolUncheckedCreateWithoutMenuItemsInput>
   connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutMenuItemsInput
@@ -462,6 +483,7 @@ export type SchoolCreateWithoutUsersInput = {
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutUsersInput = {
@@ -473,6 +495,7 @@ export type SchoolUncheckedCreateWithoutUsersInput = {
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutUsersInput = {
@@ -500,6 +523,7 @@ export type SchoolUpdateWithoutUsersInput = {
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutUsersInput = {
@@ -511,6 +535,7 @@ export type SchoolUncheckedUpdateWithoutUsersInput = {
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutRegistrationsInput = {
@@ -522,6 +547,7 @@ export type SchoolCreateWithoutRegistrationsInput = {
   users?: Prisma.UserCreateNestedManyWithoutSchoolInput
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutRegistrationsInput = {
@@ -533,6 +559,7 @@ export type SchoolUncheckedCreateWithoutRegistrationsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutRegistrationsInput = {
@@ -560,6 +587,7 @@ export type SchoolUpdateWithoutRegistrationsInput = {
   users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutRegistrationsInput = {
@@ -571,6 +599,7 @@ export type SchoolUncheckedUpdateWithoutRegistrationsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutPickupSlotsInput = {
@@ -582,6 +611,7 @@ export type SchoolCreateWithoutPickupSlotsInput = {
   users?: Prisma.UserCreateNestedManyWithoutSchoolInput
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutPickupSlotsInput = {
@@ -593,6 +623,7 @@ export type SchoolUncheckedCreateWithoutPickupSlotsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutPickupSlotsInput = {
@@ -620,6 +651,7 @@ export type SchoolUpdateWithoutPickupSlotsInput = {
   users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutPickupSlotsInput = {
@@ -631,6 +663,71 @@ export type SchoolUncheckedUpdateWithoutPickupSlotsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolCreateWithoutModifierGroupsInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolUncheckedCreateWithoutModifierGroupsInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolCreateOrConnectWithoutModifierGroupsInput = {
+  where: Prisma.SchoolWhereUniqueInput
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutModifierGroupsInput, Prisma.SchoolUncheckedCreateWithoutModifierGroupsInput>
+}
+
+export type SchoolUpsertWithoutModifierGroupsInput = {
+  update: Prisma.XOR<Prisma.SchoolUpdateWithoutModifierGroupsInput, Prisma.SchoolUncheckedUpdateWithoutModifierGroupsInput>
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutModifierGroupsInput, Prisma.SchoolUncheckedCreateWithoutModifierGroupsInput>
+  where?: Prisma.SchoolWhereInput
+}
+
+export type SchoolUpdateToOneWithWhereWithoutModifierGroupsInput = {
+  where?: Prisma.SchoolWhereInput
+  data: Prisma.XOR<Prisma.SchoolUpdateWithoutModifierGroupsInput, Prisma.SchoolUncheckedUpdateWithoutModifierGroupsInput>
+}
+
+export type SchoolUpdateWithoutModifierGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolUncheckedUpdateWithoutModifierGroupsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutMenuItemsInput = {
@@ -642,6 +739,7 @@ export type SchoolCreateWithoutMenuItemsInput = {
   users?: Prisma.UserCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutMenuItemsInput = {
@@ -653,6 +751,7 @@ export type SchoolUncheckedCreateWithoutMenuItemsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutMenuItemsInput = {
@@ -680,6 +779,7 @@ export type SchoolUpdateWithoutMenuItemsInput = {
   users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutMenuItemsInput = {
@@ -691,6 +791,7 @@ export type SchoolUncheckedUpdateWithoutMenuItemsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 
@@ -703,6 +804,7 @@ export type SchoolCountOutputType = {
   menuItems: number
   registrations: number
   pickupSlots: number
+  modifierGroups: number
 }
 
 export type SchoolCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -710,6 +812,7 @@ export type SchoolCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   menuItems?: boolean | SchoolCountOutputTypeCountMenuItemsArgs
   registrations?: boolean | SchoolCountOutputTypeCountRegistrationsArgs
   pickupSlots?: boolean | SchoolCountOutputTypeCountPickupSlotsArgs
+  modifierGroups?: boolean | SchoolCountOutputTypeCountModifierGroupsArgs
 }
 
 /**
@@ -750,6 +853,13 @@ export type SchoolCountOutputTypeCountPickupSlotsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PickupSlotWhereInput
 }
 
+/**
+ * SchoolCountOutputType without action
+ */
+export type SchoolCountOutputTypeCountModifierGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModifierGroupWhereInput
+}
+
 
 export type SchoolSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -761,6 +871,7 @@ export type SchoolSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   menuItems?: boolean | Prisma.School$menuItemsArgs<ExtArgs>
   registrations?: boolean | Prisma.School$registrationsArgs<ExtArgs>
   pickupSlots?: boolean | Prisma.School$pickupSlotsArgs<ExtArgs>
+  modifierGroups?: boolean | Prisma.School$modifierGroupsArgs<ExtArgs>
   _count?: boolean | Prisma.SchoolCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["school"]>
 
@@ -794,6 +905,7 @@ export type SchoolInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   menuItems?: boolean | Prisma.School$menuItemsArgs<ExtArgs>
   registrations?: boolean | Prisma.School$registrationsArgs<ExtArgs>
   pickupSlots?: boolean | Prisma.School$pickupSlotsArgs<ExtArgs>
+  modifierGroups?: boolean | Prisma.School$modifierGroupsArgs<ExtArgs>
   _count?: boolean | Prisma.SchoolCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SchoolIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -806,6 +918,7 @@ export type $SchoolPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     menuItems: Prisma.$MenuItemPayload<ExtArgs>[]
     registrations: Prisma.$ChildRegistrationPayload<ExtArgs>[]
     pickupSlots: Prisma.$PickupSlotPayload<ExtArgs>[]
+    modifierGroups: Prisma.$ModifierGroupPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1211,6 +1324,7 @@ export interface Prisma__SchoolClient<T, Null = never, ExtArgs extends runtime.T
   menuItems<T extends Prisma.School$menuItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$menuItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   registrations<T extends Prisma.School$registrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChildRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pickupSlots<T extends Prisma.School$pickupSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$pickupSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PickupSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  modifierGroups<T extends Prisma.School$modifierGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$modifierGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModifierGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1731,6 +1845,30 @@ export type School$pickupSlotsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.PickupSlotScalarFieldEnum | Prisma.PickupSlotScalarFieldEnum[]
+}
+
+/**
+ * School.modifierGroups
+ */
+export type School$modifierGroupsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModifierGroup
+   */
+  select?: Prisma.ModifierGroupSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModifierGroup
+   */
+  omit?: Prisma.ModifierGroupOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModifierGroupInclude<ExtArgs> | null
+  where?: Prisma.ModifierGroupWhereInput
+  orderBy?: Prisma.ModifierGroupOrderByWithRelationInput | Prisma.ModifierGroupOrderByWithRelationInput[]
+  cursor?: Prisma.ModifierGroupWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModifierGroupScalarFieldEnum | Prisma.ModifierGroupScalarFieldEnum[]
 }
 
 /**
