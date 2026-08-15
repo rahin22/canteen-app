@@ -2,19 +2,71 @@ import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/money";
 import { formatClock, formatSchoolDay, startOfSchoolDay } from "@/lib/day";
-import { describeLinesDetailed, readLines } from "@/lib/preorder-format";
+import { describeLinesDetailed, orderLabel, readLines } from "@/lib/preorder-format";
 import { preorderStatus } from "@/lib/preorders";
 import { nextSchoolDay } from "@/lib/pickup";
 import { currentSchoolName, studentSchoolFilter } from "@/lib/schools";
 import { CancelOrderButton } from "./cancel-button";
+import { OrdersBoard, type BoardOrder } from "./orders-board";
 
 export const dynamic = "force-dynamic";
 
+const orderInclude = {
+  student: {
+    select: { name: true, className: true, school: { select: { name: true } } },
+  },
+  placedBy: { select: { name: true } },
+  pickupSlot: true,
+} as const;
+
+type OrderRow = {
+  id: string;
+  orderNumber: number | null;
+  items: unknown;
+  total: number;
+  notes: string | null;
+  status: BoardOrder["status"];
+  source: BoardOrder["source"];
+  student: {
+    name: string;
+    className: string | null;
+    school: { name: string } | null;
+  };
+  placedBy: { name: string } | null;
+  pickupSlot: { id: string; label: string; startTime: string; endTime: string } | null;
+};
+
+/** Flattens a database row into what the board renders. */
+function toBoardOrder(order: OrderRow): BoardOrder {
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    studentName: order.student.name,
+    className: order.student.className,
+    schoolName: order.student.school?.name ?? null,
+    slotId: order.pickupSlot?.id ?? null,
+    slotLabel: order.pickupSlot?.label ?? null,
+    slotStart: order.pickupSlot?.startTime ?? null,
+    slotTimes: order.pickupSlot
+      ? `${formatClock(order.pickupSlot.startTime)} – ${formatClock(
+          order.pickupSlot.endTime
+        )}`
+      : null,
+    lines: readLines(order.items),
+    total: order.total,
+    notes: order.notes,
+    status: order.status,
+    source: order.source,
+    placedByName: order.placedBy?.name ?? null,
+  };
+}
+
 /**
- * What the kitchen cooks this morning.
+ * What the kitchen cooks today, and who each plate belongs to.
  *
- * Leads with a tally per menu item — that's the number someone actually works
- * from — then lists the individual orders for packing and handing over.
+ * The day's orders go to the board as one list; sorting by pickup time, order
+ * number or class happens there, in the browser, so staff can re-cut the list
+ * mid-service without waiting on the server.
  */
 export default async function PreordersPage() {
   await requireRole("ADMIN", "OPERATOR");
@@ -27,49 +79,23 @@ export default async function PreordersPage() {
     currentSchoolName(),
   ]);
   const tomorrow = nextSchoolDay(today);
-  const orderInclude = {
-    student: {
-      select: { name: true, className: true, school: { select: { name: true } } },
-    },
-    placedBy: { select: { name: true } },
-    pickupSlot: true,
-  };
   const [orders, tomorrowOrders, status] = await Promise.all([
     prisma.preorder.findMany({
-      where: { serviceDate: today, ...scope },
-      orderBy: [{ status: "asc" }, { createdAt: "asc" }],
+      where: { serviceDate: today, status: { not: "CANCELLED" }, ...scope },
+      orderBy: [{ orderNumber: "asc" }, { createdAt: "asc" }],
       include: orderInclude,
     }),
     // Orders placed after the cutoff land on the next day, so the kitchen
     // needs to see what's already booked in for tomorrow.
     prisma.preorder.findMany({
       where: { serviceDate: tomorrow, status: "PENDING", ...scope },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ orderNumber: "asc" }, { createdAt: "asc" }],
       include: orderInclude,
     }),
     preorderStatus(),
   ]);
 
-  const pending = orders.filter((o) => o.status === "PENDING");
-  const collected = orders.filter((o) => o.status === "COLLECTED");
-
-  // Tally across everything still to be made, counting each *variant*
-  // separately — three combos are three different burgers as far as the
-  // kitchen is concerned, so collapsing them by base name would be useless.
-  const tally = new Map<string, { qty: number; value: number }>();
-  for (const order of pending) {
-    for (const line of readLines(order.items)) {
-      const label = line.options?.length
-        ? `${line.name} (${line.options.map((o) => o.name).join(", ")})`
-        : line.name;
-      const entry = tally.get(label) ?? { qty: 0, value: 0 };
-      entry.qty += line.qty;
-      entry.value += line.price * line.qty;
-      tally.set(label, entry);
-    }
-  }
-  const tallied = [...tally.entries()].sort((a, b) => b[1].qty - a[1].qty);
-  const pendingValue = pending.reduce((sum, o) => sum + o.total, 0);
+  const board = orders.map(toBoardOrder);
 
   return (
     <div>
@@ -86,105 +112,16 @@ export default async function PreordersPage() {
           : "Preordering is switched off — turn it on in Settings."}
       </p>
 
-      {pending.length === 0 ? (
-        <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
-          Nothing waiting to be made.
-          {collected.length > 0 &&
-            ` All ${collected.length} of today's orders have been collected.`}
-        </p>
-      ) : (
-        <>
-          <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="font-semibold text-slate-900">Prep list</h2>
-              <p className="text-sm text-slate-500">
-                {pending.length} order{pending.length === 1 ? "" : "s"} ·{" "}
-                {formatMoney(pendingValue)}
-              </p>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {tallied.map(([name, entry]) => (
-                <div
-                  key={name}
-                  className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-2.5"
-                >
-                  <span className="font-medium text-slate-800">{name}</span>
-                  <span className="text-lg font-bold text-slate-900">
-                    ×{entry.qty}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <h2 className="mb-2 font-semibold text-slate-900">
-            Waiting to be collected
-          </h2>
-          <p className="mb-2 text-sm text-slate-500">
-            All paid for already — the till just records the hand-over.
-            Cancelling refunds the card.
-          </p>
-          <div className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            {pending.map((order) => (
-              <div
-                key={order.id}
-                className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 last:border-0"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-slate-900">
-                    {order.student.name}
-                    {order.student.className && (
-                      <span className="ml-2 text-sm font-normal text-slate-400">
-                        {order.student.className}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    {describeLinesDetailed(readLines(order.items))}
-                  </p>
-                  <p className="text-sm font-medium text-indigo-600">
-                    {order.pickupSlot
-                      ? `${order.pickupSlot.label} · ${formatClock(
-                          order.pickupSlot.startTime
-                        )}`
-                      : "No pickup time"}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {[
-                      !schoolName ? order.student.school?.name : null,
-                      order.source === "KIOSK"
-                        ? "Office kiosk"
-                        : order.source === "STAFF"
-                        ? `Taken by ${order.placedBy?.name ?? "staff"}`
-                        : `Ordered by ${order.placedBy?.name ?? "a parent"}`,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  <span className="font-semibold text-slate-900">
-                    {formatMoney(order.total)}
-                  </span>
-                  <CancelOrderButton
-                    preorderId={order.id}
-                    studentName={order.student.name}
-                    total={formatMoney(order.total)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      <OrdersBoard orders={board} showSchool={!schoolName} />
 
       {tomorrowOrders.length > 0 && (
-        <div className="mb-8 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+        <div className="mt-8 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
           <h2 className="font-semibold text-amber-900">
             Booked in for {formatSchoolDay(tomorrow)} ({tomorrowOrders.length})
           </h2>
           <p className="mb-3 mt-0.5 text-sm text-amber-800">
-            Already paid for. Prep these with tomorrow&apos;s service.
+            Already paid for. Prep these with tomorrow&apos;s service — they get
+            their own numbers on the day.
           </p>
           <div className="space-y-1.5">
             {tomorrowOrders.map((order) => (
@@ -194,6 +131,9 @@ export default async function PreordersPage() {
               >
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-slate-900">
+                    <span className="mr-2 font-bold text-indigo-700">
+                      {orderLabel(order.orderNumber)}
+                    </span>
                     {order.student.name}
                     {order.student.className && (
                       <span className="ml-2 text-xs font-normal text-slate-400">
@@ -204,6 +144,11 @@ export default async function PreordersPage() {
                   <p className="text-sm text-slate-600">
                     {describeLinesDetailed(readLines(order.items))}
                   </p>
+                  {order.notes && (
+                    <p className="text-sm font-medium text-amber-800">
+                      Note: {order.notes}
+                    </p>
+                  )}
                   <p className="text-xs font-medium text-indigo-600">
                     {order.pickupSlot
                       ? `${order.pickupSlot.label} · ${formatClock(
@@ -219,6 +164,7 @@ export default async function PreordersPage() {
                   <CancelOrderButton
                     preorderId={order.id}
                     studentName={order.student.name}
+                    orderLabel={orderLabel(order.orderNumber)}
                     total={formatMoney(order.total)}
                   />
                 </div>
@@ -226,34 +172,6 @@ export default async function PreordersPage() {
             ))}
           </div>
         </div>
-      )}
-
-      {collected.length > 0 && (
-        <>
-          <h2 className="mb-2 font-semibold text-slate-900">
-            Collected today ({collected.length})
-          </h2>
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            {collected.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium text-slate-700">
-                    {order.student.name}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {describeLinesDetailed(readLines(order.items))}
-                  </p>
-                </div>
-                <span className="text-sm text-slate-500">
-                  {formatMoney(order.total)} ✓
-                </span>
-              </div>
-            ))}
-          </div>
-        </>
       )}
     </div>
   );

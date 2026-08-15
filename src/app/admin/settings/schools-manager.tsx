@@ -4,6 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import {
   addSchool,
   renameSchool,
+  deleteSchool,
   setSchoolActive,
   type SchoolState,
 } from "./actions";
@@ -124,45 +125,67 @@ function SchoolRow({ school }: { school: SchoolOption }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2">
-      <span className="font-medium text-slate-900">
-        {school.name}
-        {!school.active && (
-          <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-500">
-            retired
-          </span>
-        )}
-      </span>
-      <div className="flex items-center gap-3 text-sm">
-        <button
-          onClick={() => setEditing(true)}
-          className="font-medium text-slate-600 hover:underline"
-        >
-          Rename
-        </button>
-        <button
-          disabled={pending}
-          onClick={() => {
-            if (
-              school.active &&
-              !confirm(
-                `Retire ${school.name}? It stops accepting new students and orders. Existing records are kept.`
+    <div className="rounded-lg border border-slate-200 px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium text-slate-900">
+          {school.name}
+          {!school.active && (
+            <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-normal text-slate-500">
+              retired
+            </span>
+          )}
+        </span>
+        <div className="flex items-center gap-3 text-sm">
+          <button
+            onClick={() => setEditing(true)}
+            className="font-medium text-slate-600 hover:underline"
+          >
+            Rename
+          </button>
+          <button
+            disabled={pending}
+            onClick={() => {
+              if (
+                school.active &&
+                !confirm(
+                  `Retire ${school.name}? It stops accepting new students and orders. Existing records are kept.`
+                )
               )
-            )
-              return;
-            startTransition(async () => {
-              await setSchoolActive(school.id, !school.active);
-            });
-          }}
-          className={
-            school.active
-              ? "font-medium text-red-600 hover:underline disabled:opacity-50"
-              : "font-medium text-emerald-700 hover:underline disabled:opacity-50"
-          }
-        >
-          {school.active ? "Retire" : "Reinstate"}
-        </button>
+                return;
+              startTransition(async () => {
+                await setSchoolActive(school.id, !school.active);
+              });
+            }}
+            className={
+              school.active
+                ? "font-medium text-amber-700 hover:underline disabled:opacity-50"
+                : "font-medium text-emerald-700 hover:underline disabled:opacity-50"
+            }
+          >
+            {school.active ? "Retire" : "Reinstate"}
+          </button>
+          <button
+            disabled={pending}
+            onClick={() => {
+              if (
+                !confirm(
+                  `Delete ${school.name} for good, along with its menu, choice groups and pick-up times?\n\nOnly possible while no accounts, registrations or orders belong to it.`
+                )
+              )
+                return;
+              setError(null);
+              startTransition(async () => {
+                const result = await deleteSchool(school.id);
+                if (result.error) setError(result.error);
+              });
+            }}
+            className="font-medium text-red-600 hover:underline disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
       </div>
+      {error && <p className="mt-1.5 text-sm text-red-700">{error}</p>}
     </div>
   );
 }

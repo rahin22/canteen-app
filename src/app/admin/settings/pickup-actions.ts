@@ -88,6 +88,35 @@ export async function setPickupSlotActive(id: string, active: boolean) {
   revalidateOrdering();
 }
 
+/**
+ * Removes a window that was never used — a typo, or a time the school tried
+ * once and dropped.
+ *
+ * Refused as soon as an order has been booked into it, because deleting would
+ * blank that order's collection time and leave the kitchen with food and no
+ * idea when it's due. Retiring is the answer there: the window stops being
+ * offered while existing orders keep pointing at it.
+ */
+export async function deletePickupSlot(id: string): Promise<SlotState> {
+  await requireRole("ADMIN");
+  const slot = await prisma.pickupSlot.findUnique({
+    where: { id },
+    select: { label: true, _count: { select: { preorders: true } } },
+  });
+  if (!slot) return { error: "That window has already been removed." };
+  if (slot._count.preorders > 0) {
+    return {
+      error: `${slot.label} has ${slot._count.preorders} order${
+        slot._count.preorders === 1 ? "" : "s"
+      } booked into it, so it can't be deleted. Retire it instead — it stops being offered but those orders keep their pick-up time.`,
+    };
+  }
+
+  await prisma.pickupSlot.delete({ where: { id } });
+  revalidateOrdering();
+  return { success: `Deleted ${slot.label}.` };
+}
+
 function revalidateOrdering() {
   revalidatePath("/admin/settings");
   revalidatePath("/admin/preorders");

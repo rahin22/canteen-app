@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { formatMoney } from "@/lib/money";
-import { describeLines } from "@/lib/preorder-format";
+import { groupOptions, orderLabel } from "@/lib/preorder-format";
 import {
   OrderComposer,
   type ComposerLine,
@@ -37,10 +37,14 @@ export function PreorderPanel({
   const [error, setError] = useState<string | null>(null);
   const [cancelling, startCancelling] = useTransition();
 
-  const submit = async (lines: ComposerLine[], pickupSlotId: string) => {
+  const submit = async (
+    lines: ComposerLine[],
+    pickupSlotId: string,
+    notes: string
+  ) => {
     setBusy(true);
     setError(null);
-    const result = await parentPlaceOrder(childId, lines, pickupSlotId);
+    const result = await parentPlaceOrder(childId, lines, pickupSlotId, notes);
     setBusy(false);
     if (result.ok) setComposing(false);
     else setError(result.error);
@@ -68,16 +72,41 @@ export function PreorderPanel({
               className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3"
             >
               <div className="min-w-0">
-                <p className="font-medium text-emerald-900">
-                  {describeLines(order.items)}
+                {/* Number and window first: it's what the canteen calls the
+                    order and when the child needs to turn up. */}
+                <p className="font-bold text-emerald-900">
+                  Order {orderLabel(order.orderNumber)}
+                  {order.pickupLabel ? ` — ${order.pickupLabel}` : ""}
                 </p>
-                <p className="text-sm text-emerald-700">
-                  {formatMoney(order.total)} paid · {order.dayLabel}
-                  {order.pickup ? ` · ${order.pickup}` : ""}
-                </p>
-                {order.source === "KIOSK" && (
-                  <p className="text-xs text-emerald-600">Ordered at school</p>
+                {order.pickup && (
+                  <p className="text-sm font-medium text-emerald-800">
+                    {order.dayLabel} · {order.pickup}
+                  </p>
                 )}
+                <ul className="mt-1.5 space-y-1">
+                  {order.items.map((line, i) => (
+                    <li key={i} className="text-sm text-emerald-900">
+                      <span className="font-medium">
+                        {line.name}
+                        {line.qty > 1 ? ` ×${line.qty}` : ""}
+                      </span>
+                      {groupOptions(line).map((group) => (
+                        <span key={group.groupName} className="block pl-3 text-emerald-700">
+                          {group.groupName}: {group.names.join(", ")}
+                        </span>
+                      ))}
+                    </li>
+                  ))}
+                </ul>
+                {order.notes && (
+                  <p className="mt-1.5 rounded-lg bg-white/70 px-2.5 py-1.5 text-sm text-emerald-900">
+                    <span className="font-medium">Note:</span> {order.notes}
+                  </p>
+                )}
+                <p className="mt-1 text-sm text-emerald-700">
+                  {formatMoney(order.total)} paid
+                  {order.source === "KIOSK" ? " · ordered at school" : ""}
+                </p>
               </div>
               <button
                 type="button"
@@ -107,6 +136,7 @@ export function PreorderPanel({
             slots={plan.slots}
             dayLabel={plan.dayLabel}
             forNextDay={plan.forNextDay}
+            askForNotes
             spendable={spendable}
             submitLabel="Place order"
             busy={busy}

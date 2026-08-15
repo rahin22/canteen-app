@@ -2,7 +2,7 @@ import { prisma } from "./db";
 import { formatClock, formatSchoolDay, startOfSchoolDay } from "./day";
 import { describeSlot, orderingPlan } from "./pickup";
 import { formatMoney } from "./money";
-import { readLines } from "./preorder-format";
+import { MAX_NOTE_LENGTH, readLines } from "./preorder-format";
 import { ModifierError, priceLinesWithModifiers } from "./modifiers";
 import { preorderCutoff, preordersOpen } from "./settings";
 import {
@@ -27,7 +27,12 @@ import type { PreorderSource } from "@/generated/prisma/enums";
 
 export class PreorderError extends Error {}
 
-export { describeLines, readLines } from "./preorder-format";
+export {
+  describeLines,
+  MAX_NOTE_LENGTH,
+  orderLabel,
+  readLines,
+} from "./preorder-format";
 
 /** Nobody needs more than this many orders waiting on one day. */
 export const MAX_PENDING_PER_DAY = 3;
@@ -63,14 +68,22 @@ export async function upcomingPreorders(
 
 export type PreorderSummary = {
   id: string;
+  /** The short number both the canteen and the family call it by — null on
+   *  orders taken before numbering existed. */
+  orderNumber: number | null;
   items: PurchaseLine[];
   total: number;
+  /** The special request left with the order, if there was one. */
+  notes: string | null;
   source: PreorderSource;
   placedByName: string | null;
   createdAt: number;
   /** Which day the food is for, and when it can be collected. */
   serviceDate: number;
   dayLabel: string;
+  /** The collection window's name on its own, e.g. "Secondary Lunch". */
+  pickupLabel: string | null;
+  /** The same window with its times, e.g. "Secondary Lunch · 12:00 – 12:20". */
   pickup: string | null;
 };
 
@@ -107,8 +120,10 @@ export async function pendingPreorders(
 
 function toSummary(row: {
   id: string;
+  orderNumber: number | null;
   items: unknown;
   total: number;
+  notes?: string | null;
   source: PreorderSource;
   createdAt: Date;
   serviceDate: Date;
@@ -121,13 +136,16 @@ function toSummary(row: {
 }): PreorderSummary {
   return {
     id: row.id,
+    orderNumber: row.orderNumber,
     items: readLines(row.items),
     total: row.total,
+    notes: row.notes ?? null,
     source: row.source,
     placedByName: row.placedBy?.name ?? null,
     createdAt: row.createdAt.getTime(),
     serviceDate: row.serviceDate.getTime(),
     dayLabel: formatSchoolDay(row.serviceDate),
+    pickupLabel: row.pickupSlot?.label ?? null,
     pickup: row.pickupSlot ? describeSlot(row.pickupSlot) : null,
   };
 }
@@ -181,8 +199,11 @@ export async function placePreorder(opts: {
   lines: PreorderLine[];
   /** Which collection window; must be one the plan currently offers. */
   pickupSlotId: string;
+  /** Optional special request to pass to the kitchen. */
+  notes?: string | null;
 }): Promise<PreorderSummary> {
   const { studentId, placedById, source, lines, pickupSlotId } = opts;
+  const notes = cleanNote(opts.notes);
 
   const student = await prisma.user.findUnique({
     where: { id: studentId },
@@ -260,8 +281,15 @@ export async function placePreorder(opts: {
             studentId,
             placedById,
             source,
+            orderNumber: await nextOrderNumber(
+              tx,
+              student.schoolId!,
+              plan.serviceDate
+            ),
+            schoolId: student.schoolId,
             items: priced as unknown as Prisma.InputJsonValue,
             total,
+            notes,
             serviceDate: plan.serviceDate,
             pickupSlotId: slot.id,
             transactionId,
@@ -283,6 +311,52 @@ export async function placePreorder(opts: {
       })
     : null;
   return toSummary({ ...created!, placedBy });
+}
+
+/**
+ * Tidies a special request into something worth putting on the kitchen's list.
+ *
+ * Line breaks are folded into spaces so a note can't push the rest of an order
+ * off the screen, and an empty one is stored as null rather than "" so the
+ * board can simply ask whether there is a note at all. Over-long notes are
+ * refused rather than cut short — half an allergy warning is worse than none.
+ */
+function cleanNote(input: string | null | undefined): string | null {
+  const text = (input ?? "").replace(/\s+/g, " ").trim();
+  if (!text) return null;
+  if (text.length > MAX_NOTE_LENGTH) {
+    throw new PreorderError(
+      `Please keep the note under ${MAX_NOTE_LENGTH} characters — the canteen reads it off a list.`
+    );
+  }
+  return text;
+}
+
+/**
+ * Claims the next ticket number for one school's service day.
+ *
+ * The insert-or-increment is a single statement, so the row lock Postgres
+ * takes on the counter is what serialises two orders placed at the same
+ * moment — the second waits and gets the number after the first. It runs
+ * inside the caller's transaction, so an order that fails to save gives its
+ * number back rather than leaving a gap in the kitchen's list.
+ *
+ * Always after the student row lock in chargeStudent, never before, so the two
+ * locks are taken in the same order everywhere and can't deadlock.
+ */
+async function nextOrderNumber(
+  tx: Prisma.TransactionClient,
+  schoolId: string,
+  serviceDate: Date
+): Promise<number> {
+  const rows = await tx.$queryRaw<{ issued: number }[]>`
+    INSERT INTO "OrderCounter" ("schoolId", "serviceDate", "issued")
+    VALUES (${schoolId}, ${serviceDate}, 1)
+    ON CONFLICT ("schoolId", "serviceDate")
+    DO UPDATE SET "issued" = "OrderCounter"."issued" + 1
+    RETURNING "issued"
+  `;
+  return rows[0].issued;
 }
 
 function affordabilityMessage(

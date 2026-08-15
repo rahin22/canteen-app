@@ -204,7 +204,28 @@ model School {
   registrations ChildRegistration[]
   pickupSlots   PickupSlot[]
   modifierGroups ModifierGroup[]
+  preorders     Preorder[]
+  orderCounters OrderCounter[]
   createdAt     DateTime            @default(now())
+}
+
+/**
+ * The next ticket number to hand out, per school per service day.
+ *
+ * A counter row rather than `max(orderNumber) + 1`: the increment happens in
+ * one statement that takes a row lock, so two parents ordering at the same
+ * instant can't both be told they're order #4. Rows are tiny and only one is
+ * created per school per day.
+ */
+model OrderCounter {
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId    String
+  /** Local midnight of the day being numbered — matches Preorder.serviceDate. */
+  serviceDate DateTime
+  /** The highest number handed out so far. */
+  issued      Int      @default(0)
+
+  @@id([schoolId, serviceDate])
 }
 
 /**
@@ -353,11 +374,25 @@ model Preorder {
   placedBy   User?          @relation("PlacedPreorders", fields: [placedById], references: [id], onDelete: SetNull)
   placedById String?
   source     PreorderSource
+  // The number the canteen and the family both call this order by — "#3".
+  // Counts from 1 each morning, per school, so it stays short enough to read
+  // off a list at a glance. Optional only because orders taken before the
+  // scheme existed have none.
+  orderNumber Int?
+  // The school this order belongs to, copied from the student as it's placed.
+  // Denormalised so numbering and the kitchen's list stay put even if a child
+  // later transfers between schools.
+  school     School?        @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  schoolId   String?
   // Snapshot of the lines and the prices quoted at order time. The till
   // charges these rather than live menu prices, so editing the menu can't
   // change what a child was quoted or strand an order whose item was removed.
   items      Json
   total      Int
+  // A short free-text request from whoever placed the order — "no butter",
+  // "allergic to sesame". Read by the kitchen, never priced or acted on
+  // automatically. Null when nothing was written.
+  notes      String?
   status     PreorderStatus @default(PENDING)
   // Local midnight of the canteen day the order is for (see src/lib/day.ts).
   // Orders placed after the cutoff are for the *next* school day, so this is
@@ -376,4 +411,7 @@ model Preorder {
 
   @@index([serviceDate, status])
   @@index([studentId, serviceDate])
+  // Belt and braces around the counter: even a bug in the allocator can't
+  // land two orders on the same number for one school on one day.
+  @@unique([schoolId, serviceDate, orderNumber])
 }

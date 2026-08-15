@@ -4,6 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import {
   addPickupSlot,
   updatePickupSlot,
+  deletePickupSlot,
   setPickupSlotActive,
   type SlotState,
 } from "./pickup-actions";
@@ -115,6 +116,7 @@ function SchoolSlots({
 function SlotRow({ slot }: { slot: Slot }) {
   const [editing, setEditing] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const [state, formAction, saving] = useActionState<SlotState, FormData>(
     async (prev, fd) => {
       const result = await updatePickupSlot(prev, fd);
@@ -168,44 +170,61 @@ function SlotRow({ slot }: { slot: Slot }) {
 
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2 ${
+      className={`rounded-lg border border-slate-200 px-3 py-2 ${
         slot.active ? "" : "opacity-50"
       }`}
     >
-      <span className="font-medium text-slate-900">
-        {slot.label}
-        <span className="ml-2 font-normal text-slate-500">
-          {slot.startTime} – {slot.endTime}
-        </span>
-        {!slot.active && (
-          <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
-            retired
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium text-slate-900">
+          {slot.label}
+          <span className="ml-2 font-normal text-slate-500">
+            {slot.startTime} – {slot.endTime}
           </span>
-        )}
-      </span>
-      <div className="flex items-center gap-3 text-sm">
-        <button
-          onClick={() => setEditing(true)}
-          className="font-medium text-slate-600 hover:underline"
-        >
-          Edit
-        </button>
-        <button
-          disabled={pending}
-          onClick={() =>
-            startTransition(async () => {
-              await setPickupSlotActive(slot.id, !slot.active);
-            })
-          }
-          className={
-            slot.active
-              ? "font-medium text-red-600 hover:underline disabled:opacity-50"
-              : "font-medium text-emerald-700 hover:underline disabled:opacity-50"
-          }
-        >
-          {slot.active ? "Retire" : "Restore"}
-        </button>
+          {!slot.active && (
+            <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
+              retired
+            </span>
+          )}
+        </span>
+        <div className="flex items-center gap-3 text-sm">
+          <button
+            onClick={() => setEditing(true)}
+            className="font-medium text-slate-600 hover:underline"
+          >
+            Edit
+          </button>
+          <button
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                await setPickupSlotActive(slot.id, !slot.active);
+              })
+            }
+            className={
+              slot.active
+                ? "font-medium text-amber-700 hover:underline disabled:opacity-50"
+                : "font-medium text-emerald-700 hover:underline disabled:opacity-50"
+            }
+          >
+            {slot.active ? "Retire" : "Restore"}
+          </button>
+          <button
+            disabled={pending}
+            onClick={() => {
+              if (!confirm(`Delete the ${slot.label} window?`)) return;
+              setError(null);
+              startTransition(async () => {
+                const result = await deletePickupSlot(slot.id);
+                if (result.error) setError(result.error);
+              });
+            }}
+            className="font-medium text-red-600 hover:underline disabled:opacity-50"
+          >
+            Delete
+          </button>
+        </div>
       </div>
+      {error && <p className="mt-1.5 text-sm text-red-700">{error}</p>}
     </div>
   );
 }

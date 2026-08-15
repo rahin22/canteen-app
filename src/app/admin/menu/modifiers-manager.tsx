@@ -5,6 +5,9 @@ import { formatMoney } from "@/lib/money";
 import {
   createModifierGroup,
   createModifierOption,
+  updateModifierGroup,
+  updateModifierOption,
+  deleteModifierGroup,
   setModifierGroupActive,
   setModifierOptionSoldOut,
   deleteModifierOption,
@@ -32,6 +35,13 @@ export type AdminGroup = {
 
 const inputCls =
   "rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500";
+
+/** How a group's min/max reads in plain English. */
+function describeRule(minSelect: number, maxSelect: number): string {
+  if (minSelect === 0) return `optional, up to ${maxSelect}`;
+  if (minSelect === maxSelect) return `choose exactly ${minSelect}`;
+  return `choose ${minSelect}–${maxSelect}`;
+}
 
 /**
  * Choice groups for a school's menu — sauces, salad, combo meals and drinks.
@@ -147,6 +157,16 @@ function GroupCard({
   >(createModifierOption, {});
   const [pending, startTransition] = useTransition();
   const [showItems, setShowItems] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [editState, editAction, saving] = useActionState<ModifierState, FormData>(
+    async (prev, fd) => {
+      const result = await updateModifierGroup(prev, fd);
+      if (result.success) setEditing(false);
+      return result;
+    },
+    {}
+  );
 
   return (
     <div
@@ -154,80 +174,120 @@ function GroupCard({
         group.active ? "" : "opacity-60"
       }`}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="font-semibold text-slate-900">
-          {group.name}
-          <span className="ml-2 text-xs font-normal text-slate-500">
-            {group.minSelect === 0
-              ? `optional, up to ${group.maxSelect}`
-              : group.minSelect === group.maxSelect
-              ? `choose exactly ${group.minSelect}`
-              : `choose ${group.minSelect}–${group.maxSelect}`}
-          </span>
-          {!group.active && (
-            <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
-              hidden
-            </span>
+      {editing ? (
+        <form action={editAction} className="flex flex-wrap items-end gap-2">
+          <input type="hidden" name="id" value={group.id} />
+          <div className="flex-1 min-w-40">
+            <label className="mb-1 block text-xs text-slate-500">Name</label>
+            <input
+              name="name"
+              defaultValue={group.name}
+              required
+              className={inputCls + " w-full"}
+            />
+          </div>
+          <div className="w-20">
+            <label className="mb-1 block text-xs text-slate-500">Min</label>
+            <input
+              name="minSelect"
+              type="number"
+              min={0}
+              max={20}
+              defaultValue={group.minSelect}
+              className={inputCls + " w-full"}
+            />
+          </div>
+          <div className="w-20">
+            <label className="mb-1 block text-xs text-slate-500">Max</label>
+            <input
+              name="maxSelect"
+              type="number"
+              min={1}
+              max={20}
+              defaultValue={group.maxSelect}
+              className={inputCls + " w-full"}
+            />
+          </div>
+          <button
+            disabled={saving}
+            className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            className="px-2 text-sm text-slate-500 hover:underline"
+          >
+            Cancel
+          </button>
+          {editState.error && (
+            <p className="w-full text-sm text-red-700">{editState.error}</p>
           )}
-        </p>
-        <button
-          disabled={pending}
-          onClick={() =>
-            startTransition(async () => {
-              await setModifierGroupActive(group.id, !group.active);
-            })
-          }
-          className="text-sm font-medium text-slate-600 hover:underline disabled:opacity-50"
-        >
-          {group.active ? "Hide" : "Show"}
-        </button>
-      </div>
+        </form>
+      ) : (
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <p className="font-semibold text-slate-900">
+            {group.name}
+            <span className="ml-2 text-xs font-normal text-slate-500">
+              {describeRule(group.minSelect, group.maxSelect)}
+            </span>
+            {!group.active && (
+              <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
+                hidden
+              </span>
+            )}
+          </p>
+          <div className="flex items-center gap-3 text-sm">
+            <button
+              onClick={() => setEditing(true)}
+              className="font-medium text-slate-600 hover:underline"
+            >
+              Edit
+            </button>
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  await setModifierGroupActive(group.id, !group.active);
+                })
+              }
+              className="font-medium text-slate-600 hover:underline disabled:opacity-50"
+            >
+              {group.active ? "Hide" : "Show"}
+            </button>
+            <button
+              disabled={pending}
+              onClick={() => {
+                if (
+                  !confirm(
+                    `Delete the ${group.name} group and all ${group.options.length} of its choices?\n\nIt comes off the ${group.itemIds.length} item${
+                      group.itemIds.length === 1 ? "" : "s"
+                    } using it. Orders already placed keep what was chosen.`
+                  )
+                )
+                  return;
+                setError(null);
+                startTransition(async () => {
+                  const result = await deleteModifierGroup(group.id);
+                  if (result.error) setError(result.error);
+                });
+              }}
+              className="font-medium text-red-600 hover:underline disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
+      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-3 space-y-1.5">
         {group.options.length === 0 && (
           <p className="text-sm text-slate-500">No choices yet.</p>
         )}
         {group.options.map((option) => (
-          <span
-            key={option.id}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm ${
-              option.soldOut
-                ? "border-amber-300 bg-amber-50 text-amber-800"
-                : "border-slate-200 bg-slate-50 text-slate-700"
-            }`}
-          >
-            {option.name}
-            {option.price > 0 && (
-              <span className="text-xs text-slate-500">
-                +{formatMoney(option.price)}
-              </span>
-            )}
-            <button
-              disabled={pending}
-              title={option.soldOut ? "Back in stock" : "Mark sold out"}
-              onClick={() =>
-                startTransition(async () => {
-                  await setModifierOptionSoldOut(option.id, !option.soldOut);
-                })
-              }
-              className="text-xs font-semibold hover:underline disabled:opacity-50"
-            >
-              {option.soldOut ? "restock" : "sold out"}
-            </button>
-            <button
-              disabled={pending}
-              title="Remove"
-              onClick={() => {
-                if (!confirm(`Remove ${option.name} from ${group.name}?`)) return;
-                startTransition(async () => {
-                  await deleteModifierOption(option.id);
-                });
-              }}
-              className="text-xs text-red-600 hover:underline disabled:opacity-50"
-            >
-              ×
-            </button>
-          </span>
+          <OptionRow key={option.id} option={option} groupName={group.name} />
         ))}
       </div>
 
@@ -290,6 +350,120 @@ function GroupCard({
             })}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** One choice in a group — renamed, repriced, taken out of stock or removed. */
+function OptionRow({
+  option,
+  groupName,
+}: {
+  option: AdminOption;
+  groupName: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const [state, formAction, saving] = useActionState<ModifierState, FormData>(
+    async (prev, fd) => {
+      const result = await updateModifierOption(prev, fd);
+      if (result.success) setEditing(false);
+      return result;
+    },
+    {}
+  );
+
+  if (editing) {
+    return (
+      <form action={formAction} className="flex flex-wrap items-center gap-2">
+        <input type="hidden" name="id" value={option.id} />
+        <input
+          name="name"
+          defaultValue={option.name}
+          required
+          className={inputCls + " flex-1 min-w-36"}
+        />
+        <input
+          name="price"
+          defaultValue={option.price > 0 ? (option.price / 100).toFixed(2) : ""}
+          inputMode="decimal"
+          placeholder="free"
+          className={inputCls + " w-24"}
+        />
+        <button
+          disabled={saving}
+          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditing(false)}
+          className="text-sm text-slate-500 hover:underline"
+        >
+          Cancel
+        </button>
+        {state.error && <p className="w-full text-sm text-red-700">{state.error}</p>}
+      </form>
+    );
+  }
+
+  return (
+    <div
+      className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-1.5 ${
+        option.soldOut
+          ? "border-amber-300 bg-amber-50"
+          : "border-slate-200 bg-slate-50"
+      }`}
+    >
+      <span
+        className={`text-sm font-medium ${
+          option.soldOut ? "text-amber-900" : "text-slate-800"
+        }`}
+      >
+        {option.name}
+        {option.price > 0 && (
+          <span className="ml-1.5 font-normal text-slate-500">
+            +{formatMoney(option.price)}
+          </span>
+        )}
+        {option.soldOut && (
+          <span className="ml-2 text-xs font-semibold uppercase tracking-wide">
+            sold out
+          </span>
+        )}
+      </span>
+      <div className="flex items-center gap-3 text-sm">
+        <button
+          onClick={() => setEditing(true)}
+          className="font-medium text-slate-600 hover:underline"
+        >
+          Edit
+        </button>
+        <button
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              await setModifierOptionSoldOut(option.id, !option.soldOut);
+            })
+          }
+          className="font-medium text-slate-600 hover:underline disabled:opacity-50"
+        >
+          {option.soldOut ? "Restock" : "Sold out"}
+        </button>
+        <button
+          disabled={pending}
+          onClick={() => {
+            if (!confirm(`Remove ${option.name} from ${groupName}?`)) return;
+            startTransition(async () => {
+              await deleteModifierOption(option.id);
+            });
+          }}
+          className="font-medium text-red-600 hover:underline disabled:opacity-50"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );

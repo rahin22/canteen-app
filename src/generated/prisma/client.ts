@@ -87,6 +87,17 @@ export type VerificationCode = Prisma.VerificationCodeModel
  */
 export type School = Prisma.SchoolModel
 /**
+ * Model OrderCounter
+ * *
+ *  * The next ticket number to hand out, per school per service day.
+ *  *
+ *  * A counter row rather than `max(orderNumber) + 1`: the increment happens in
+ *  * one statement that takes a row lock, so two parents ordering at the same
+ *  * instant can't both be told they're order #4. Rows are tiny and only one is
+ *  * created per school per day.
+ */
+export type OrderCounter = Prisma.OrderCounterModel
+/**
  * Model PickupSlot
  * *
  *  * A window during the school day when preordered food can be collected —

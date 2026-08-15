@@ -72,8 +72,14 @@ export async function updateModifierGroup(
   const maxSelect = Number(formData.get("maxSelect") ?? 1);
 
   if (!name) return { error: "Give the group a name." };
-  if (minSelect < 0 || maxSelect < 1 || minSelect > maxSelect) {
-    return { error: "Check the minimum and maximum." };
+  if (!Number.isInteger(minSelect) || minSelect < 0 || minSelect > 20) {
+    return { error: "Minimum must be between 0 and 20." };
+  }
+  if (!Number.isInteger(maxSelect) || maxSelect < 1 || maxSelect > 20) {
+    return { error: "Maximum must be between 1 and 20." };
+  }
+  if (minSelect > maxSelect) {
+    return { error: "The minimum can't be more than the maximum." };
   }
 
   await prisma.modifierGroup.update({
@@ -88,6 +94,27 @@ export async function setModifierGroupActive(id: string, active: boolean) {
   await requireRole("ADMIN");
   await prisma.modifierGroup.update({ where: { id }, data: { active } });
   revalidateMenu();
+}
+
+/**
+ * Deletes a group and every choice in it, and detaches it from the items that
+ * used it.
+ *
+ * Orders keep their own copy of what was chosen, so deleting "Sauces" doesn't
+ * rewrite a ticket that said "Garlic" — it only stops the question being asked
+ * from now on. Hiding stays available for a group that's coming back.
+ */
+export async function deleteModifierGroup(id: string): Promise<ModifierState> {
+  await requireRole("ADMIN");
+  const group = await prisma.modifierGroup.findUnique({
+    where: { id },
+    select: { name: true },
+  });
+  if (!group) return { error: "That group has already been removed." };
+
+  await prisma.modifierGroup.delete({ where: { id } });
+  revalidateMenu();
+  return { success: `Deleted ${group.name}.` };
 }
 
 /** Adds one choice to a group. A blank price means it's free. */
@@ -117,6 +144,27 @@ export async function createModifierOption(
   });
   revalidateMenu();
   return { success: `Added ${name}.` };
+}
+
+/** Renames a choice or changes what it costs. Blank price still means free. */
+export async function updateModifierOption(
+  _prev: ModifierState,
+  formData: FormData
+): Promise<ModifierState> {
+  await requireRole("ADMIN");
+  const id = String(formData.get("id") || "");
+  const name = String(formData.get("name") || "").trim();
+  const rawPrice = String(formData.get("price") || "").trim();
+
+  if (!name) return { error: "Name the choice, e.g. Garlic sauce." };
+  const price = rawPrice ? parseAmount(rawPrice) : 0;
+  if (price === null) {
+    return { error: "Enter a valid price, or leave it blank for free." };
+  }
+
+  await prisma.modifierOption.update({ where: { id }, data: { name, price } });
+  revalidateMenu();
+  return { success: "Saved." };
 }
 
 /** Out of stock for one choice — the group simply offers fewer options. */
@@ -153,20 +201,4 @@ export async function toggleItemModifier(
     },
   });
   revalidateMenu();
-}
-
-/** The "Includes chips" line under a combo, and anything like it. */
-export async function setItemDescription(
-  _prev: ModifierState,
-  formData: FormData
-): Promise<ModifierState> {
-  await requireRole("ADMIN");
-  const id = String(formData.get("id") || "");
-  const description = String(formData.get("description") || "").trim();
-  await prisma.menuItem.update({
-    where: { id },
-    data: { description: description || null },
-  });
-  revalidateMenu();
-  return { success: "Saved." };
 }

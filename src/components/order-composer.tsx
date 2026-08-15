@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatMoney } from "@/lib/money";
+import { MAX_NOTE_LENGTH } from "@/lib/preorder-format";
 import { ItemChoices } from "./item-choices";
 import type { ItemOffer } from "@/lib/modifiers";
 
@@ -50,6 +51,7 @@ export function OrderComposer({
   slots,
   dayLabel,
   forNextDay,
+  askForNotes = false,
   onSubmit,
   onCancel,
 }: {
@@ -65,10 +67,20 @@ export function OrderComposer({
   dayLabel: string;
   /** True when the cutoff has passed and this order is for the next day. */
   forNextDay: boolean;
-  onSubmit: (lines: ComposerLine[], pickupSlotId: string) => void;
+  /**
+   * Offers a box for a special request. Off at the kiosk, where a child is
+   * ordering for themselves and there's a counter to say it over.
+   */
+  askForNotes?: boolean;
+  onSubmit: (
+    lines: ComposerLine[],
+    pickupSlotId: string,
+    notes: string
+  ) => void;
   onCancel?: () => void;
 }) {
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [notes, setNotes] = useState("");
   // Pre-selected when there's only one window left, so the common
   // last-minute case is one tap fewer.
   const [slotId, setSlotId] = useState(slots.length === 1 ? slots[0].id : "");
@@ -354,6 +366,35 @@ export function OrderComposer({
         </div>
       )}
 
+      {askForNotes && (
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+          <label
+            htmlFor="order-notes"
+            className="text-sm font-semibold text-slate-900"
+          >
+            Anything the canteen should know?
+          </label>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Optional — allergies, or a request like &quot;no butter&quot;. The
+            canteen sees this with the order.
+          </p>
+          <textarea
+            id="order-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            maxLength={MAX_NOTE_LENGTH}
+            rows={2}
+            placeholder="e.g. no sauce please"
+            className="mt-2 w-full resize-none rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+          />
+          {notes.length > MAX_NOTE_LENGTH - 40 && (
+            <p className="mt-1 text-right text-xs text-slate-400">
+              {MAX_NOTE_LENGTH - notes.length} characters left
+            </p>
+          )}
+        </div>
+      )}
+
       {overBudget && (
         <p className="mt-3 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700">
           That&apos;s {formatMoney(total - spendable!)} more than can be spent
@@ -392,7 +433,8 @@ export function OrderComposer({
                 qty: l.qty,
                 optionIds: l.optionIds,
               })),
-              slotId
+              slotId,
+              askForNotes ? notes : ""
             )
           }
           disabled={busy || total <= 0 || overBudget || !slotId}

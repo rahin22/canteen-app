@@ -227,6 +227,8 @@ export type SchoolWhereInput = {
   registrations?: Prisma.ChildRegistrationListRelationFilter
   pickupSlots?: Prisma.PickupSlotListRelationFilter
   modifierGroups?: Prisma.ModifierGroupListRelationFilter
+  preorders?: Prisma.PreorderListRelationFilter
+  orderCounters?: Prisma.OrderCounterListRelationFilter
 }
 
 export type SchoolOrderByWithRelationInput = {
@@ -240,6 +242,8 @@ export type SchoolOrderByWithRelationInput = {
   registrations?: Prisma.ChildRegistrationOrderByRelationAggregateInput
   pickupSlots?: Prisma.PickupSlotOrderByRelationAggregateInput
   modifierGroups?: Prisma.ModifierGroupOrderByRelationAggregateInput
+  preorders?: Prisma.PreorderOrderByRelationAggregateInput
+  orderCounters?: Prisma.OrderCounterOrderByRelationAggregateInput
 }
 
 export type SchoolWhereUniqueInput = Prisma.AtLeast<{
@@ -256,6 +260,8 @@ export type SchoolWhereUniqueInput = Prisma.AtLeast<{
   registrations?: Prisma.ChildRegistrationListRelationFilter
   pickupSlots?: Prisma.PickupSlotListRelationFilter
   modifierGroups?: Prisma.ModifierGroupListRelationFilter
+  preorders?: Prisma.PreorderListRelationFilter
+  orderCounters?: Prisma.OrderCounterListRelationFilter
 }, "id">
 
 export type SchoolOrderByWithAggregationInput = {
@@ -293,6 +299,8 @@ export type SchoolCreateInput = {
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateInput = {
@@ -306,6 +314,8 @@ export type SchoolUncheckedCreateInput = {
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUpdateInput = {
@@ -319,6 +329,8 @@ export type SchoolUpdateInput = {
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateInput = {
@@ -332,6 +344,8 @@ export type SchoolUncheckedUpdateInput = {
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateManyInput = {
@@ -432,6 +446,20 @@ export type SchoolUpdateOneWithoutRegistrationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutRegistrationsInput, Prisma.SchoolUpdateWithoutRegistrationsInput>, Prisma.SchoolUncheckedUpdateWithoutRegistrationsInput>
 }
 
+export type SchoolCreateNestedOneWithoutOrderCountersInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutOrderCountersInput, Prisma.SchoolUncheckedCreateWithoutOrderCountersInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutOrderCountersInput
+  connect?: Prisma.SchoolWhereUniqueInput
+}
+
+export type SchoolUpdateOneRequiredWithoutOrderCountersNestedInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutOrderCountersInput, Prisma.SchoolUncheckedCreateWithoutOrderCountersInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutOrderCountersInput
+  upsert?: Prisma.SchoolUpsertWithoutOrderCountersInput
+  connect?: Prisma.SchoolWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutOrderCountersInput, Prisma.SchoolUpdateWithoutOrderCountersInput>, Prisma.SchoolUncheckedUpdateWithoutOrderCountersInput>
+}
+
 export type SchoolCreateNestedOneWithoutPickupSlotsInput = {
   create?: Prisma.XOR<Prisma.SchoolCreateWithoutPickupSlotsInput, Prisma.SchoolUncheckedCreateWithoutPickupSlotsInput>
   connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutPickupSlotsInput
@@ -474,6 +502,22 @@ export type SchoolUpdateOneRequiredWithoutMenuItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutMenuItemsInput, Prisma.SchoolUpdateWithoutMenuItemsInput>, Prisma.SchoolUncheckedUpdateWithoutMenuItemsInput>
 }
 
+export type SchoolCreateNestedOneWithoutPreordersInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutPreordersInput, Prisma.SchoolUncheckedCreateWithoutPreordersInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutPreordersInput
+  connect?: Prisma.SchoolWhereUniqueInput
+}
+
+export type SchoolUpdateOneWithoutPreordersNestedInput = {
+  create?: Prisma.XOR<Prisma.SchoolCreateWithoutPreordersInput, Prisma.SchoolUncheckedCreateWithoutPreordersInput>
+  connectOrCreate?: Prisma.SchoolCreateOrConnectWithoutPreordersInput
+  upsert?: Prisma.SchoolUpsertWithoutPreordersInput
+  disconnect?: Prisma.SchoolWhereInput | boolean
+  delete?: Prisma.SchoolWhereInput | boolean
+  connect?: Prisma.SchoolWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SchoolUpdateToOneWithWhereWithoutPreordersInput, Prisma.SchoolUpdateWithoutPreordersInput>, Prisma.SchoolUncheckedUpdateWithoutPreordersInput>
+}
+
 export type SchoolCreateWithoutUsersInput = {
   id?: string
   name: string
@@ -484,6 +528,8 @@ export type SchoolCreateWithoutUsersInput = {
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutUsersInput = {
@@ -496,6 +542,8 @@ export type SchoolUncheckedCreateWithoutUsersInput = {
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutUsersInput = {
@@ -524,6 +572,8 @@ export type SchoolUpdateWithoutUsersInput = {
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutUsersInput = {
@@ -536,6 +586,8 @@ export type SchoolUncheckedUpdateWithoutUsersInput = {
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutRegistrationsInput = {
@@ -548,6 +600,8 @@ export type SchoolCreateWithoutRegistrationsInput = {
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutRegistrationsInput = {
@@ -560,6 +614,8 @@ export type SchoolUncheckedCreateWithoutRegistrationsInput = {
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutRegistrationsInput = {
@@ -588,6 +644,8 @@ export type SchoolUpdateWithoutRegistrationsInput = {
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutRegistrationsInput = {
@@ -600,6 +658,80 @@ export type SchoolUncheckedUpdateWithoutRegistrationsInput = {
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolCreateWithoutOrderCountersInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolUncheckedCreateWithoutOrderCountersInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolCreateOrConnectWithoutOrderCountersInput = {
+  where: Prisma.SchoolWhereUniqueInput
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutOrderCountersInput, Prisma.SchoolUncheckedCreateWithoutOrderCountersInput>
+}
+
+export type SchoolUpsertWithoutOrderCountersInput = {
+  update: Prisma.XOR<Prisma.SchoolUpdateWithoutOrderCountersInput, Prisma.SchoolUncheckedUpdateWithoutOrderCountersInput>
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutOrderCountersInput, Prisma.SchoolUncheckedCreateWithoutOrderCountersInput>
+  where?: Prisma.SchoolWhereInput
+}
+
+export type SchoolUpdateToOneWithWhereWithoutOrderCountersInput = {
+  where?: Prisma.SchoolWhereInput
+  data: Prisma.XOR<Prisma.SchoolUpdateWithoutOrderCountersInput, Prisma.SchoolUncheckedUpdateWithoutOrderCountersInput>
+}
+
+export type SchoolUpdateWithoutOrderCountersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolUncheckedUpdateWithoutOrderCountersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutPickupSlotsInput = {
@@ -612,6 +744,8 @@ export type SchoolCreateWithoutPickupSlotsInput = {
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutPickupSlotsInput = {
@@ -624,6 +758,8 @@ export type SchoolUncheckedCreateWithoutPickupSlotsInput = {
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutPickupSlotsInput = {
@@ -652,6 +788,8 @@ export type SchoolUpdateWithoutPickupSlotsInput = {
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutPickupSlotsInput = {
@@ -664,6 +802,8 @@ export type SchoolUncheckedUpdateWithoutPickupSlotsInput = {
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutModifierGroupsInput = {
@@ -676,6 +816,8 @@ export type SchoolCreateWithoutModifierGroupsInput = {
   menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutModifierGroupsInput = {
@@ -688,6 +830,8 @@ export type SchoolUncheckedCreateWithoutModifierGroupsInput = {
   menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutModifierGroupsInput = {
@@ -716,6 +860,8 @@ export type SchoolUpdateWithoutModifierGroupsInput = {
   menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutModifierGroupsInput = {
@@ -728,6 +874,8 @@ export type SchoolUncheckedUpdateWithoutModifierGroupsInput = {
   menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolCreateWithoutMenuItemsInput = {
@@ -740,6 +888,8 @@ export type SchoolCreateWithoutMenuItemsInput = {
   registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolUncheckedCreateWithoutMenuItemsInput = {
@@ -752,6 +902,8 @@ export type SchoolUncheckedCreateWithoutMenuItemsInput = {
   registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
   pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
   modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  preorders?: Prisma.PreorderUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
 }
 
 export type SchoolCreateOrConnectWithoutMenuItemsInput = {
@@ -780,6 +932,8 @@ export type SchoolUpdateWithoutMenuItemsInput = {
   registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
 }
 
 export type SchoolUncheckedUpdateWithoutMenuItemsInput = {
@@ -792,6 +946,80 @@ export type SchoolUncheckedUpdateWithoutMenuItemsInput = {
   registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
   pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
   modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  preorders?: Prisma.PreorderUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolCreateWithoutPreordersInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolUncheckedCreateWithoutPreordersInput = {
+  id?: string
+  name: string
+  active?: boolean
+  sortOrder?: number
+  createdAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutSchoolInput
+  menuItems?: Prisma.MenuItemUncheckedCreateNestedManyWithoutSchoolInput
+  registrations?: Prisma.ChildRegistrationUncheckedCreateNestedManyWithoutSchoolInput
+  pickupSlots?: Prisma.PickupSlotUncheckedCreateNestedManyWithoutSchoolInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedCreateNestedManyWithoutSchoolInput
+  orderCounters?: Prisma.OrderCounterUncheckedCreateNestedManyWithoutSchoolInput
+}
+
+export type SchoolCreateOrConnectWithoutPreordersInput = {
+  where: Prisma.SchoolWhereUniqueInput
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutPreordersInput, Prisma.SchoolUncheckedCreateWithoutPreordersInput>
+}
+
+export type SchoolUpsertWithoutPreordersInput = {
+  update: Prisma.XOR<Prisma.SchoolUpdateWithoutPreordersInput, Prisma.SchoolUncheckedUpdateWithoutPreordersInput>
+  create: Prisma.XOR<Prisma.SchoolCreateWithoutPreordersInput, Prisma.SchoolUncheckedCreateWithoutPreordersInput>
+  where?: Prisma.SchoolWhereInput
+}
+
+export type SchoolUpdateToOneWithWhereWithoutPreordersInput = {
+  where?: Prisma.SchoolWhereInput
+  data: Prisma.XOR<Prisma.SchoolUpdateWithoutPreordersInput, Prisma.SchoolUncheckedUpdateWithoutPreordersInput>
+}
+
+export type SchoolUpdateWithoutPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUpdateManyWithoutSchoolNestedInput
+}
+
+export type SchoolUncheckedUpdateWithoutPreordersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutSchoolNestedInput
+  menuItems?: Prisma.MenuItemUncheckedUpdateManyWithoutSchoolNestedInput
+  registrations?: Prisma.ChildRegistrationUncheckedUpdateManyWithoutSchoolNestedInput
+  pickupSlots?: Prisma.PickupSlotUncheckedUpdateManyWithoutSchoolNestedInput
+  modifierGroups?: Prisma.ModifierGroupUncheckedUpdateManyWithoutSchoolNestedInput
+  orderCounters?: Prisma.OrderCounterUncheckedUpdateManyWithoutSchoolNestedInput
 }
 
 
@@ -805,6 +1033,8 @@ export type SchoolCountOutputType = {
   registrations: number
   pickupSlots: number
   modifierGroups: number
+  preorders: number
+  orderCounters: number
 }
 
 export type SchoolCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -813,6 +1043,8 @@ export type SchoolCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   registrations?: boolean | SchoolCountOutputTypeCountRegistrationsArgs
   pickupSlots?: boolean | SchoolCountOutputTypeCountPickupSlotsArgs
   modifierGroups?: boolean | SchoolCountOutputTypeCountModifierGroupsArgs
+  preorders?: boolean | SchoolCountOutputTypeCountPreordersArgs
+  orderCounters?: boolean | SchoolCountOutputTypeCountOrderCountersArgs
 }
 
 /**
@@ -860,6 +1092,20 @@ export type SchoolCountOutputTypeCountModifierGroupsArgs<ExtArgs extends runtime
   where?: Prisma.ModifierGroupWhereInput
 }
 
+/**
+ * SchoolCountOutputType without action
+ */
+export type SchoolCountOutputTypeCountPreordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PreorderWhereInput
+}
+
+/**
+ * SchoolCountOutputType without action
+ */
+export type SchoolCountOutputTypeCountOrderCountersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderCounterWhereInput
+}
+
 
 export type SchoolSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -872,6 +1118,8 @@ export type SchoolSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   registrations?: boolean | Prisma.School$registrationsArgs<ExtArgs>
   pickupSlots?: boolean | Prisma.School$pickupSlotsArgs<ExtArgs>
   modifierGroups?: boolean | Prisma.School$modifierGroupsArgs<ExtArgs>
+  preorders?: boolean | Prisma.School$preordersArgs<ExtArgs>
+  orderCounters?: boolean | Prisma.School$orderCountersArgs<ExtArgs>
   _count?: boolean | Prisma.SchoolCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["school"]>
 
@@ -906,6 +1154,8 @@ export type SchoolInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   registrations?: boolean | Prisma.School$registrationsArgs<ExtArgs>
   pickupSlots?: boolean | Prisma.School$pickupSlotsArgs<ExtArgs>
   modifierGroups?: boolean | Prisma.School$modifierGroupsArgs<ExtArgs>
+  preorders?: boolean | Prisma.School$preordersArgs<ExtArgs>
+  orderCounters?: boolean | Prisma.School$orderCountersArgs<ExtArgs>
   _count?: boolean | Prisma.SchoolCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SchoolIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -919,6 +1169,8 @@ export type $SchoolPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     registrations: Prisma.$ChildRegistrationPayload<ExtArgs>[]
     pickupSlots: Prisma.$PickupSlotPayload<ExtArgs>[]
     modifierGroups: Prisma.$ModifierGroupPayload<ExtArgs>[]
+    preorders: Prisma.$PreorderPayload<ExtArgs>[]
+    orderCounters: Prisma.$OrderCounterPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1325,6 +1577,8 @@ export interface Prisma__SchoolClient<T, Null = never, ExtArgs extends runtime.T
   registrations<T extends Prisma.School$registrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChildRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pickupSlots<T extends Prisma.School$pickupSlotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$pickupSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PickupSlotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   modifierGroups<T extends Prisma.School$modifierGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$modifierGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModifierGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preorders<T extends Prisma.School$preordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$preordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PreorderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderCounters<T extends Prisma.School$orderCountersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.School$orderCountersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderCounterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1869,6 +2123,54 @@ export type School$modifierGroupsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ModifierGroupScalarFieldEnum | Prisma.ModifierGroupScalarFieldEnum[]
+}
+
+/**
+ * School.preorders
+ */
+export type School$preordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Preorder
+   */
+  select?: Prisma.PreorderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Preorder
+   */
+  omit?: Prisma.PreorderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PreorderInclude<ExtArgs> | null
+  where?: Prisma.PreorderWhereInput
+  orderBy?: Prisma.PreorderOrderByWithRelationInput | Prisma.PreorderOrderByWithRelationInput[]
+  cursor?: Prisma.PreorderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PreorderScalarFieldEnum | Prisma.PreorderScalarFieldEnum[]
+}
+
+/**
+ * School.orderCounters
+ */
+export type School$orderCountersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderCounter
+   */
+  select?: Prisma.OrderCounterSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderCounter
+   */
+  omit?: Prisma.OrderCounterOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderCounterInclude<ExtArgs> | null
+  where?: Prisma.OrderCounterWhereInput
+  orderBy?: Prisma.OrderCounterOrderByWithRelationInput | Prisma.OrderCounterOrderByWithRelationInput[]
+  cursor?: Prisma.OrderCounterWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderCounterScalarFieldEnum | Prisma.OrderCounterScalarFieldEnum[]
 }
 
 /**

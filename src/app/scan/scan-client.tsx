@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { formatMoney, parseAmount } from "@/lib/money";
 import type { DailySpend } from "@/lib/ledger";
 import { CardScanner } from "@/components/card-scanner";
-import { describeLines } from "@/lib/preorder-format";
+import {
+  describeLines,
+  describeLinesDetailed,
+  orderLabel,
+} from "@/lib/preorder-format";
 import { OrderComposer, type ComposerLine } from "@/components/order-composer";
 import {
   lookupCard,
@@ -192,11 +196,11 @@ function OrderBuilder({
     setBusy(false);
     if (result.ok) {
       setPlaced(
-        `${describeLines(result.summary.items)} — ${formatMoney(
-          result.summary.total
-        )} paid, for ${result.summary.dayLabel}${
-          result.summary.pickup ? ` · ${result.summary.pickup}` : ""
-        }.`
+        `Order ${orderLabel(result.summary.orderNumber)} — ${describeLines(
+          result.summary.items
+        )} — ${formatMoney(result.summary.total)} paid, for ${
+          result.summary.dayLabel
+        }${result.summary.pickup ? ` · ${result.summary.pickup}` : ""}.`
       );
     } else {
       setError(result.error);
@@ -359,9 +363,18 @@ function OrderBuilder({
               className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-emerald-100 pt-2 first:border-0 first:pt-0"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-emerald-900">
-                  {describeLines(order.items)}
+                <p className="text-sm font-bold text-emerald-900">
+                  Order {orderLabel(order.orderNumber)}
+                  {order.pickupLabel ? ` — ${order.pickupLabel}` : ""}
                 </p>
+                <p className="text-sm font-medium text-emerald-900">
+                  {describeLinesDetailed(order.items)}
+                </p>
+                {order.notes && (
+                  <p className="text-sm font-medium text-amber-800">
+                    Note: {order.notes}
+                  </p>
+                )}
                 <p className="text-xs text-emerald-700">
                   Paid {formatMoney(order.total)} ·{" "}
                   {order.source === "KIOSK"

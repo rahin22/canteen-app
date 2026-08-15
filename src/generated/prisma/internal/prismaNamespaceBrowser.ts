@@ -56,6 +56,7 @@ export const ModelName = {
   ChildRegistration: 'ChildRegistration',
   VerificationCode: 'VerificationCode',
   School: 'School',
+  OrderCounter: 'OrderCounter',
   PickupSlot: 'PickupSlot',
   Setting: 'Setting',
   Card: 'Card',
@@ -159,6 +160,15 @@ export const SchoolScalarFieldEnum = {
 export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
+export const OrderCounterScalarFieldEnum = {
+  schoolId: 'schoolId',
+  serviceDate: 'serviceDate',
+  issued: 'issued'
+} as const
+
+export type OrderCounterScalarFieldEnum = (typeof OrderCounterScalarFieldEnum)[keyof typeof OrderCounterScalarFieldEnum]
+
+
 export const PickupSlotScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
@@ -255,8 +265,11 @@ export const PreorderScalarFieldEnum = {
   studentId: 'studentId',
   placedById: 'placedById',
   source: 'source',
+  orderNumber: 'orderNumber',
+  schoolId: 'schoolId',
   items: 'items',
   total: 'total',
+  notes: 'notes',
   status: 'status',
   serviceDate: 'serviceDate',
   pickupSlotId: 'pickupSlotId',

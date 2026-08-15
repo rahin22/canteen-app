@@ -402,6 +402,7 @@ export const ModelName = {
   ChildRegistration: 'ChildRegistration',
   VerificationCode: 'VerificationCode',
   School: 'School',
+  OrderCounter: 'OrderCounter',
   PickupSlot: 'PickupSlot',
   Setting: 'Setting',
   Card: 'Card',
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "school" | "pickupSlot" | "setting" | "card" | "modifierGroup" | "modifierOption" | "menuItem" | "transaction" | "preorder"
+    modelProps: "user" | "photo" | "childRegistration" | "verificationCode" | "school" | "orderCounter" | "pickupSlot" | "setting" | "card" | "modifierGroup" | "modifierOption" | "menuItem" | "transaction" | "preorder"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -796,6 +797,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SchoolCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SchoolCountAggregateOutputType> | number
+        }
+      }
+    }
+    OrderCounter: {
+      payload: Prisma.$OrderCounterPayload<ExtArgs>
+      fields: Prisma.OrderCounterFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OrderCounterFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OrderCounterFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        findFirst: {
+          args: Prisma.OrderCounterFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OrderCounterFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        findMany: {
+          args: Prisma.OrderCounterFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>[]
+        }
+        create: {
+          args: Prisma.OrderCounterCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        createMany: {
+          args: Prisma.OrderCounterCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OrderCounterCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>[]
+        }
+        delete: {
+          args: Prisma.OrderCounterDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        update: {
+          args: Prisma.OrderCounterUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        deleteMany: {
+          args: Prisma.OrderCounterDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OrderCounterUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OrderCounterUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>[]
+        }
+        upsert: {
+          args: Prisma.OrderCounterUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderCounterPayload>
+        }
+        aggregate: {
+          args: Prisma.OrderCounterAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrderCounter>
+        }
+        groupBy: {
+          args: Prisma.OrderCounterGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderCounterGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OrderCounterCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderCounterCountAggregateOutputType> | number
         }
       }
     }
@@ -1507,6 +1582,15 @@ export const SchoolScalarFieldEnum = {
 export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
+export const OrderCounterScalarFieldEnum = {
+  schoolId: 'schoolId',
+  serviceDate: 'serviceDate',
+  issued: 'issued'
+} as const
+
+export type OrderCounterScalarFieldEnum = (typeof OrderCounterScalarFieldEnum)[keyof typeof OrderCounterScalarFieldEnum]
+
+
 export const PickupSlotScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
@@ -1603,8 +1687,11 @@ export const PreorderScalarFieldEnum = {
   studentId: 'studentId',
   placedById: 'placedById',
   source: 'source',
+  orderNumber: 'orderNumber',
+  schoolId: 'schoolId',
   items: 'items',
   total: 'total',
+  notes: 'notes',
   status: 'status',
   serviceDate: 'serviceDate',
   pickupSlotId: 'pickupSlotId',
@@ -2029,6 +2116,7 @@ export type GlobalOmitConfig = {
   childRegistration?: Prisma.ChildRegistrationOmit
   verificationCode?: Prisma.VerificationCodeOmit
   school?: Prisma.SchoolOmit
+  orderCounter?: Prisma.OrderCounterOmit
   pickupSlot?: Prisma.PickupSlotOmit
   setting?: Prisma.SettingOmit
   card?: Prisma.CardOmit

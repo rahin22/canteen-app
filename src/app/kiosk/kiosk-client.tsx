@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/money";
 import { CardScanner } from "@/components/card-scanner";
 import { OrderComposer, type ComposerLine } from "@/components/order-composer";
-import { describeLines } from "@/lib/preorder-format";
+import { describeLines, orderLabel } from "@/lib/preorder-format";
 import {
   kioskLookup,
   kioskPlaceOrder,
@@ -82,20 +82,28 @@ export default function KioskClient({ cutoffLabel }: { cutoffLabel: string }) {
           <div className="mt-10 rounded-3xl border-2 border-emerald-300 bg-emerald-50 p-10 text-center">
             <div className="text-7xl">✅</div>
             <h2 className="mt-4 text-4xl font-bold text-emerald-900">
-              Order placed
+              Order {orderLabel(mode.placed.orderNumber)}
+              {mode.placed.pickupLabel ? ` — ${mode.placed.pickupLabel}` : ""}
             </h2>
+            {/* The number is the thing to remember, so it gets its own line
+                at a size that reads from arm's length. */}
+            {mode.placed.orderNumber !== null && (
+              <p className="mt-1 text-lg text-emerald-700">
+                Tell the canteen this number when you collect.
+              </p>
+            )}
             <p className="mt-2 text-2xl text-emerald-800">
               {mode.student.name.split(" ")[0]} — {describeLines(mode.placed.items)}
-            </p>
-            <p className="mt-4 text-xl text-emerald-800">
-              <span className="font-bold">{formatMoney(mode.placed.total)}</span>{" "}
-              paid from your card. Just pick it up at the canteen.
             </p>
             {mode.placed.pickup && (
               <p className="mt-3 text-2xl font-bold text-emerald-900">
                 {mode.placed.dayLabel} · {mode.placed.pickup}
               </p>
             )}
+            <p className="mt-4 text-xl text-emerald-800">
+              <span className="font-bold">{formatMoney(mode.placed.total)}</span>{" "}
+              paid from your card. Just pick it up at the canteen.
+            </p>
             <p className="mt-1 text-lg text-emerald-700">
               {formatMoney(mode.student.balance)} left on your card.
             </p>
@@ -217,7 +225,10 @@ function OrderStep({
               className="mt-2 flex flex-wrap items-center justify-between gap-2"
             >
               <span className="text-lg text-emerald-900">
-                {describeLines(order.items)} · {formatMoney(order.total)}
+                <span className="font-bold">
+                  Order {orderLabel(order.orderNumber)}
+                </span>{" "}
+                — {describeLines(order.items)} · {formatMoney(order.total)}
                 <span className="block text-base text-emerald-700">
                   {[order.dayLabel, order.pickup].filter(Boolean).join(" · ")}
                 </span>

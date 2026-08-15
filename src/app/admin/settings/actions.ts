@@ -87,6 +87,50 @@ export async function setSchoolActive(schoolId: string, active: boolean) {
   revalidateSchools();
 }
 
+/**
+ * Deletes a school that never got going — added by mistake, or set up and
+ * then abandoned.
+ *
+ * Only while nobody is attached to it. Once a school has staff, students or
+ * registrations, deleting would orphan people rather than records: their
+ * accounts survive with no school, which is the one state the ordering code
+ * treats as "shows nothing". Retiring covers that case properly, so this
+ * refuses and says so.
+ *
+ * Its menu, choice groups and pick-up windows go with it — none of them mean
+ * anything without the school, and orders keep their own snapshot regardless.
+ */
+export async function deleteSchool(schoolId: string): Promise<SchoolState> {
+  await requireRole("ADMIN");
+  const school = await prisma.school.findUnique({
+    where: { id: schoolId },
+    select: {
+      name: true,
+      _count: { select: { users: true, registrations: true, preorders: true } },
+    },
+  });
+  if (!school) return { error: "That school has already been removed." };
+
+  const attached =
+    school._count.users + school._count.registrations + school._count.preorders;
+  if (attached > 0) {
+    const parts = [
+      school._count.users && `${school._count.users} account${school._count.users === 1 ? "" : "s"}`,
+      school._count.registrations &&
+        `${school._count.registrations} registration${school._count.registrations === 1 ? "" : "s"}`,
+      school._count.preorders &&
+        `${school._count.preorders} order${school._count.preorders === 1 ? "" : "s"}`,
+    ].filter(Boolean);
+    return {
+      error: `${school.name} still has ${parts.join(" and ")}, so it can't be deleted. Retire it instead — it stops taking new students and orders, and everything stays where it belongs.`,
+    };
+  }
+
+  await prisma.school.delete({ where: { id: schoolId } });
+  revalidateSchools();
+  return { success: `Deleted ${school.name}.` };
+}
+
 function revalidateSchools() {
   revalidatePath("/admin/settings");
   revalidatePath("/admin/menu");

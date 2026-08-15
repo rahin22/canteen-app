@@ -53,8 +53,9 @@ export default async function MenuPage() {
       <p className="mb-1 font-medium text-indigo-600">{schoolName}</p>
       <p className="mb-6 text-sm text-slate-500">
         These items appear as tap-buttons on the till and in preordering, for
-        this school only. Deactivate items instead of deleting them so past
-        purchases keep their history.
+        this school only. Hide an item to take it off the till for now; delete
+        it to remove it for good — either way, past sales and orders keep their
+        own record of what was bought.
       </p>
       <MenuManager
         schoolId={schoolId}
@@ -63,6 +64,7 @@ export default async function MenuPage() {
           name: i.name,
           price: i.price,
           category: i.category,
+          description: i.description,
           active: i.active,
           soldOut: i.soldOut,
         }))}

@@ -6,10 +6,13 @@ import { adminCancelOrder } from "./actions";
 export function CancelOrderButton({
   preorderId,
   studentName,
+  orderLabel,
   total,
 }: {
   preorderId: string;
   studentName: string;
+  /** e.g. "#3" — named in the confirmation so nobody voids the wrong ticket. */
+  orderLabel: string;
   /** Formatted for the confirmation — this puts real money back on the card. */
   total: string;
 }) {
@@ -21,7 +24,7 @@ export function CancelOrderButton({
       onClick={() => {
         if (
           !confirm(
-            `Cancel ${studentName}'s order and refund ${total} to their card?`
+            `Cancel order ${orderLabel} — ${studentName} — and refund ${total} to their card?`
           )
         )
           return;

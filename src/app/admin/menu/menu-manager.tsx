@@ -5,6 +5,7 @@ import { formatMoney } from "@/lib/money";
 import {
   createMenuItem,
   updateMenuItem,
+  deleteMenuItem,
   setMenuItemActive,
   setMenuItemSoldOut,
   type MenuActionState,
@@ -15,6 +16,8 @@ type Item = {
   name: string;
   price: number;
   category: string | null;
+  /** The "Includes chips" line shown under the name when ordering. */
+  description: string | null;
   active: boolean;
   /** Out of stock today — hidden from ordering, still on the menu. */
   soldOut: boolean;
@@ -55,6 +58,16 @@ export function MenuManager({
           <label className="mb-1 block text-xs font-medium text-slate-500">Category</label>
           <input name="category" placeholder="optional" className={inputCls + " w-full"} />
         </div>
+        <div className="w-full">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
+            Description
+          </label>
+          <input
+            name="description"
+            placeholder="optional — e.g. Includes chips and a drink"
+            className={inputCls + " w-full"}
+          />
+        </div>
         <button
           disabled={addPending}
           className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
@@ -82,6 +95,7 @@ export function MenuManager({
 
 function MenuRow({ item }: { item: Item }) {
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [state, formAction, pending] = useActionState<MenuActionState, FormData>(
     async (prev, fd) => {
       const result = await updateMenuItem(prev, fd);
@@ -113,6 +127,12 @@ function MenuRow({ item }: { item: Item }) {
           placeholder="category"
           className={inputCls + " w-28"}
         />
+        <input
+          name="description"
+          defaultValue={item.description || ""}
+          placeholder="description — e.g. Includes chips"
+          className={inputCls + " w-full"}
+        />
         <button
           disabled={pending}
           className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
@@ -133,11 +153,11 @@ function MenuRow({ item }: { item: Item }) {
 
   return (
     <div
-      className={`flex items-center justify-between rounded-xl border bg-white p-3 ${
+      className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-white p-3 ${
         item.active ? "border-slate-200" : "border-slate-200 opacity-50"
       }`}
     >
-      <div>
+      <div className="min-w-0">
         <p className="font-medium text-slate-900">
           {item.name}
           {item.category && (
@@ -155,8 +175,12 @@ function MenuRow({ item }: { item: Item }) {
           )}
         </p>
         <p className="text-sm text-slate-500">{formatMoney(item.price)}</p>
+        {item.description && (
+          <p className="text-sm text-slate-400">{item.description}</p>
+        )}
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setEditing(true)}
           className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
@@ -190,6 +214,25 @@ function MenuRow({ item }: { item: Item }) {
           className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
         >
           {item.active ? "Hide" : "Show"}
+        </button>
+        <button
+          disabled={togglePending}
+          onClick={() => {
+            if (
+              !confirm(
+                `Delete ${item.name} from the menu for good?\n\nPast sales and orders keep their own record of it, so nothing in your history changes. Hide it instead if you might bring it back.`
+              )
+            )
+              return;
+            setError(null);
+            startTransition(async () => {
+              const result = await deleteMenuItem(item.id);
+              if (result.error) setError(result.error);
+            });
+          }}
+          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+        >
+          Delete
         </button>
       </div>
     </div>

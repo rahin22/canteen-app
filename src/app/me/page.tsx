@@ -7,7 +7,7 @@ import { formatMoney } from "@/lib/money";
 import { onlineTopupsAvailable } from "@/lib/settings";
 import { getDailySpend } from "@/lib/ledger";
 import { pendingPreorders } from "@/lib/preorders";
-import { describeLines } from "@/lib/preorder-format";
+import { describeLines, orderLabel } from "@/lib/preorder-format";
 import { logout } from "@/app/login/actions";
 import { ShowCardButton } from "./show-card";
 
@@ -73,11 +73,23 @@ export default async function StudentHome() {
         <div className="mt-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-4">
           <p className="font-bold text-emerald-900">🥪 Waiting at the canteen</p>
           {pendingOrders.map((order) => (
-            <p key={order.id} className="mt-1 text-sm text-emerald-800">
-              {describeLines(order.items)} —{" "}
-              <span className="font-semibold">{formatMoney(order.total)}</span>{" "}
-              already paid, just pick it up
-            </p>
+            <div key={order.id} className="mt-2 text-sm text-emerald-800">
+              <p className="font-bold text-emerald-900">
+                Order {orderLabel(order.orderNumber)}
+                {order.pickupLabel ? ` — ${order.pickupLabel}` : ""}
+              </p>
+              {order.pickup && (
+                <p className="text-emerald-700">{order.pickup}</p>
+              )}
+              {order.notes && (
+                <p className="text-emerald-700">Note: {order.notes}</p>
+              )}
+              <p>
+                {describeLines(order.items)} —{" "}
+                <span className="font-semibold">{formatMoney(order.total)}</span>{" "}
+                already paid, just pick it up
+              </p>
+            </div>
           ))}
         </div>
       )}
